@@ -24,8 +24,8 @@ export default Vue.extend({
     }
   },
   mounted () {
-    axios.get(`${API_URL}/issues`).then(response => {
-      console.log(response)
+    axios.get(`/api/issues`).then(response => {
+      this.issues = response.data.issues;
     })
   }
 })

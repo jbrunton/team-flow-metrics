@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:lts-alpine
 WORKDIR "/app"
 
 RUN apk update && apk add yarn python g++ make && rm -rf /var/cache/apk/*
