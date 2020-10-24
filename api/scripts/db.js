@@ -1,15 +1,18 @@
-const connectionString = require('../database')({ database: 'postgres' });
-const { Client } = require('pg')
-const client = new Client({ connectionString: connectionString })
+// const connectionString = require('../database')({ database: 'postgres' });
+// const { Client } = require('pg')
+// const client = new Client({ connectionString: connectionString })
+
+const { createConnection } = require('typeorm')
+const ormconfig = require('../ormconfig');
 
 const commands = {
-  create: async (client) => {
-    console.log('creating database test...');
-    await client.query('CREATE DATABASE test');
+  create: async (connection) => {
+    console.log(`creating database ${ormconfig.database}...`);
+    await connection.query(`CREATE DATABASE ${ormconfig.database}`);
   },
-  drop: async (client) => {
-    console.log('dropping database test...');
-    await client.query('DROP DATABASE test');
+  drop: async (connection) => {
+    console.log(`dropping database ${ormconfig.database}...`);
+    await connection.query(`DROP DATABASE ${ormconfig.database}`);
   }
 }
 
@@ -24,21 +27,22 @@ if (!commands[command]) {
 }
 
 async function run() {
-  console.log('connecting to:', connectionString);
-
+  let connection;
   try {
-    await client.connect();
-    await commands[command](client);
+    const config = Object.assign({}, ormconfig, { database: 'postgres'});
+    connection = await createConnection(config);
+    //await connection.query(`CREATE DATABASE ${ormconfig.database}`);
+    //await connection.connect();
+    //await client.connect();
+    await commands[command](connection);
   }
   catch(e) {
     console.log(e.message);
     process.exit(1);
   }
   finally {
-    await client.end();
+    await connection.close();
   }
-
-  console.log('done')
 }
 
 run();

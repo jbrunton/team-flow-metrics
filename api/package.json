@@ -3,8 +3,8 @@
     "debug": "NODE_ENV=development node --inspect -r ts-node/register main.ts",
     "start": "ts-node src/index.ts",
     "test": "NODE_ENV=test jest",
-    "db:create": "NODE_ENV=development node scripts/db create",
-    "db:drop": "NODE_ENV=development node scripts/db drop"
+    "db:create": "NODE_ENV=development ts-node scripts/db create",
+    "db:drop": "NODE_ENV=development ts-node scripts/db drop"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

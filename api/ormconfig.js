@@ -1,10 +1,14 @@
-{
+if (!['development', 'test', 'production'].includes(process.env.NODE_ENV)) {
+   throw new Error(`Invalid NODE_ENV: ${process.env.NODE_ENV}`);
+}
+
+module.exports = {
    "type": "postgres",
    "host": "localhost",
    "port": 5432,
    "username": "postgres",
    "password": "postgres",
-   "database": "test",
+   "database": `metrics_${process.env.NODE_ENV}`,
    "synchronize": true,
    "logging": false,
    "entities": [
@@ -21,4 +25,4 @@
       "migrationsDir": "src/migration",
       "subscribersDir": "src/subscriber"
    }
-}
+};
