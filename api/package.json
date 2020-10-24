@@ -7,7 +7,8 @@
     "db:create": "ts-node scripts/db/create",
     "db:drop": "ts-node scripts/db/drop",
     "db:migrate": "npm run typeorm migration:run",
-    "db:revert": "npm run typeorm migration:revert"
+    "db:revert": "npm run typeorm migration:revert",
+    "db:seed": "ts-node database/seeds.ts"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
