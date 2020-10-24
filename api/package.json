@@ -3,8 +3,10 @@
     "debug": "NODE_ENV=development node --inspect -r ts-node/register main.ts",
     "start": "ts-node src/index.ts",
     "test": "NODE_ENV=test jest",
-    "db:create": "NODE_ENV=development ts-node scripts/db/create",
-    "db:drop": "NODE_ENV=development ts-node scripts/db/drop"
+    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
+    "db:create": "ts-node scripts/db/create",
+    "db:drop": "ts-node scripts/db/drop",
+    "db:migrate": "npm run typeorm migration:run"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

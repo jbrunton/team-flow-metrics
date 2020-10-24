@@ -9,8 +9,8 @@ module.exports = {
    "username": "postgres",
    "password": "postgres",
    "database": `metrics_${process.env.NODE_ENV}`,
-   "synchronize": true,
-   "logging": false,
+   "synchronize": false,
+   "logging": process.env.NODE_ENV == 'development',
    "entities": [
       "src/entity/**/*.ts"
    ],
