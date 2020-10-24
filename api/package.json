@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "debug": "NODE_ENV=development nodemon --inspect=0.0.0.0:9229 run.js",
+    "debug": "NODE_ENV=development nodemon --inspect=0.0.0.0:9229 main.js",
     "start": "node main.js",
     "test": "NODE_ENV=test jest"
   },
