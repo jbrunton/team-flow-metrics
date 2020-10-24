@@ -15,7 +15,7 @@ module.exports = {
       "src/entity/**/*.ts"
    ],
    "migrations": [
-      "src/migration/**/*.ts"
+      "database/migrations/**/*.ts"
    ],
    "subscribers": [
       "src/subscriber/**/*.ts"
