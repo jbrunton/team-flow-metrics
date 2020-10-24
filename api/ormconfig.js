@@ -12,7 +12,7 @@ module.exports = {
    "synchronize": false,
    "logging": process.env.NODE_ENV == 'development',
    "entities": [
-      "src/entity/**/*.ts"
+      "models/entities/**/*.ts"
    ],
    "migrations": [
       "database/migrations/**/*.ts"
