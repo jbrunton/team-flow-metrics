@@ -1,0 +1,21 @@
+name: test
+
+on:
+  push:
+    branches:
+    - develop
+  pull_request:
+
+jobs:
+
+  test-client:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+    - uses: actions/checkout@v2
+    - run: npm ci
+    - run: npm run test:unit
+    - run: npm run lint
+    - run: git diff --exit-code --name-only
