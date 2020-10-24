@@ -13,20 +13,19 @@
 
 <script lang="ts">
 import Vue from "vue";
-import axios from 'axios';
-import { API_URL } from '../config';
+import axios from "axios";
 
 export default Vue.extend({
   name: "Issues",
-  data () {
+  data() {
     return {
       issues: []
-    }
+    };
   },
-  mounted () {
+  mounted() {
     axios.get(`/api/issues`).then(response => {
       this.issues = response.data.issues;
-    })
+    });
   }
-})
+});
 </script>
