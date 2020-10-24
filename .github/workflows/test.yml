@@ -10,7 +10,11 @@ jobs:
 
   test-client:
     runs-on: ubuntu-latest
+    defaults:
+      working-directory: client
     steps:
     - uses: actions/checkout@v2
-    - run: cd client && npm install
-    - run: cd client && npm test:unit
+    - run: npm install
+    - run: npm run test:unit
+    - run: npm run lint
+    - run: git diff --exit-code --name-only
