@@ -11,7 +11,8 @@ jobs:
   test-client:
     runs-on: ubuntu-latest
     defaults:
-      working-directory: client
+      run:
+        working-directory: client
     steps:
     - uses: actions/checkout@v2
     - run: npm install
