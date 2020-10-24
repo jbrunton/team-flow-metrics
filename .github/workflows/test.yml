@@ -19,3 +19,13 @@ jobs:
     - run: npm run test:unit
     - run: npm run lint
     - run: git diff --exit-code --name-only
+
+  test-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+    - uses: actions/checkout@v2
+    - run: npm ci
+    - run: npm run test
