@@ -18,11 +18,34 @@ export class JiraClient {
   }
 
   async search(jql: string): Promise<Array<Issue>> {
+    console.log(`starting search: ${jql}`)
+    console.time(`search: ${jql}`)
     const connection = getConnection();
     const repo = connection.getRepository(Issue);
-    const jiraIssues = await this._client.issueSearch.searchForIssuesUsingJqlPost({ jql: jql })
-    return jiraIssues.issues.map(issue => repo.create({ key: issue.key, title: issue.fields.summary }))
-    //return jiraIssues;
-    //return [repo.create({ key: 'DEMO-101', title: 'Demo 101' })];
+
+    const results = [];
+    console.log('fetching page 1');
+    let result = await this._client.issueSearch.searchForIssuesUsingJqlPost({ jql: jql })
+    results.push(result);
+
+    const pages = Math.ceil(result.total / result.maxResults);
+
+    while (result.startAt + result.maxResults < result.total) {
+      const page = result.startAt / result.maxResults + 2;
+      console.log(`fetching page ${page} of ${pages}`);
+      result = await this._client.issueSearch.searchForIssuesUsingJqlPost({ jql, startAt: result.startAt + result.maxResults })
+      results.push(result);
+    }
+
+    const issues = [];
+
+    results.forEach(result => {
+      result.issues.forEach(issue => {
+        issues.push(repo.create({ key: issue.key, title: issue.fields.summary }))
+      });
+    })
+
+    console.timeEnd(`search: ${jql}`)
+    return issues;
   }
 }
