@@ -12,6 +12,11 @@ services:
       - ./api:/app
     environment:
       - API_PORT=5000
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+
     command: npm run debug
     depends_on:
       - postgres
@@ -34,12 +39,12 @@ services:
     build:
       context: ./nginx
     ports:
-      - "${NGINX_LOCAL_PORT:-3001}:80"
+      - "${NGINX_PORT:-3001}:80"
   
   postgres:
     image: postgres:12
     ports:
-      - 5432:5432
+      - "${POSTGRES_PORT:-5432}:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
