@@ -21,7 +21,8 @@ export class JiraClient {
     const connection = getConnection();
     const repo = connection.getRepository(Issue);
     const jiraIssues = await this._client.issueSearch.searchForIssuesUsingJqlPost({ jql: jql })
-    //return jiraIssues.map(issue => repo.create({ key: issue.key, title: issue.summary }))
-    return [repo.create({ key: 'DEMO-101', title: 'Demo 101' })];
+    return jiraIssues.issues.map(issue => repo.create({ key: issue.key, title: issue.fields.summary }))
+    //return jiraIssues;
+    //return [repo.create({ key: 'DEMO-101', title: 'Demo 101' })];
   }
 }

@@ -11,6 +11,7 @@ router.get('/', async (req, res) => {
   const issues = await client.search('project=LIST');
 
   res.json({
+    count: issues.length,
     issues: issues
   })
 })
