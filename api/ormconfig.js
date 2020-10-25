@@ -2,20 +2,17 @@ if (!['development', 'test', 'production'].includes(process.env.NODE_ENV)) {
    throw new Error(`Invalid NODE_ENV: ${process.env.NODE_ENV}`);
 }
 
-const entitiesDir = __dirname + "/models/entities/*.ts";
-console.log('entitiesDir:', entitiesDir)
-
-module.exports = {
+const config = {
    "type": "postgres",
-   "host": "postgres",
-   "port": 5432,
-   "username": "postgres",
-   "password": "postgres",
+   "host": process.env.POSTGRES_HOST || "postgres",
+   "port": process.env.POSTGRES_PORT || 5432,
+   "username": process.env.POSTGRES_USER || "postgres",
+   "password": process.env.POSTGRES_PASSWORD || "postgres",
    "database": `metrics_${process.env.NODE_ENV}`,
    "synchronize": false,
    "logging": process.env.NODE_ENV == 'development',
    "entities": [
-      entitiesDir
+      "models/entities/*.ts"
    ],
    "migrations": [
       "database/migrations/**/*.ts"
@@ -29,3 +26,5 @@ module.exports = {
       "subscribersDir": "src/subscriber"
    }
 };
+
+module.exports = config;

@@ -24,7 +24,8 @@ export const createApp = async function configure() {
   });
 
   console.log('Creating connection...');
-  await createConnection();
+  const connection = await createConnection();
+  console.log(`Connected to ${connection.options.host}:${connection.options.port}/${connection.options.database}`);
 
   return app;
 }
