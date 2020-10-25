@@ -1,6 +1,7 @@
 import { Client } from "jira.js";
 import { Issue } from "../../models/entities/issue";
 import { getConnection } from "typeorm";
+import { IssueAttributesBuilder } from "./issue_attributes_builder";
 
 export class JiraClient {
   _client: Client
@@ -38,10 +39,11 @@ export class JiraClient {
     }
 
     const issues = [];
+    const builder = new IssueAttributesBuilder();
 
     results.forEach(result => {
       result.issues.forEach(issue => {
-        issues.push(repo.create({ key: issue.key, title: issue.fields.summary }))
+        issues.push(repo.create(builder.build(issue)))
       });
     })
 
