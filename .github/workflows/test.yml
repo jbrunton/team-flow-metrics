@@ -22,10 +22,10 @@ jobs:
 
   test-api:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: api
     steps:
     - uses: actions/checkout@v2
-    - run: npm ci
-    - run: npm run test
+    - name: setup database
+      run: |
+        docker-compose run -e NODE_ENV=test api npm run db:create
+        docker-compose run -e NODE_ENV=test api npm run db:migrate
+    - run: docker-compose run api npm run test
