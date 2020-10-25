@@ -1,6 +1,7 @@
 module.exports = {
   // options...
   devServer: {
-    disableHostCheck: true
+    disableHostCheck: true,
+    progress: false
   }
 };
