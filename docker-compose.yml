@@ -16,6 +16,8 @@ services:
       - POSTGRES_PORT
       - POSTGRES_USER
       - POSTGRES_PASSWORD
+      - JIRA_USER
+      - JIRA_TOKEN
 
     command: npm run debug
     depends_on:

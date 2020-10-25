@@ -1,6 +1,6 @@
-const express = require('express')
+import * as express from 'express';
 const router = express.Router()
-const {getRepository, getMetadataArgsStorage} = require('typeorm')
+const {getRepository} = require('typeorm')
 const {Issue} = require('../models/entities/issue')
 
 
