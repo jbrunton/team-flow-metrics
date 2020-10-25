@@ -1,24 +1,14 @@
 import * as express from 'express';
-import { Client } from "jira.js";
+import { JiraClient } from "../datasources/jira/jira_client";
 
 const router = express.Router()
 const {getRepository} = require('typeorm')
 const {Issue} = require('../models/entities/issue')
 
 router.get('/', async (req, res) => {
-  const client = new Client({
-    host: "https://jbrunton.atlassian.net",
-    authentication: {
-      basic: {
-        username: process.env.JIRA_USER,
-        apiToken: process.env.JIRA_TOKEN
-      }
-    }
-  });
+  const client = new JiraClient();
 
-  const issues = await client.issueSearch.searchForIssuesUsingJqlPost({
-    jql: 'project=LIST'
-  })
+  const issues = await client.search('project=LIST');
 
   res.json({
     issues: issues
