@@ -5,11 +5,14 @@ const {Issue} = require('../models/entities/issue')
 
 
 router.get('/', async (req, res) => {
-  // console.log('metadata:', getMetadataArgsStorage()); //<- All the entities are here
-  // console.log("getRepository('Issue'):", getRepository('Issue')); //<- This works
-  // console.log("getRepository(Issue):", getRepository(Issue)); //<- But this will raise the error
+  let issues = await getRepository(Issue).find()
 
-  const issues = await getRepository(Issue).find()
+  if (issues.length == 0) {
+    await getRepository(Issue).save({ key: 'DEMO-101', title: 'Demo Issue 101' });
+    await getRepository(Issue).save({ key: 'DEMO-102', title: 'Demo Issue 102' });
+    issues = await getRepository(Issue).find()
+  }
+
   res.json({
     issues: issues
   })
