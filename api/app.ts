@@ -12,7 +12,7 @@ export const createApp = async function configure() {
   app.use(bodyParser.json());
   
   console.log('Configuring routers...');
-  glob.sync('./routers/*_router.js').forEach(function(file) {
+  glob.sync('./routers/*_router.{js,ts}').forEach(function(file) {
     const { routerPath, router, environments } = require(path.resolve(file));
     const applyRouter = !environments || environments.includes(process.env.NODE_ENV);
     if (applyRouter) {
