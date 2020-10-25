@@ -16,7 +16,7 @@ describe('issues_router', () => {
     await getConnection().close();
   })
 
-  afterEach(() => {
+  beforeEach(() => {
     const connection = getConnection();
     const entities = connection.entityMetadatas;
 
