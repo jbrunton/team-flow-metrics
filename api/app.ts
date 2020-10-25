@@ -7,10 +7,10 @@ import "reflect-metadata";
 
 const { createConnection } = require('typeorm')
 
-const app = express()
-app.use(bodyParser.json());
-
-async function configure() {
+export const createApp = async function configure() {
+  const app = express()
+  app.use(bodyParser.json());
+  
   console.log('Configuring routers...');
   glob.sync('./routers/*_router.js').forEach(function(file) {
     const { routerPath, router, environments } = require(path.resolve(file));
@@ -25,8 +25,6 @@ async function configure() {
 
   console.log('Creating connection...');
   await createConnection();
+
+  return app;
 }
-
-module.exports = app
-
-configure();

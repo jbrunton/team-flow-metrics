@@ -2,6 +2,9 @@ if (!['development', 'test', 'production'].includes(process.env.NODE_ENV)) {
    throw new Error(`Invalid NODE_ENV: ${process.env.NODE_ENV}`);
 }
 
+const entitiesDir = __dirname + "/models/entities/*.ts";
+console.log('entitiesDir:', entitiesDir)
+
 module.exports = {
    "type": "postgres",
    "host": "localhost",
@@ -12,7 +15,7 @@ module.exports = {
    "synchronize": false,
    "logging": process.env.NODE_ENV == 'development',
    "entities": [
-      "models/entities/**/*.ts"
+      entitiesDir
    ],
    "migrations": [
       "database/migrations/**/*.ts"

@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import {createConnection} from "typeorm";
-import {Issue} from "../models/entities/Issue";
+import {Issue} from "../models/entities/issue";
 
 createConnection().then(async connection => {
     const issue = new Issue();
