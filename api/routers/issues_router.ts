@@ -14,6 +14,7 @@ router.get('/', async (req, res) => {
   }
 
   res.json({
+    count: issues.length,
     issues: issues
   })
 })

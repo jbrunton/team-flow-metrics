@@ -7,7 +7,7 @@ import "reflect-metadata";
 
 const { createConnection } = require('typeorm')
 
-export const createApp = async function configure() {
+export async function createApp() {
   const app = express()
   app.use(bodyParser.json());
   

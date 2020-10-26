@@ -7,8 +7,12 @@ const {Issue} = require('../models/entities/issue')
 
 router.get('/', async (req, res) => {
   const client = new JiraClient();
+  const repo = getRepository(Issue);
 
   const issues = await client.search('project=LIST');
+
+  await repo.clear();
+  await repo.save(issues);
 
   res.json({
     count: issues.length,
@@ -17,6 +21,6 @@ router.get('/', async (req, res) => {
 })
 
 module.exports = {
-  routerPath: '/search',
+  routerPath: '/sync',
   router: router
 }
