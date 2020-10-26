@@ -35,6 +35,7 @@ describe('issues_router', () => {
     
       expect(res.statusCode).toEqual(200)
       expect(res.body).toEqual({
+        count: 2,
         issues: [
           issue1,
           issue2
