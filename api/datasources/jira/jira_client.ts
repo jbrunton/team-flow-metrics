@@ -26,17 +26,17 @@ export class JiraClient {
 
     const results = [];
     console.log('fetching page 1');
-    let result = await this._client.issueSearch.searchForIssuesUsingJqlPost({ jql: jql })
+    let result = await this._client.issueSearch.searchForIssuesUsingJqlPost({ jql: jql, expand: ['changelog'] })
     results.push(result);
 
     const pages = Math.ceil(result.total / result.maxResults);
 
-    while (result.startAt + result.maxResults < result.total) {
-      const page = result.startAt / result.maxResults + 2;
-      console.log(`fetching page ${page} of ${pages}`);
-      result = await this._client.issueSearch.searchForIssuesUsingJqlPost({ jql, startAt: result.startAt + result.maxResults })
-      results.push(result);
-    }
+    // while (result.startAt + result.maxResults < result.total) {
+    //   const page = result.startAt / result.maxResults + 2;
+    //   console.log(`fetching page ${page} of ${pages}`);
+    //   result = await this._client.issueSearch.searchForIssuesUsingJqlPost({ jql, startAt: result.startAt + result.maxResults })
+    //   results.push(result);
+    // }
 
     const issues = [];
     const builder = new IssueAttributesBuilder();
