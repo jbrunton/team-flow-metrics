@@ -30,19 +30,22 @@ export class IssueAttributesBuilder {
 }
 
 function getStatusChanges(json): Array<StatusChange> {
+  // TODO: What if changelog.total > changelog.maxResults? Are all entries always returned?
   return json.changelog.histories
     .map(event => {
-      const statusChanges = event.items.filter(item => item.field == "status");
-      if (!statusChanges.length) {
-        return [];
+      const statusChange = event.items.find(item => item.field == "status");
+      if (!statusChange) {
+        return null;
       }
       return {
         date: moment(event.created),
-        status: statusChanges[0].toString
+        status: statusChange.toString
       }
     })
     .filter(event => event)
-    .sort((e1, e2) => e1.date.diff(e2.date));
+    .sort((e1, e2) => {
+      e1.date.diff(e2.date)
+    });
 }
 
 function getStartedDate(statusChanges: Array<StatusChange>): Moment {
