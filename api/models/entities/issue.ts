@@ -12,4 +12,9 @@ export class Issue {
     @Column()
     title: string;
 
+    @Column("timestamp")
+    started: Date;
+
+    @Column("timestamp")
+    completed: Date;
 }

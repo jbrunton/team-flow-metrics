@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "db:create": "docker-compose run -e NODE_ENV=development api npm run db:create",
+    "db:reset": "docker-compose run -e NODE_ENV=development api npm run db:reset"
+  }
+}
