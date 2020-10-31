@@ -1,7 +1,7 @@
 import "reflect-metadata";
 const request = require('supertest')
-const { createApp } = require('../../app')
-const { Issue } = require('../../models/entities/issue')
+const { createApp } = require('../../../app')
+const { Issue } = require('../../../models/entities/issue')
 
 const { getConnection, getRepository } = require('typeorm')
 

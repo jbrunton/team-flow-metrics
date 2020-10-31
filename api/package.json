@@ -1,7 +1,8 @@
 {
   "scripts": {
     "debug": "NODE_ENV=development nodemon --ext 'ts,js,json' --inspect --exec 'ts-node main.ts'",
-    "test": "NODE_ENV=test jest",
+    "test:unit": "NODE_ENV=test jest -c jest.config.unit.js",
+    "test:integration": "NODE_ENV=test jest -c jest.config.integration.js",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
     "db:create": "ts-node scripts/db/create",
     "db:drop": "ts-node scripts/db/drop",
