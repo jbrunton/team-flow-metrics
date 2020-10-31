@@ -120,18 +120,7 @@ describe('IssueAttributesBuilder', () => {
           summary: "Demo Issue 101"
         },
         changelog: {
-          histories: [
-            {
-              created: "2020-01-01T10:00:00.000+0100",
-              items: [
-                {
-                  "field": "Sprint",
-                  "fromString": "",
-                  "toString": "Sprint 10"
-                }
-              ]
-            }
-          ]
+          histories: []
         }
       };
   
