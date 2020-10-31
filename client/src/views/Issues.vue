@@ -26,7 +26,9 @@
         <td>{{ issue.key }}</td>
         <td>{{ issue.title }}</td>
         <td>{{ issue.started ? moment(issue.started).toString() : null }}</td>
-        <td>{{ issue.completed ? moment(issue.completed).toString() : null }}</td>
+        <td>
+          {{ issue.completed ? moment(issue.completed).toString() : null }}
+        </td>
         <td>{{ issue.cycleTime ? issue.cycleTime.toFixed(2) : null }}</td>
       </tr>
     </table>
