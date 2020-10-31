@@ -17,4 +17,7 @@ export class Issue {
 
     @Column("timestamp")
     completed: Date;
+
+    @Column()
+    cycleTime: number
 }

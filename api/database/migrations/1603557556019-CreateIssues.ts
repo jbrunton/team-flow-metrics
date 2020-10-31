@@ -10,6 +10,7 @@ export class CreateIssues1603557556019 implements MigrationInterface {
             "title" character varying NOT NULL,
             "started" timestamp,
             "completed" timestamp,
+            "cycleTime" real,
             CONSTRAINT "PK_9d8ecbbeff46229c700f0449257" PRIMARY KEY ("id")
         )`);
     }
