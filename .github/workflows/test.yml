@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  test-client:
+  unit-test-client:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -20,7 +20,17 @@ jobs:
     - run: npm run lint
     - run: git diff --exit-code --name-only
 
-  test-api:
+  unit-test-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+    - uses: actions/checkout@v2
+    - run: npm ci
+    - run: npm run test:unit
+
+  integration-test-api:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
