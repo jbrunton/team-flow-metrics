@@ -7,7 +7,8 @@
     "db:drop": "ts-node scripts/db/drop",
     "db:migrate": "npm run typeorm migration:run",
     "db:revert": "npm run typeorm migration:revert",
-    "db:reset": "npm run db:drop && npm run db:create && npm run db:migrate",
+    "db:setup": "npm run db:create && npm run db:migrate",
+    "db:reset": "npm run db:drop && npm run db:setup",
     "db:seed": "ts-node database/seeds.ts"
   },
   "dependencies": {

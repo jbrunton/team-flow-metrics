@@ -25,7 +25,5 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup database
-      run: |
-        docker-compose run -e NODE_ENV=test api npm run db:create
-        docker-compose run -e NODE_ENV=test api npm run db:migrate
+      run: NODE_ENV=test npm run db:setup
     - run: docker-compose run api npm run test
