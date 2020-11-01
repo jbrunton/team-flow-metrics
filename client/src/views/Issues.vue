@@ -25,11 +25,9 @@
       <tr v-for="issue in issues" v-bind:key="issue.key">
         <td>{{ issue.key }}</td>
         <td>{{ issue.title }}</td>
-        <td>{{ issue.started ? moment(issue.started).toString() : null }}</td>
-        <td>
-          {{ issue.completed ? moment(issue.completed).toString() : null }}
-        </td>
-        <td>{{ issue.cycleTime ? issue.cycleTime.toFixed(2) : null }}</td>
+        <td>{{ formatDate(issue.started) }}</td>
+        <td>{{ formatDate(issue.completed) }}</td>
+        <td>{{ formatNumber(issue.cycleTime) }}</td>
       </tr>
     </table>
   </div>
@@ -53,7 +51,19 @@ export default Vue.extend({
     });
   },
   methods: {
-    moment: moment
+    moment: moment,
+    formatDate(date) {
+      if (!date) {
+        return "-";
+      }
+      return moment(date).format("DD MMM YYYY hh:mm Z");
+    },
+    formatNumber(number) {
+      if (!number) {
+        return "-";
+      }
+      return number.toFixed(2);
+    }
   }
 });
 </script>
