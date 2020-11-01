@@ -2,14 +2,18 @@
   "scripts": {
     "db:create": "docker-compose run -e NODE_ENV api npm run db:create",
     "db:setup": "docker-compose run -e NODE_ENV api npm run db:setup",
-    "db:reset": "docker-compose run -e NODE_ENV api npm run db:reset"
+    "db:reset": "docker-compose run -e NODE_ENV api npm run db:reset",
+    "client:lint": "cd client && npm run lint",
+    "client:lint:check": "cd client && npm run lint:check",
+    "lint": "npm run client:lint",
+    "lint:check": "npm run client:lint:check"
   },
   "devDependencies": {
     "husky": "^4.3.0"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "cd client && npm run lint:check"
+      "pre-commit": "npm run lint:check"
     }
   }
 }
