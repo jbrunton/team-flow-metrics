@@ -17,21 +17,13 @@ describe('issues_router', () => {
   })
 
   beforeEach(async () => {
-    console.log('deleting data')
-    const repository = getRepository(Issue);
-    await repository.query(`DELETE FROM issues`);
-    const count = await repository.count();
-    console.log('count:', count);
+    const connection = getConnection();
+    const entities = connection.entityMetadatas;
 
-    const issues = await getRepository(Issue).find()
-    console.log('issues.length:', issues.length);
-    // const connection = getConnection();
-    // const entities = connection.entityMetadatas;
-
-    // entities.forEach(async (entity) => {
-    //   const repository = connection.getRepository(entity.name);
-    //   await repository.query(`DELETE FROM ${entity.tableName}`);
-    // });
+    entities.forEach(async (entity) => {
+      const repository = connection.getRepository(entity.name);
+      await repository.query(`DELETE FROM ${entity.tableName}`);
+    });
   })
 
   it('should return a list of issues', async () => {
