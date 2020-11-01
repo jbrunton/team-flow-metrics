@@ -72,6 +72,44 @@ describe('IssueAttributesBuilder', () => {
   
       expect(issue.started).toEqual(new Date("2020-01-02T09:00:00.000Z"))
     })
+
+    it('ignores events without status changes', () => {
+      // Note: this test includes two events in order to test the sort function
+      const json = {
+        key: 'DEMO-101',
+        fields: {
+          summary: "Demo Issue 101"
+        },
+        changelog: {
+          histories: [
+            {
+              created: "2020-01-01T10:00:00.000+0100",
+              items: [
+                {
+                  "field": "Sprint",
+                  "fromString": "",
+                  "toString": "Sprint 10"
+                }
+              ]
+            },
+            {
+              created: "2020-01-01T10:00:00.000+0100",
+              items: [
+                {
+                  "field": "Sprint",
+                  "fromString": "Sprint 10",
+                  "toString": "Sprint 11"
+                }
+              ]
+            }
+          ]
+        }
+      };
+  
+      const issue = new IssueAttributesBuilder().build(json);
+  
+      expect(issue.started).toBeNull();
+    })
   })
 
   describe('#completed', () => {
