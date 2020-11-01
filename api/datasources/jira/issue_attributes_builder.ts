@@ -43,9 +43,7 @@ function getStatusChanges(json): Array<StatusChange> {
       }
     })
     .filter(event => event)
-    .sort((e1, e2) => {
-      e1.date.diff(e2.date)
-    });
+    .sort((e1, e2) => e1.date.diff(e2.date));
 }
 
 function getStartedDate(statusChanges: Array<StatusChange>): Moment {
