@@ -16,14 +16,22 @@ describe('issues_router', () => {
     await getConnection().close();
   })
 
-  beforeEach(() => {
-    const connection = getConnection();
-    const entities = connection.entityMetadatas;
+  beforeEach(async () => {
+    console.log('deleting data')
+    const repository = getRepository(Issue);
+    await repository.query(`DELETE FROM issues`);
+    const count = await repository.count();
+    console.log('count:', count);
 
-    entities.forEach(async (entity) => {
-      const repository = connection.getRepository(entity.name);
-      await repository.query(`DELETE FROM ${entity.tableName}`);
-    });
+    const issues = await getRepository(Issue).find()
+    console.log('issues.length:', issues.length);
+    // const connection = getConnection();
+    // const entities = connection.entityMetadatas;
+
+    // entities.forEach(async (entity) => {
+    //   const repository = connection.getRepository(entity.name);
+    //   await repository.query(`DELETE FROM ${entity.tableName}`);
+    // });
   })
 
   it('should return a list of issues', async () => {
@@ -33,14 +41,14 @@ describe('issues_router', () => {
     const res = await request(app)
       .get('/issues')
     
-      expect(res.statusCode).toEqual(200)
-      expect(res.body).toEqual({
-        count: 2,
-        issues: [
-          issue1,
-          issue2
-        ]
-      })
+    expect(res.statusCode).toEqual(200)
+    expect(res.body).toEqual({
+      count: 2,
+      issues: [
+        issue1,
+        issue2
+      ]
+    })
   })
 })
 
