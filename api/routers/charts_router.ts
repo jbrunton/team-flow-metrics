@@ -3,10 +3,7 @@ const moment = require('moment');
 const router = express.Router()
 const {getRepository} = require('typeorm')
 const {Issue} = require('../models/entities/issue')
-
-function formatDate(date: Date): string {
-  return `Date${moment(date).format("(YYYY, M, D, h, m)")}`;
-}
+const {formatDate} = require('../helpers/charts_helper');
 
 router.get('/scatterplot', async (req, res) => {
   let issues = await getRepository(Issue).find()

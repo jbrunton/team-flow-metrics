@@ -16,7 +16,7 @@ describe('issues_router', () => {
     await getConnection().close();
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const connection = getConnection();
     const entities = connection.entityMetadatas;
 
@@ -33,14 +33,14 @@ describe('issues_router', () => {
     const res = await request(app)
       .get('/issues')
     
-      expect(res.statusCode).toEqual(200)
-      expect(res.body).toEqual({
-        count: 2,
-        issues: [
-          issue1,
-          issue2
-        ]
-      })
+    expect(res.statusCode).toEqual(200)
+    expect(res.body).toEqual({
+      count: 2,
+      issues: [
+        issue1,
+        issue2
+      ]
+    })
   })
 })
 
