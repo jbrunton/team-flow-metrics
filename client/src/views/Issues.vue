@@ -3,7 +3,6 @@
     <h1>Issues</h1>
 
     <b-table :data="issues" :columns="columns"></b-table>
-
   </div>
 </template>
 
@@ -18,11 +17,11 @@ export default Vue.extend({
     return {
       issues: [],
       columns: [
-        { field: 'key', label: 'Key' },
-        { field: 'title', label: 'Title' },
-        { field: 'started', label: 'Started' },
-        { field: 'completed', label: 'Completed' },
-        { field: 'cycleTime', label: 'Cycle Time' }
+        { field: "key", label: "Key" },
+        { field: "title", label: "Title" },
+        { field: "started", label: "Started" },
+        { field: "completed", label: "Completed" },
+        { field: "cycleTime", label: "Cycle Time" }
       ]
     };
   },
