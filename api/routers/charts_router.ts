@@ -10,6 +10,35 @@ function formatDate(date: Date): string {
 
 router.get('/scatterplot', async (req, res) => {
   let issues = await getRepository(Issue).find()
+  const chartOpts = {
+    seriesType: "scatter",
+    interpolateNulls: true,
+    series: {
+      1: {
+        type: "steppedArea",
+        color: "#f44336",
+        areaOpacity: 0
+      },
+      2: {
+        type: "steppedArea",
+        color: "#f44336",
+        areaOpacity: 0,
+        lineDashStyle: [
+          4,
+          4
+        ]
+      }
+    },
+    legend: {
+      position: "none"
+    },
+    chartArea: {
+      width: "90%",
+      height: "80%",
+      top: "5%"
+    },
+    height: 500
+  };
   const cols = [
     {
       label: "completed_time",
@@ -31,6 +60,7 @@ router.get('/scatterplot', async (req, res) => {
       };
     })
   res.json({
+    chartOpts: chartOpts,
     chartData: {
       cols: cols,
       rows: rows

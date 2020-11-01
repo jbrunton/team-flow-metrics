@@ -16,14 +16,15 @@ export default Vue.extend({
   name: "Issues",
   data() {
     return {
+      chartOps: {},
       chartData: []
     };
   },
   mounted() {
-    //"/api/charts/scatterplot"
     axios.get("/api/charts/scatterplot").then(response => {
       console.log(response.data);
       this.chartData = response.data.chartData;
+      this.chartOpts = response.data.chartOpts;
       this.loadCharts();
     });
   },
@@ -35,19 +36,10 @@ export default Vue.extend({
     },
     drawChart() {
       const data = new google.visualization.DataTable(this.chartData);
-
-      const options = {
-        title: "Cycle Times",
-        //hAxis: { title: "Age", minValue: 0, maxValue: 15 },
-        //vAxis: { title: "Weight", minValue: 0, maxValue: 15 },
-        legend: "none"
-      };
-
       const chart = new google.visualization.ScatterChart(
         document.getElementById("chart_div")
       );
-
-      chart.draw(data, options);
+      chart.draw(data, this.chartOpts);
     }
   }
 });
