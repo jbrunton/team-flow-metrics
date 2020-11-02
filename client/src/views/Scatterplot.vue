@@ -8,6 +8,7 @@
             <b-datepicker
                 placeholder="Click to select..."
                 v-model="dates"
+                :date-formatter="dateFormatter"
                 range>
             </b-datepicker>
         </b-field>
@@ -23,6 +24,7 @@
 
 import Vue from "vue";
 import axios from "axios";
+import moment from "moment";
 
 export default Vue.extend({
   name: "Issues",
@@ -67,6 +69,11 @@ export default Vue.extend({
         document.getElementById("chart_div")
       );
       chart.draw(data, this.chartOpts);
+    },
+    dateFormatter(dates) {
+      const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' };
+      const formatter = new Intl.DateTimeFormat(this.locale, options);
+      return dates.map((date) => formatter.format(date)).join(' - ');
     }
   },
 
