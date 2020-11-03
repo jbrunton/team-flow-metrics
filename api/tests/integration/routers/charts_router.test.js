@@ -44,7 +44,7 @@ describe('charts_router', () => {
       });
 
       const res = await request(app)
-        .get('/charts/scatterplot')
+        .get('/charts/scatterplot?fromDate=2020-01-01&toDate=2020-03-01')
       
       expect(res.statusCode).toEqual(200)
       expect(res.body.chartData).toEqual({
