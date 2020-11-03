@@ -76,6 +76,50 @@ describe('charts_router', () => {
         ]
       })
     })
+
+    it('should filters out epics', async () => {
+      const issue1 = await getRepository(Issue).save({
+        key: 'DEMO-101',
+        title: 'Demo Issue 101',
+        issueType: 'Story',
+        started: new Date(2020, 1, 1, 0, 0),
+        completed: new Date(2020, 1, 2, 0, 0),
+        cycleTime: 1
+      });
+      const issue2 = await getRepository(Issue).save({
+        key: 'DEMO-102',
+        title: 'Demo Epic 102',
+        issueType: 'Epic',
+        started: new Date(2020, 1, 3, 0, 0),
+        completed: new Date(2020, 1, 5, 0, 0),
+        cycleTime: 2
+      });
+
+      const res = await request(app)
+        .get('/charts/scatterplot?fromDate=2020-01-01&toDate=2020-03-01')
+      
+      expect(res.statusCode).toEqual(200)
+      expect(res.body.chartData).toEqual({
+        cols: [
+          {
+            label: "completed_time",
+            type: "date"
+          },
+          {
+            label: "cycle_time",
+            type: "number"
+          }
+        ],
+        rows: [
+          {
+            c: [
+              { v: "Date(2020, 1, 1, 0, 0)" },
+              { v: 1 }
+            ]
+          }
+        ]
+      })
+    })
   })
 })
 
