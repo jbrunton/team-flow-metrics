@@ -19,6 +19,7 @@ export default Vue.extend({
       columns: [
         { field: "key", label: "Key" },
         { field: "title", label: "Title" },
+        { field: "issueType", label: "Issue Type" },
         { field: "started", label: "Started" },
         { field: "completed", label: "Completed" },
         { field: "cycleTime", label: "Cycle Time" }
@@ -31,6 +32,7 @@ export default Vue.extend({
         return {
           key: issue.key,
           title: issue.title,
+          issueType: issue.issueType,
           started: this.formatDate(issue.started),
           completed: this.formatDate(issue.completed),
           cycleTime: this.formatNumber(issue.cycleTime)

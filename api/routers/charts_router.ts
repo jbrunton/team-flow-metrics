@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { Between } from 'typeorm';
+import { Between, Not } from 'typeorm';
 const moment = require('moment');
 const router = express.Router()
 const {getRepository} = require('typeorm')
@@ -21,7 +21,8 @@ router.get('/scatterplot', async (req, res) => {
   const fromDate = moment(req.query.fromDate);
   const toDate = moment(req.query.toDate);
   let issues = await getRepository(Issue).find({
-    completed: Between(fromDate, toDate)
+    completed: Between(fromDate, toDate),
+    issueType: Not("Epic")
   })
   const chartOpts = {
     seriesType: "scatter",
@@ -73,6 +74,9 @@ router.get('/scatterplot', async (req, res) => {
       };
     })
   res.json({
+    meta: {
+      issueCount: rows.length
+    },
     chartOpts: chartOpts,
     chartData: {
       cols: cols,

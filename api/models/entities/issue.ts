@@ -12,6 +12,9 @@ export class Issue {
     @Column()
     title: string;
 
+    @Column()
+    issueType: string;
+
     @Column("timestamp")
     started: Date;
 
