@@ -25,6 +25,7 @@
 import Vue from "vue";
 import axios from "axios";
 import moment from "moment";
+import { getDefaultDateRange } from "../helpers/date_helper";
 
 export default Vue.extend({
   name: "Issues",
@@ -36,19 +37,15 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.loadCharts();
+    this.initCharts();
   },
 
   methods: {
-    initChart() {
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const toDate = new Date(today);
-      toDate.setDate(toDate.getDate() + 1);
-      const fromDate = new Date(toDate);
-      fromDate.setDate(toDate.getDate() - 90);
-      this.dates = [fromDate, toDate];
+    initCharts() {
+      google.charts.load("current", { packages: ["corechart"] });
+      google.charts.setOnLoadCallback(() => { this.dates = getDefaultDateRange() });
     },
+    
     fetchData() {
       const fromDate = this.dates[0];
       const toDate = this.dates[1];
@@ -59,10 +56,7 @@ export default Vue.extend({
         this.drawChart();
       });
     },
-    loadCharts() {
-      google.charts.load("current", { packages: ["corechart"] });
-      google.charts.setOnLoadCallback(this.initChart);
-    },
+
     drawChart() {
       const data = new google.visualization.DataTable(this.chartData);
       const chart = new google.visualization.ScatterChart(
@@ -70,6 +64,7 @@ export default Vue.extend({
       );
       chart.draw(data, this.chartOpts);
     },
+    
     dateFormatter(dates) {
       const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' };
       const formatter = new Intl.DateTimeFormat(this.locale, options);
