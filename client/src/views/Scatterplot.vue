@@ -25,7 +25,7 @@
 
 import Vue from "vue";
 import axios from "axios";
-import { getDefaultDateRange } from "../helpers/date_helper";
+import { getDefaultDateRange, formatDateRange } from "../helpers/date_helper";
 
 export default Vue.extend({
   name: "Issues",
@@ -72,14 +72,7 @@ export default Vue.extend({
     },
 
     dateFormatter(dates) {
-      const options = {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        timeZone: "UTC"
-      };
-      const formatter = new Intl.DateTimeFormat(this.locale, options);
-      return dates.map(date => formatter.format(date)).join(" - ");
+      return formatDateRange(this.locale, dates);
     }
   },
 
