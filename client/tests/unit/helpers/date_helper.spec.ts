@@ -5,5 +5,5 @@ describe("getDefaultDateRange", () => {
     const now = new Date(2020, 1, 10);
     const dates = getDefaultDateRange(now);
     expect(dates).toEqual([new Date(2020, 0, 11), new Date(2020, 1, 11)]);
-  })
+  });
 });

@@ -5,12 +5,13 @@
     <div class="columns">
       <div class="column is-one-quarter">
         <b-field label="Date Range">
-            <b-datepicker
-                placeholder="Click to select..."
-                v-model="dates"
-                :date-formatter="dateFormatter"
-                range>
-            </b-datepicker>
+          <b-datepicker
+            placeholder="Click to select..."
+            v-model="dates"
+            :date-formatter="dateFormatter"
+            range
+          >
+          </b-datepicker>
         </b-field>
       </div>
     </div>
@@ -24,7 +25,6 @@
 
 import Vue from "vue";
 import axios from "axios";
-import moment from "moment";
 import { getDefaultDateRange } from "../helpers/date_helper";
 
 export default Vue.extend({
@@ -43,18 +43,24 @@ export default Vue.extend({
   methods: {
     initCharts() {
       google.charts.load("current", { packages: ["corechart"] });
-      google.charts.setOnLoadCallback(() => { this.dates = getDefaultDateRange() });
+      google.charts.setOnLoadCallback(() => {
+        this.dates = getDefaultDateRange();
+      });
     },
-    
+
     fetchData() {
       const fromDate = this.dates[0];
       const toDate = this.dates[1];
 
-      axios.get(`/api/charts/scatterplot?fromDate=${fromDate.toString()}&toDate=${toDate.toString()}`).then(response => {
-        this.chartData = response.data.chartData;
-        this.chartOpts = response.data.chartOpts;
-        this.drawChart();
-      });
+      axios
+        .get(
+          `/api/charts/scatterplot?fromDate=${fromDate.toString()}&toDate=${toDate.toString()}`
+        )
+        .then(response => {
+          this.chartData = response.data.chartData;
+          this.chartOpts = response.data.chartOpts;
+          this.drawChart();
+        });
     },
 
     drawChart() {
@@ -64,16 +70,21 @@ export default Vue.extend({
       );
       chart.draw(data, this.chartOpts);
     },
-    
+
     dateFormatter(dates) {
-      const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' };
+      const options = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: "UTC"
+      };
       const formatter = new Intl.DateTimeFormat(this.locale, options);
-      return dates.map((date) => formatter.format(date)).join(' - ');
+      return dates.map(date => formatter.format(date)).join(" - ");
     }
   },
 
   watch: {
-    dates (dates) {
+    dates() {
       this.fetchData();
     }
   }
