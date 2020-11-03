@@ -27,8 +27,22 @@ describe('issues_router', () => {
   })
 
   it('should return a list of issues', async () => {
-    const issue1 = await getRepository(Issue).save({ key: 'DEMO-101', title: 'Demo Issue 101', started: null, completed: null, cycleTime: null });
-    const issue2 = await getRepository(Issue).save({ key: 'DEMO-102', title: 'Demo Issue 102', started: null, completed: null, cycleTime: null });
+    const issue1 = await getRepository(Issue).save({
+      key: 'DEMO-101',
+      title: 'Demo Issue 101',
+      issueType: 'Story',
+      started: null,
+      completed: null,
+      cycleTime: null
+    });
+    const issue2 = await getRepository(Issue).save({
+      key: 'DEMO-102',
+      title: 'Demo Issue 102',
+      issueType: 'Story',
+      started: null,
+      completed: null,
+      cycleTime: null
+    });
     
     const res = await request(app)
       .get('/issues')

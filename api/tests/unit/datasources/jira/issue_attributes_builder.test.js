@@ -6,7 +6,10 @@ describe('IssueAttributesBuilder', () => {
     const json = {
       key: 'DEMO-101',
       fields: {
-        summary: "Demo Issue 101"
+        summary: "Demo Issue 101",
+        issuetype: {
+          name: 'Story'
+        }
       },
       changelog: {
         histories: []
@@ -24,7 +27,10 @@ describe('IssueAttributesBuilder', () => {
       const json = {
         key: 'DEMO-101',
         fields: {
-          summary: "Demo Issue 101"
+          summary: "Demo Issue 101",
+          issuetype: {
+            name: 'Story'
+          }
         },
         changelog: {
           histories: []
@@ -40,7 +46,10 @@ describe('IssueAttributesBuilder', () => {
       const json = {
         key: 'DEMO-101',
         fields: {
-          summary: "Demo Issue 101"
+          summary: "Demo Issue 101",
+          issuetype: {
+            name: 'Story'
+          }
         },
         changelog: {
           histories: [
@@ -78,7 +87,10 @@ describe('IssueAttributesBuilder', () => {
       const json = {
         key: 'DEMO-101',
         fields: {
-          summary: "Demo Issue 101"
+          summary: "Demo Issue 101",
+          issuetype: {
+            name: 'Story'
+          }
         },
         changelog: {
           histories: [
@@ -117,7 +129,10 @@ describe('IssueAttributesBuilder', () => {
       const json = {
         key: 'DEMO-101',
         fields: {
-          summary: "Demo Issue 101"
+          summary: "Demo Issue 101",
+          issuetype: {
+            name: 'Story'
+          }
         },
         changelog: {
           histories: []
@@ -133,7 +148,10 @@ describe('IssueAttributesBuilder', () => {
       const json = {
         key: 'DEMO-101',
         fields: {
-          summary: "Demo Issue 101"
+          summary: "Demo Issue 101",
+          issuetype: {
+            name: 'Story'
+          }
         },
         changelog: {
           histories: [
@@ -180,7 +198,10 @@ describe('IssueAttributesBuilder', () => {
       const json = {
         key: 'DEMO-101',
         fields: {
-          summary: "Demo Issue 101"
+          summary: "Demo Issue 101",
+          issuetype: {
+            name: 'Story'
+          }
         },
         changelog: {
           histories: [

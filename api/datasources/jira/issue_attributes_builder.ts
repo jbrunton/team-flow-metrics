@@ -11,6 +11,7 @@ export class IssueAttributesBuilder {
   build(json: JSON): {
     key: string,
     title: string,
+    issueType: string,
     started: Date,
     completed: Date,
     cycleTime: number
@@ -22,6 +23,7 @@ export class IssueAttributesBuilder {
     return {
       key: json["key"],
       title: json["fields"]["summary"],
+      issueType: json["fields"]["issuetype"]["name"],
       started: startedDate ? startedDate.toDate() : null,
       completed: completedDate ? completedDate.toDate() : null,
       cycleTime: cycleTime
