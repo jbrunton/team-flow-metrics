@@ -31,6 +31,7 @@ describe('charts_router', () => {
       const issue1 = await getRepository(Issue).save({
         key: 'DEMO-101',
         title: 'Demo Issue 101',
+        issueType: 'Story',
         started: new Date(2020, 1, 1, 0, 0),
         completed: new Date(2020, 1, 2, 0, 0),
         cycleTime: 1
@@ -38,6 +39,7 @@ describe('charts_router', () => {
       const issue2 = await getRepository(Issue).save({
         key: 'DEMO-102',
         title: 'Demo Issue 102',
+        issueType: 'Story',
         started: new Date(2020, 1, 3, 0, 0),
         completed: new Date(2020, 1, 5, 0, 0),
         cycleTime: 2
