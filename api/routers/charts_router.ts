@@ -1,4 +1,5 @@
 import * as express from 'express';
+import { Between } from 'typeorm';
 const moment = require('moment');
 const router = express.Router()
 const {getRepository} = require('typeorm')
@@ -6,7 +7,22 @@ const {Issue} = require('../models/entities/issue')
 const {formatDate} = require('../helpers/charts_helper');
 
 router.get('/scatterplot', async (req, res) => {
-  let issues = await getRepository(Issue).find()
+  if (!req.query.fromDate) {
+    res.status(400).json({
+      error: "Required fromDate query param"
+    })
+  }
+  if (!req.query.toDate) {
+    res.status(400).json({
+      error: "Required toDate query param"
+    })
+  }
+  
+  const fromDate = moment(req.query.fromDate);
+  const toDate = moment(req.query.toDate);
+  let issues = await getRepository(Issue).find({
+    completed: Between(fromDate, toDate)
+  })
   const chartOpts = {
     seriesType: "scatter",
     interpolateNulls: true,
