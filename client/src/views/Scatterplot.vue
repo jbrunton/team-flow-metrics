@@ -65,7 +65,7 @@ export default Vue.extend({
 
     drawChart() {
       const data = new google.visualization.DataTable(this.chartData);
-      const chart = new google.visualization.ScatterChart(
+      const chart = new google.visualization.ComboChart(
         document.getElementById("chart_div")
       );
       chart.draw(data, this.chartOpts);
