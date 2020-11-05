@@ -6,7 +6,7 @@ type DataTableColumn = {
 }
 
 type DataTableValue = {
-  v: Number
+  v: number
 }
 
 type DataTableHeaderRow = Array<DataTableColumn>
@@ -18,7 +18,7 @@ type DataTableBodyRow = {
 type DataTableRow = DataTableHeaderRow | DataTableBodyRow
 
 export class DataTable {
-  public rows: Array<Array<Number>>
+  public rows: Array<Array<number>>
   public cols: DataTableHeaderRow
 
   constructor() {
@@ -30,15 +30,31 @@ export class DataTable {
     this.cols = cols;
   }
 
-  addRow(row: Array<Number>) {
+  addRow(row: Array<number>) {
     this.rows.push(row);
   }
 
-  addRows(rows: Array<Array<Number>>) {
+  addRows(rows: Array<Array<number>>) {
     for (let row of rows) {
       this.rows.push(row);
     }
   }
+
+  getColumnValues(colIndex: number) {
+    return this.rows.map(row => row[colIndex]);
+  }
+
+  addPercentiles(percentiles: Array<number>) {
+    percentiles.reverse().forEach(percentile => {
+      this.cols.push({
+        label: `${percentile}th Percentile`,
+        type: "number"
+      });
+      this.rows.forEach(row => {
+        row.push(null);
+      });
+    });
+}
 
   build(): Array<DataTableRow> {
     const rows = [this.cols] as Array<DataTableRow>;
