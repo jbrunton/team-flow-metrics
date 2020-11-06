@@ -1,6 +1,8 @@
 import * as express from 'express';
-import { Between, Not } from 'typeorm';
+import { Between, IsNull, Not } from 'typeorm';
+import { DataTableBuilder } from '../models/metrics/data_table_builder';
 const moment = require('moment');
+const { jStat } = require('jstat');
 const router = express.Router()
 const {getRepository} = require('typeorm')
 const {Issue} = require('../models/entities/issue')
@@ -18,26 +20,46 @@ router.get('/scatterplot', async (req, res) => {
     })
   }
   
-  const fromDate = moment(req.query.fromDate);
-  const toDate = moment(req.query.toDate);
-  let issues = await getRepository(Issue).find({
-    completed: Between(fromDate, toDate),
-    issueType: Not("Epic")
-  })
+  const fromDate = moment(req.query.fromDate).toDate();
+  const toDate = moment(req.query.toDate).toDate();
+  const issues = await getRepository(Issue)
+    .find({
+      completed: Between(fromDate, toDate),
+      issueType: Not("Epic"),
+      started: Not(IsNull())
+    })
   const chartOpts = {
     seriesType: "scatter",
     interpolateNulls: true,
     series: {
-      1: {
-        type: "steppedArea",
-        color: "#f44336",
-        areaOpacity: 0
+      "1": {
+        "type": "steppedArea",
+        "color": "#f44336",
+        "areaOpacity": 0
       },
-      2: {
-        type: "steppedArea",
-        color: "#f44336",
-        areaOpacity: 0,
-        lineDashStyle: [
+      "2": {
+        "type": "steppedArea",
+        "color": "#f44336",
+        "areaOpacity": 0,
+        "lineDashStyle": [
+          4,
+          4
+        ]
+      },
+      "3": {
+        "type": "steppedArea",
+        "color": "#ff9800",
+        "areaOpacity": 0,
+        "lineDashStyle": [
+          4,
+          4
+        ]
+      },
+      "4": {
+        "type": "steppedArea",
+        "color": "#03a9f4",
+        "areaOpacity": 0,
+        "lineDashStyle": [
           4,
           4
         ]
@@ -53,7 +75,8 @@ router.get('/scatterplot', async (req, res) => {
     },
     height: 500
   };
-  const cols = [
+  const builder = new DataTableBuilder();
+  builder.setColumns([
     {
       label: "completed_time",
       type: "date"
@@ -62,26 +85,21 @@ router.get('/scatterplot', async (req, res) => {
       label: "cycle_time",
       type: "number"
     }
-  ];
-  const rows = issues
-    .filter(issue => issue.started && issue.completed)
-    .map(issue => {
-      return {
-        c: [
-          { v: formatDate(issue.started) },
-          { v: issue.cycleTime }
-        ]
-      };
-    })
+  ])
+  
+  builder.addRows(issues.map(issue => [
+    formatDate(issue.started),
+    issue.cycleTime
+  ]))
+  
+  builder.addPercentiles(1, [50, 70, 85, 95]);
+
   res.json({
     meta: {
-      issueCount: rows.length
+      issueCount: builder.rows.length
     },
     chartOpts: chartOpts,
-    chartData: {
-      cols: cols,
-      rows: rows
-    }
+    chartData: builder.build()
   })
 })
 

@@ -6,7 +6,13 @@
     "client:lint": "cd client && npm run lint",
     "client:lint:check": "cd client && npm run lint:check",
     "lint": "npm run client:lint",
-    "lint:check": "npm run client:lint:check"
+    "lint:check": "npm run client:lint:check",
+    "client:test:unit": "cd client && npm run test:unit",
+    "api:test:unit": "cd api && npm run test:unit",
+    "api:test:integration": "docker-compose run api npm run test:integration",    
+    "test:unit": "npm run client:test:unit && npm run api:test:unit",
+    "test:integration": "npm run api:test:integration",
+    "test": "npm run test:unit && npm run test:integration"
   },
   "devDependencies": {
     "husky": "^4.3.0"
