@@ -10,5 +10,5 @@ export function getDefaultDateRange(now = new Date()): Array<Date> {
 }
 
 export function formatDateRange(locale: string, dates: Array<Date>): string {
-  return dates.map(date => moment(date).format('D MMM YYYY')).join(" - ");
+  return dates.map(date => moment(date).format("D MMM YYYY")).join(" - ");
 }
