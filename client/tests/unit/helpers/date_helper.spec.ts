@@ -16,7 +16,7 @@ describe("formatDateRange", () => {
     const fromDate = new Date(2020, 0, 1);
     const toDate = new Date(2020, 1, 10);
     expect(formatDateRange("en-GB", [fromDate, toDate])).toEqual(
-      "Jan 1, 2020 - Feb 10, 2020"
+      "1 Jan 2020 - 10 Feb 2020"
     );
   });
 });
