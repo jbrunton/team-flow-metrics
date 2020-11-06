@@ -1,5 +1,6 @@
 import * as express from 'express';
 import { Between, IsNull, Not } from 'typeorm';
+import { DataTableBuilder } from '../models/metrics/data_table_builder';
 const moment = require('moment');
 const { jStat } = require('jstat');
 const router = express.Router()
@@ -74,7 +75,8 @@ router.get('/scatterplot', async (req, res) => {
     },
     height: 500
   };
-  const cols = [
+  const builder = new DataTableBuilder();
+  builder.setColumns([
     {
       label: "completed_time",
       type: "date"
@@ -82,76 +84,22 @@ router.get('/scatterplot', async (req, res) => {
     {
       label: "cycle_time",
       type: "number"
-    },
-    {
-      "label": "95th percentile",
-      "type": "number"
-    },
-    {
-      "label": "85th percentile",
-      "type": "number"
-    },
-    {
-      "label": "70th percentile",
-      "type": "number"
-    },
-    {
-      "label": "50th percentile",
-      "type": "number"
     }
-  ];
-  const rows = issues
-    .map(issue => {
-      return {
-        c: [
-          { v: formatDate(issue.started) },
-          { v: issue.cycleTime },
-          { v: null },
-          { v: null },
-          { v: null },
-          { v: null }
-        ]
-      };
-    })
+  ])
   
-  const percentiles = {
-    50: jStat.percentile(issues.map(issue => issue.cycleTime), 0.5),
-    70: jStat.percentile(issues.map(issue => issue.cycleTime), 0.7),
-    85: jStat.percentile(issues.map(issue => issue.cycleTime), 0.85),
-    95: jStat.percentile(issues.map(issue => issue.cycleTime), 0.95)
-  };
-
-  rows.push({
-    c: [
-      { v: formatDate(fromDate) },
-      { v: null },
-      { v: percentiles[95] },
-      { v: percentiles[85] },
-      { v: percentiles[70] },
-      { v: percentiles[50] },
-    ]
-  })
-  rows.push({
-    c: [
-      { v: formatDate(toDate) },
-      { v: null },
-      { v: percentiles[95] },
-      { v: percentiles[85] },
-      { v: percentiles[70] },
-      { v: percentiles[50] },
-    ]
-  })
+  builder.addRows(issues.map(issue => [
+    formatDate(issue.started),
+    issue.cycleTime
+  ]))
+  
+  builder.addPercentiles(1, [50, 70, 85, 95]);
 
   res.json({
     meta: {
-      issueCount: rows.length,
-      percentiles: percentiles
+      issueCount: builder.rows.length
     },
     chartOpts: chartOpts,
-    chartData: {
-      cols: cols,
-      rows: rows
-    }
+    chartData: builder.build()
   })
 })
 

@@ -9,17 +9,18 @@ type DataTableValue = {
   v: number
 }
 
-type DataTableHeaderRow = Array<DataTableColumn>
-
-type DataTableBodyRow = {
+type DataTableRow = {
   c: Array<DataTableValue>
 }
 
-type DataTableRow = DataTableHeaderRow | DataTableBodyRow
+type DataTable = {
+  cols: Array<DataTableColumn>,
+  rows: Array<DataTableRow>
+}
 
-export class DataTable {
+export class DataTableBuilder {
   public rows: Array<Array<number>>
-  public cols: DataTableHeaderRow
+  public cols: Array<DataTableColumn>
 
   constructor() {
     this.rows = [];
@@ -45,6 +46,10 @@ export class DataTable {
   }
 
   addPercentiles(colIndex: number, percentiles: Array<number>) {
+    if (!this.rows.length) {
+      return;
+    }
+
     const fromValue = this.rows[0][0];
     const toValue = this.rows[this.rows.length - 1][0];
     const padding = new Array(this.cols.length - 1).fill(null);
@@ -68,13 +73,16 @@ export class DataTable {
     this.rows.push([toValue].concat(padding).concat(percentileValues));
   }
 
-  build(): Array<DataTableRow> {
-    const rows = [this.cols] as Array<DataTableRow>;
+  build(): DataTable {
+    const rows = [] as Array<DataTableRow>;
     for (let row of this.rows) {
       rows.push({
         c: row.map(value => ({ v: value }))
       });
     }
-    return rows;
+    return {
+      cols: this.cols,
+      rows: rows
+    };
   }
 }
