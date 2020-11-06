@@ -58,26 +58,70 @@ describe('charts_router', () => {
           {
             label: "cycle_time",
             type: "number"
+          },
+          {
+            label: "95th Percentile",
+            type: "number"
+          },
+          {
+            label: "85th Percentile",
+            type: "number"
+          },
+          {
+            label: "70th Percentile",
+            type: "number"
+          },
+          {
+            label: "50th Percentile",
+            type: "number"
           }
         ],
         rows: [
           {
             c: [
               { v: "Date(2020, 1, 1, 0, 0)" },
-              { v: 1 }
+              { v: 1 },
+              { v: null },
+              { v: null },
+              { v: null },
+              { v: null }
             ]
           },
           {
             c: [
               { v: "Date(2020, 1, 3, 0, 0)" },
-              { v: 2 }
+              { v: 2 },
+              { v: null },
+              { v: null },
+              { v: null },
+              { v: null }
+            ],
+          },
+          {
+            c: [
+              { v: "Date(2020, 1, 1, 0, 0)" },
+              { v: null },
+              { v: 1 },
+              { v: 1 },
+              { v: 1 },
+              { v: 1 }
+            ],
+          },
+          {
+            c: [
+              { v: "Date(2020, 1, 3, 0, 0)" },
+              { v: null },
+              { v: 1 },
+              { v: 1 },
+              { v: 1 },
+              { v: 1 }
             ]
           },
         ]
       })
     })
 
-    it('should filters out epics', async () => {
+    it('filters out epics', async () => {
       const issue1 = await getRepository(Issue).save({
         key: 'DEMO-101',
         title: 'Demo Issue 101',

@@ -46,7 +46,7 @@ export class DataTableBuilder {
   }
 
   addPercentiles(colIndex: number, percentiles: Array<number>) {
-    if (!this.rows.length) {
+    if (this.rows.length <= 1) {
       return;
     }
 
