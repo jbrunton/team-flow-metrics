@@ -1,4 +1,4 @@
-import { throws } from "assert";
+import { jStat } from "jstat";
 
 type DataTableColumn = {
   label: string,
@@ -44,7 +44,16 @@ export class DataTable {
     return this.rows.map(row => row[colIndex]);
   }
 
-  addPercentiles(percentiles: Array<number>) {
+  addPercentiles(colIndex: number, percentiles: Array<number>) {
+    const fromValue = this.rows[0][0];
+    const toValue = this.rows[this.rows.length - 1][0];
+    const padding = new Array(this.cols.length - 1).fill(null);
+
+    const columnValues = this.getColumnValues(colIndex);
+    const percentileValues = percentiles.map(percentile => {
+      return jStat.percentile(columnValues, percentile / 100.0);
+    }).reverse();
+
     percentiles.reverse().forEach(percentile => {
       this.cols.push({
         label: `${percentile}th Percentile`,
@@ -54,7 +63,10 @@ export class DataTable {
         row.push(null);
       });
     });
-}
+    
+    this.rows.push([fromValue].concat(padding).concat(percentileValues));
+    this.rows.push([toValue].concat(padding).concat(percentileValues));
+  }
 
   build(): Array<DataTableRow> {
     const rows = [this.cols] as Array<DataTableRow>;

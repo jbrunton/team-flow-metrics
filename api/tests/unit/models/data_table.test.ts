@@ -64,7 +64,7 @@ describe("DataTable", () => {
     })
 
     it("adds percentile columns", () => {
-      table.addPercentiles([50, 80]);
+      table.addPercentiles(1, [50, 80]);
       expect(table.cols).toEqual([
         { label: "X", type: "number" },
         { label: "Y", type: "number" },
@@ -74,13 +74,15 @@ describe("DataTable", () => {
     })
 
     it("adds percentile rows", () => {
-      table.addPercentiles([50, 80]);
+      table.addPercentiles(1, [50, 80]);
       expect(table.rows).toEqual([
         [1, 10, null, null],
         [2, 10, null, null],
         [3, 10, null, null],
         [4, 15, null, null],
-        [5, 20, null, null]
+        [5, 20, null, null],
+        [1, null, 15, 10],
+        [5, null, 15, 10]
       ])
     })
   })
