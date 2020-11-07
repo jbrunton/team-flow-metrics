@@ -8,7 +8,7 @@ export class JiraClient {
 
   constructor() {
     this._client = new Client({
-      host: "https://jbrunton.atlassian.net",
+      host: process.env.JIRA_HOST,
       authentication: {
         basic: {
           username: process.env.JIRA_USER,

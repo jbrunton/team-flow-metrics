@@ -18,6 +18,7 @@ services:
       - POSTGRES_PASSWORD
       - JIRA_USER
       - JIRA_TOKEN
+      - JIRA_HOST
 
     command: npm run debug
     depends_on:
@@ -31,6 +32,8 @@ services:
     volumes:
       - /app/node_modules
       - ./client:/app
+    environment:
+      - JIRA_HOST
     depends_on:
       - api
       - nginx

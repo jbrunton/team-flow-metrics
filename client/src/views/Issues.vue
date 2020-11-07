@@ -2,7 +2,29 @@
   <div class="issues">
     <h1>Issues</h1>
 
-    <b-table :data="issues" :columns="columns"></b-table>
+    <b-table :data="issues">
+      <b-table-column field="key" label="Key" v-slot="props">
+        {{ props.row.key }}
+        <a :href="props.row.externalUrl" target="_blank">
+          <b-icon icon="open-in-new" size="is-small"></b-icon>
+        </a>
+      </b-table-column>
+      <b-table-column field="title" label="Title" v-slot="props">
+        {{ props.row.title }}
+      </b-table-column>
+      <b-table-column field="issueType" label="Issue Type" v-slot="props">
+        {{ props.row.issueType }}
+      </b-table-column>
+      <b-table-column field="started" label="Started" v-slot="props">
+        {{ props.row.started }}
+      </b-table-column>
+      <b-table-column field="completed" label="Completed" v-slot="props">
+        {{ props.row.completed }}
+      </b-table-column>
+      <b-table-column field="cycleTime" label="Cycle Time" v-slot="props">
+        {{ props.row.cycleTime }}
+      </b-table-column>
+    </b-table>
   </div>
 </template>
 
@@ -35,7 +57,8 @@ export default Vue.extend({
           issueType: issue.issueType,
           started: this.formatDate(issue.started),
           completed: this.formatDate(issue.completed),
-          cycleTime: this.formatNumber(issue.cycleTime)
+          cycleTime: this.formatNumber(issue.cycleTime),
+          externalUrl: `${process.env.VUE_APP_JIRA_HOST}/browse/${issue.key}`
         };
       });
     });
