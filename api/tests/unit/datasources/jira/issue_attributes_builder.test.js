@@ -1,4 +1,6 @@
 const { IssueAttributesBuilder } = require('../../../../datasources/jira/issue_attributes_builder');
+const { getRepository } = require('typeorm');
+const { Field } = require('../../../../models/entities/field');
 
 describe('IssueAttributesBuilder', () => {
 
@@ -16,12 +18,38 @@ describe('IssueAttributesBuilder', () => {
       }
     };
 
-    const issue = new IssueAttributesBuilder().build(json);
+    const issue = new IssueAttributesBuilder([]).build(json);
 
     expect(issue.key).toEqual('DEMO-101');
     expect(issue.title).toEqual('Demo Issue 101');
     expect(issue.issueType).toEqual('Story');
     expect(issue.externalUrl).toEqual('https://jira.example.com/browse/DEMO-101');
+  })
+
+  describe("#parentKey", () => {
+    it("sets the parent epic key", () => {
+      const epicLinkField = new Field();
+      epicLinkField.externalId = "customfield_10001";
+      epicLinkField.name = "Epic Link";
+      const fields = [epicLinkField];
+      const json = {
+        key: 'DEMO-101',
+        fields: {
+          summary: "Demo Issue 101",
+          issuetype: {
+            name: 'Story'
+          },
+          customfield_10001: "DEMO-102"
+        },
+        changelog: {
+          histories: []
+        }
+      };
+  
+      const issue = new IssueAttributesBuilder(fields).build(json);
+  
+      expect(issue.parentKey).toEqual('DEMO-102');
+    });
   })
 
   describe('#started', () => {
@@ -39,7 +67,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder().build(json);
+      const issue = new IssueAttributesBuilder([]).build(json);
   
       expect(issue.started).toBeNull();
     })
@@ -79,7 +107,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder().build(json);
+      const issue = new IssueAttributesBuilder([]).build(json);
   
       expect(issue.started).toEqual(new Date("2020-01-02T09:00:00.000Z"))
     })
@@ -120,7 +148,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder().build(json);
+      const issue = new IssueAttributesBuilder([]).build(json);
   
       expect(issue.started).toBeNull();
     })
@@ -141,7 +169,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder().build(json);
+      const issue = new IssueAttributesBuilder([]).build(json);
   
       expect(issue.completed).toBeNull();
     })
@@ -191,7 +219,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder().build(json);
+      const issue = new IssueAttributesBuilder([]).build(json);
   
       expect(issue.completed).toEqual(new Date("2020-01-03T09:00:00.000Z"))
     })
@@ -231,7 +259,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder().build(json);
+      const issue = new IssueAttributesBuilder([]).build(json);
   
       expect(issue.completed).toBeNull()
     })
