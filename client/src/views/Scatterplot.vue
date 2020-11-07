@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <div id="chart_div"></div>
   </div>
 </template>
 
@@ -38,6 +38,7 @@ export default Vue.extend({
   },
   mounted() {
     this.initCharts();
+    window.onresize = this.drawChart;
   },
 
   methods: {
@@ -64,10 +65,13 @@ export default Vue.extend({
     },
 
     drawChart() {
+      const container = document.getElementById("chart_div");
+      const width = container.offsetWidth;
+      const height = container.offsetWidth * 0.6;
+      console.log({ width, height });
+      container.style.height = `${height}px`;
       const data = new google.visualization.DataTable(this.chartData);
-      const chart = new google.visualization.ComboChart(
-        document.getElementById("chart_div")
-      );
+      const chart = new google.visualization.ComboChart(container);
       chart.draw(data, this.chartOpts);
     },
 

@@ -72,8 +72,7 @@ router.get('/scatterplot', async (req, res) => {
       width: "90%",
       height: "80%",
       top: "5%"
-    },
-    height: 500
+    }
   };
   const builder = new DataTableBuilder();
   builder.setColumns([
