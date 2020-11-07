@@ -10,13 +10,12 @@ export class CreateIssues1603557556019 implements MigrationInterface {
             "title" character varying NOT NULL,
             "issueType" character varying NOT NULL,
             "parentKey" character varying,
-            "parentId" integer,
+            "parentId" integer REFERENCES issues(id),
             "externalUrl" character varying NOT NULL,
             "started" timestamp,
             "completed" timestamp,
             "cycleTime" real,
-            CONSTRAINT "PK_ISSUES_ID" PRIMARY KEY ("id"),
-            CONSTRAINT "FK_PARENT_ID" FOREIGN KEY(parentId) REFERENCES issues(id)
+            CONSTRAINT "PK_ISSUES_ID" PRIMARY KEY ("id")
         )`);
     }
 

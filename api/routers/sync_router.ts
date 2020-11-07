@@ -20,6 +20,19 @@ router.get('/', async (req, res) => {
   await fieldsRepo.save(fields);
   await issuesRepo.save(issues);
 
+  for (let issue of issues) {
+    if (issue.parentKey) {
+      const parent = issues.find(candidate => candidate.key == issue.parentKey)
+      if (parent) {
+        console.log(`Found parent ${parent.key} for issue ${issue.key}`);
+        issue.parentId = parent.id;
+      } else {
+        console.warn(`Could not find parent ${issue.parentKey} for issue ${issue.key}`);
+      }
+    }
+  }
+  await issuesRepo.save(issues);
+
   res.json({
     count: issues.length,
     issues: issues
