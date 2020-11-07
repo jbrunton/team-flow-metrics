@@ -16,13 +16,16 @@ export class Issue {
     issueType: string;
 
     @Column()
+    externalUrl: string;
+
+    @Column()
     parentKey: string;
 
     @Column()
     parentId: number;
 
     @Column()
-    externalUrl: string;
+    childCount: number;
 
     @Column("timestamp")
     started: Date;
@@ -31,5 +34,5 @@ export class Issue {
     completed: Date;
 
     @Column()
-    cycleTime: number
+    cycleTime: number;
 }

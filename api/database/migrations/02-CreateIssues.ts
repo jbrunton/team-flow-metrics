@@ -6,12 +6,16 @@ export class CreateIssues1603557556019 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "issues" (
             "id" SERIAL NOT NULL,
+
             "key" character varying NOT NULL,
             "title" character varying NOT NULL,
             "issueType" character varying NOT NULL,
+            "externalUrl" character varying NOT NULL,
+
             "parentKey" character varying,
             "parentId" integer REFERENCES issues(id),
-            "externalUrl" character varying NOT NULL,
+            "childCount" integer,
+
             "started" timestamp,
             "completed" timestamp,
             "cycleTime" real,

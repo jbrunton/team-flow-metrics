@@ -26,6 +26,7 @@ router.get('/', async (req, res) => {
       if (parent) {
         console.log(`Found parent ${parent.key} for issue ${issue.key}`);
         issue.parentId = parent.id;
+        parent.childCount = (parent.childCount || 0) + 1;
       } else {
         console.warn(`Could not find parent ${issue.parentKey} for issue ${issue.key}`);
       }

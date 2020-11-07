@@ -15,6 +15,9 @@
       <b-table-column field="issueType" label="Issue Type" v-slot="props">
         {{ props.row.issueType }}
       </b-table-column>
+      <b-table-column field="childCount" label="Children" v-slot="props">
+        {{ props.row.childCount }}
+      </b-table-column>
       <b-table-column field="started" label="Started" v-slot="props">
         {{ props.row.started }}
       </b-table-column>
@@ -56,6 +59,7 @@ export default Vue.extend({
           title: issue.title,
           issueType: issue.issueType,
           externalUrl: issue.externalUrl,
+          childCount: issue.childCount,
           started: this.formatDate(issue.started),
           completed: this.formatDate(issue.completed),
           cycleTime: this.formatNumber(issue.cycleTime)
