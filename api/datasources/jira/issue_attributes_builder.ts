@@ -1,4 +1,5 @@
 import { Moment } from "moment";
+import { URL } from "url";
 
 const moment = require('moment');
 
@@ -12,6 +13,7 @@ export class IssueAttributesBuilder {
     key: string,
     title: string,
     issueType: string,
+    externalUrl: string,
     started: Date,
     completed: Date,
     cycleTime: number
@@ -24,6 +26,7 @@ export class IssueAttributesBuilder {
       key: json["key"],
       title: json["fields"]["summary"],
       issueType: json["fields"]["issuetype"]["name"],
+      externalUrl: new URL(`browse/${json["key"]}`, process.env.JIRA_HOST).href,
       started: startedDate ? startedDate.toDate() : null,
       completed: completedDate ? completedDate.toDate() : null,
       cycleTime: cycleTime

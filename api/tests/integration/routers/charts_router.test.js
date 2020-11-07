@@ -32,6 +32,7 @@ describe('charts_router', () => {
         key: 'DEMO-101',
         title: 'Demo Issue 101',
         issueType: 'Story',
+        externalUrl: 'https://jira.example.com/browse/DEMO-101',
         started: new Date(2020, 1, 1, 0, 0),
         completed: new Date(2020, 1, 2, 0, 0),
         cycleTime: 1
@@ -39,6 +40,7 @@ describe('charts_router', () => {
       const issue2 = await getRepository(Issue).save({
         key: 'DEMO-102',
         title: 'Demo Issue 102',
+        externalUrl: 'https://jira.example.com/browse/DEMO-102',
         issueType: 'Story',
         started: new Date(2020, 1, 3, 0, 0),
         completed: new Date(2020, 1, 5, 0, 0),
@@ -126,6 +128,7 @@ describe('charts_router', () => {
         key: 'DEMO-101',
         title: 'Demo Issue 101',
         issueType: 'Story',
+        externalUrl: 'https://jira.example.com/browse/DEMO-101',
         started: new Date(2020, 1, 1, 0, 0),
         completed: new Date(2020, 1, 2, 0, 0),
         cycleTime: 1
@@ -134,6 +137,7 @@ describe('charts_router', () => {
         key: 'DEMO-102',
         title: 'Demo Epic 102',
         issueType: 'Epic',
+        externalUrl: 'https://jira.example.com/browse/DEMO-102',
         started: new Date(2020, 1, 3, 0, 0),
         completed: new Date(2020, 1, 5, 0, 0),
         cycleTime: 2

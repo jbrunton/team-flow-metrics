@@ -20,6 +20,8 @@ describe('IssueAttributesBuilder', () => {
 
     expect(issue.key).toEqual('DEMO-101');
     expect(issue.title).toEqual('Demo Issue 101');
+    expect(issue.issueType).toEqual('Story');
+    expect(issue.externalUrl).toEqual('https://jira.example.com/browse/DEMO-101');
   })
 
   describe('#started', () => {
