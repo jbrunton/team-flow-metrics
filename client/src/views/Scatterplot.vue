@@ -47,7 +47,14 @@ export default Vue.extend({
     initCharts() {
       google.charts.load("current", { packages: ["corechart"] });
       google.charts.setOnLoadCallback(() => {
-        this.dates = getDefaultDateRange(this.$route);
+        if (this.$route.query.fromDate && this.$route.query.toDate) {
+          this.dates = [
+            moment(this.$route.query.fromDate as string).toDate(),
+            moment(this.$route.query.toDate as string).toDate()
+          ];
+        } else {
+          this.dates = getDefaultDateRange();
+        }
         new ResizeObserver(this.drawChart).observe(
           document.getElementById("chart_div")
         );
