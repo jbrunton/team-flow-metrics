@@ -32,8 +32,6 @@ services:
     volumes:
       - /app/node_modules
       - ./client:/app
-    environment:
-      - JIRA_HOST
     depends_on:
       - api
       - nginx

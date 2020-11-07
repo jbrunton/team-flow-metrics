@@ -9,6 +9,7 @@ export class CreateIssues1603557556019 implements MigrationInterface {
             "key" character varying NOT NULL,
             "title" character varying NOT NULL,
             "issueType" character varying NOT NULL,
+            "externalUrl" character varying NOT NULL,
             "started" timestamp,
             "completed" timestamp,
             "cycleTime" real,

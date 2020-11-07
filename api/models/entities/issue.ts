@@ -15,6 +15,9 @@ export class Issue {
     @Column()
     issueType: string;
 
+    @Column()
+    externalUrl: string;
+
     @Column("timestamp")
     started: Date;
 

@@ -55,10 +55,10 @@ export default Vue.extend({
           key: issue.key,
           title: issue.title,
           issueType: issue.issueType,
+          externalUrl: issue.externalUrl,
           started: this.formatDate(issue.started),
           completed: this.formatDate(issue.completed),
-          cycleTime: this.formatNumber(issue.cycleTime),
-          externalUrl: `${process.env.VUE_APP_JIRA_HOST}/browse/${issue.key}`
+          cycleTime: this.formatNumber(issue.cycleTime)
         };
       });
     });
