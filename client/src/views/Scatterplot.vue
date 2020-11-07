@@ -25,6 +25,7 @@
 
 import Vue from "vue";
 import axios from "axios";
+import moment from "moment";
 import { getDefaultDateRange, formatDateRange } from "../helpers/date_helper";
 
 export default Vue.extend({
@@ -46,7 +47,14 @@ export default Vue.extend({
     initCharts() {
       google.charts.load("current", { packages: ["corechart"] });
       google.charts.setOnLoadCallback(() => {
-        this.dates = getDefaultDateRange();
+        if (this.$route.query.fromDate && this.$route.query.toDate) {
+          this.dates = [
+            moment(this.$route.query.fromDate as string).toDate(),
+            moment(this.$route.query.toDate as string).toDate()
+          ];
+        } else {
+          this.dates = getDefaultDateRange();
+        }
         new ResizeObserver(this.drawChart).observe(
           document.getElementById("chart_div")
         );
@@ -89,6 +97,16 @@ export default Vue.extend({
   watch: {
     dates() {
       this.fetchData();
+      const query = {
+        fromDate: moment(this.dates[0]).format("YYYY-MM-DD"),
+        toDate: moment(this.dates[1]).format("YYYY-MM-DD")
+      };
+      if (JSON.stringify(this.$route.query) !== JSON.stringify(query)) {
+        this.$router.replace({
+          path: this.$route.path,
+          query: query
+        });
+      }
     }
   }
 });
