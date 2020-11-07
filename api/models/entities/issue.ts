@@ -16,6 +16,12 @@ export class Issue {
     issueType: string;
 
     @Column()
+    parentKey: string;
+
+    @Column()
+    parentId: number;
+
+    @Column()
     externalUrl: string;
 
     @Column("timestamp")

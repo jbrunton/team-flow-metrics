@@ -1,5 +1,6 @@
 import { Client } from "jira.js";
 import { Issue } from "../../models/entities/issue";
+import { Field } from "../../models/entities/field";
 import { getConnection } from "typeorm";
 import { IssueAttributesBuilder } from "./issue_attributes_builder";
 
@@ -18,7 +19,7 @@ export class JiraClient {
     })
   }
 
-  async search(jql: string): Promise<Array<Issue>> {
+  async search(fields: Array<Field>, jql: string): Promise<Array<Issue>> {
     console.log(`starting search: ${jql}`)
     console.time(`search: ${jql}`)
     const connection = getConnection();
@@ -39,7 +40,7 @@ export class JiraClient {
     }
 
     const issues = [];
-    const builder = new IssueAttributesBuilder();
+    const builder = new IssueAttributesBuilder(fields);
 
     results.forEach(result => {
       result.issues.forEach(issue => {
@@ -49,5 +50,16 @@ export class JiraClient {
 
     console.timeEnd(`search: ${jql}`)
     return issues;
+  }
+
+  async getFields(): Promise<Array<Field>> {
+    console.log("Fetching Jira fields");
+    const connection = getConnection();
+    const repo = connection.getRepository(Field);
+    const fields = await this._client.issueFields.getFields();
+    return fields.map(field => repo.create({
+      externalId: field["id"],
+      name: field["name"]
+    }));
   }
 }

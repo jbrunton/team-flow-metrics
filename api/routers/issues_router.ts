@@ -5,7 +5,7 @@ const {Issue} = require('../models/entities/issue')
 
 
 router.get('/', async (req, res) => {
-  let issues = await getRepository(Issue).find()
+  const issues = await getRepository(Issue).find()
   res.json({
     count: issues.length,
     issues: issues
