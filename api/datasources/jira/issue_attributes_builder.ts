@@ -1,5 +1,6 @@
 import { Moment } from "moment";
 import { URL } from "url";
+import { Field } from "../../models/entities/field";
 
 const moment = require('moment');
 
@@ -9,10 +10,21 @@ type StatusChange = {
 }
 
 export class IssueAttributesBuilder {
+  private epicLinkFieldId: string;
+
+  constructor(fields: Array<Field>) {
+    for (let field of fields) {
+      if (field.name === "Epic Link") {
+        this.epicLinkFieldId = field.externalId;
+      }
+    }
+  }
+
   build(json: JSON): {
     key: string,
     title: string,
     issueType: string,
+    parentKey: string,
     externalUrl: string,
     started: Date,
     completed: Date,
@@ -26,6 +38,7 @@ export class IssueAttributesBuilder {
       key: json["key"],
       title: json["fields"]["summary"],
       issueType: json["fields"]["issuetype"]["name"],
+      parentKey: json["fields"][this.epicLinkFieldId],
       externalUrl: new URL(`browse/${json["key"]}`, process.env.JIRA_HOST).href,
       started: startedDate ? startedDate.toDate() : null,
       completed: completedDate ? completedDate.toDate() : null,

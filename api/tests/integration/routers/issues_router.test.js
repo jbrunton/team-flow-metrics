@@ -32,6 +32,9 @@ describe('issues_router', () => {
       title: 'Demo Issue 101',
       issueType: 'Story',
       externalUrl: 'https://jira.example.com/browse/DEMO-101',
+      parentId: null,
+      parentKey: null,
+      childCount: null,
       started: null,
       completed: null,
       cycleTime: null
@@ -41,6 +44,9 @@ describe('issues_router', () => {
       title: 'Demo Issue 102',
       externalUrl: 'https://jira.example.com/browse/DEMO-102',
       issueType: 'Story',
+      parentId: null,
+      parentKey: null,
+      childCount: null,
       started: null,
       completed: null,
       cycleTime: null
