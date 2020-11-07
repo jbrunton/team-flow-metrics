@@ -29,6 +29,7 @@ import { getDefaultDateRange, formatDateRange } from "../helpers/date_helper";
 
 export default Vue.extend({
   name: "Issues",
+
   data() {
     return {
       chartOps: {},
@@ -36,9 +37,9 @@ export default Vue.extend({
       dates: []
     };
   },
+
   mounted() {
     this.initCharts();
-    window.onresize = this.drawChart;
   },
 
   methods: {
@@ -46,6 +47,9 @@ export default Vue.extend({
       google.charts.load("current", { packages: ["corechart"] });
       google.charts.setOnLoadCallback(() => {
         this.dates = getDefaultDateRange();
+        new ResizeObserver(this.drawChart).observe(
+          document.getElementById("chart_div")
+        );
       });
     },
 
@@ -66,6 +70,11 @@ export default Vue.extend({
 
     drawChart() {
       const container = document.getElementById("chart_div");
+      if (!container) {
+        // switched pages, ignore
+        return;
+      }
+
       container.style.height = `${container.offsetWidth * 0.6}px`;
       const data = new google.visualization.DataTable(this.chartData);
       const chart = new google.visualization.ComboChart(container);
