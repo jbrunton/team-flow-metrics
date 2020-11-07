@@ -31,6 +31,7 @@ describe('issues_router', () => {
       key: 'DEMO-101',
       title: 'Demo Issue 101',
       issueType: 'Story',
+      externalUrl: 'https://jira.example.com/browse/DEMO-101',
       started: null,
       completed: null,
       cycleTime: null
@@ -38,6 +39,7 @@ describe('issues_router', () => {
     const issue2 = await getRepository(Issue).save({
       key: 'DEMO-102',
       title: 'Demo Issue 102',
+      externalUrl: 'https://jira.example.com/browse/DEMO-102',
       issueType: 'Story',
       started: null,
       completed: null,
