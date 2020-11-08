@@ -15,6 +15,9 @@
       <b-table-column field="issueType" label="Issue Type" v-slot="props">
         {{ props.row.issueType }}
       </b-table-column>
+      <b-table-column field="status" label="Status" v-slot="props">
+        <b-tag :type="props.row.statusType">{{ props.row.status }}</b-tag>
+      </b-table-column>
       <b-table-column field="childCount" label="Children" v-slot="props">
         {{ props.row.childCount }}
       </b-table-column>
@@ -52,6 +55,11 @@ export default Vue.extend({
     };
   },
   mounted() {
+    const statusTypes = {
+      "To Do": "",
+      "In Progress": "is-success",
+      Done: "is-primary"
+    };
     axios.get(`/api/issues`).then(response => {
       this.issues = response.data.issues.map(issue => {
         return {
@@ -59,6 +67,8 @@ export default Vue.extend({
           title: issue.title,
           issueType: issue.issueType,
           externalUrl: issue.externalUrl,
+          status: issue.status,
+          statusType: statusTypes[issue.status],
           childCount: issue.childCount,
           started: this.formatDate(issue.started),
           completed: this.formatDate(issue.completed),
