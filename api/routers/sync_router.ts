@@ -1,10 +1,11 @@
 import * as express from 'express';
 import { JiraClient } from "../datasources/jira/jira_client";
 import { Field } from '../models/entities/field';
+import { Issue } from '../models/entities/issue';
+import { IssueCollection } from '../models/scope/issue_collection';
 
 const router = express.Router()
 const {getRepository} = require('typeorm')
-const {Issue} = require('../models/entities/issue')
 
 router.get('/', async (req, res) => {
   const client = new JiraClient();
@@ -20,17 +21,22 @@ router.get('/', async (req, res) => {
   await fieldsRepo.save(fields);
   await issuesRepo.save(issues);
 
-  for (let issue of issues) {
-    if (issue.parentKey) {
-      const parent = issues.find(candidate => candidate.key == issue.parentKey)
-      if (parent) {
-        issue.parentId = parent.id;
-        parent.childCount = (parent.childCount || 0) + 1;
-      } else {
-        console.warn(`Could not find parent ${issue.parentKey} for issue ${issue.key}`);
+  const issueCollection = new IssueCollection(issues);
+
+  for (let parentKey of issueCollection.getParentKeys()) {
+    const parent = issueCollection.getIssue(parentKey);
+    const children = issueCollection.getChildrenFor(parentKey);
+    if (parent) {
+      parent.childCount = children.length;
+      for (let child of children) {
+        child.parentId = parent.id;
       }
+    } else {
+      const childKeys = children.map(issue => issue.key)
+      console.warn(`Could not find parent ${parentKey} for issues [${childKeys.join(", ")}]`);
     }
   }
+
   await issuesRepo.save(issues);
 
   res.json({
