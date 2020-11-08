@@ -3,6 +3,7 @@ import { Issue } from "../../models/entities/issue";
 import { Field } from "../../models/entities/field";
 import { getConnection } from "typeorm";
 import { IssueAttributesBuilder } from "./issue_attributes_builder";
+import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 
 export class JiraClient {
   _client: Client
@@ -19,7 +20,7 @@ export class JiraClient {
     })
   }
 
-  async search(fields: Array<Field>, jql: string): Promise<Array<Issue>> {
+  async search(fields: Array<Field>, hierarchyLevels: Array<HierarchyLevel>, jql: string): Promise<Array<Issue>> {
     console.log(`starting search: ${jql}`)
     console.time(`search: ${jql}`)
     const connection = getConnection();
@@ -40,7 +41,7 @@ export class JiraClient {
     }
 
     const issues = [];
-    const builder = new IssueAttributesBuilder(fields);
+    const builder = new IssueAttributesBuilder(fields, hierarchyLevels);
 
     results.forEach(result => {
       result.issues.forEach(issue => {
