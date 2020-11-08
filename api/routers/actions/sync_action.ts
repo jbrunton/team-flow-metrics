@@ -19,8 +19,8 @@ export async function syncIssues(): Promise<Array<Issue>> {
 
   console.log("Syncing Jira data...");
   const hierarchyLevels = [
-    { name: "Epic", issueType: "Epic" },
-    { name: "Story", issueType: "*" }
+    { name: "Story", issueType: "*" },
+    { name: "Epic", issueType: "Epic" }
   ].map(level => hierarchyLevelsRepo.create(level));
   await hierarchyLevelsRepo.save(hierarchyLevels);
 

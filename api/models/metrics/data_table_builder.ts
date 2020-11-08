@@ -1,4 +1,5 @@
 import { jStat } from "jstat";
+const moment = require('moment')
 
 type DataTableColumn = {
   label: string,
@@ -50,6 +51,7 @@ export class DataTableBuilder {
       return;
     }
 
+    const xValues = this.getColumnValues(0).sort((d1, d2) => moment(d1).diff(moment(d2)));
     const fromValue = this.rows[0][0];
     const toValue = this.rows[this.rows.length - 1][0];
     const padding = new Array(this.cols.length - 1).fill(null);

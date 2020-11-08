@@ -87,7 +87,9 @@ export default Vue.extend({
       const toDate = this.dates[1];
 
       const response = await axios.get(
-        `/api/charts/scatterplot?fromDate=${fromDate.toString()}&toDate=${toDate.toString()}`
+        `/api/charts/scatterplot?fromDate=${fromDate.toString()}&toDate=${toDate.toString()}&hierarchyLevel=${
+          this.selectedLevel
+        }`
       );
 
       this.chartData = response.data.chartData;
