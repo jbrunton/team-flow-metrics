@@ -16,6 +16,12 @@ export class Issue {
     issueType: string;
 
     @Column()
+    status: string;
+
+    @Column()
+    statusCategory: string;
+
+    @Column()
     externalUrl: string;
 
     @Column()

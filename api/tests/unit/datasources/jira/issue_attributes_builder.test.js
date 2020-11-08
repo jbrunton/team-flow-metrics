@@ -11,6 +11,12 @@ describe('IssueAttributesBuilder', () => {
         summary: "Demo Issue 101",
         issuetype: {
           name: 'Story'
+        },
+        status: {
+          name: "Backlog",
+          statusCategory: {
+            name: "To Do"
+          }
         }
       },
       changelog: {
@@ -23,6 +29,8 @@ describe('IssueAttributesBuilder', () => {
     expect(issue.key).toEqual('DEMO-101');
     expect(issue.title).toEqual('Demo Issue 101');
     expect(issue.issueType).toEqual('Story');
+    expect(issue.status).toEqual('Backlog');
+    expect(issue.statusCategory).toEqual('To Do');
     expect(issue.externalUrl).toEqual('https://jira.example.com/browse/DEMO-101');
   })
 
@@ -38,6 +46,12 @@ describe('IssueAttributesBuilder', () => {
           summary: "Demo Issue 101",
           issuetype: {
             name: 'Story'
+          },
+          status: {
+            name: "Backlog",
+            statusCategory: {
+              name: "To Do"
+            }
           },
           customfield_10001: "DEMO-102"
         },
@@ -60,6 +74,12 @@ describe('IssueAttributesBuilder', () => {
           summary: "Demo Issue 101",
           issuetype: {
             name: 'Story'
+          },
+          status: {
+            name: "Backlog",
+            statusCategory: {
+              name: "To Do"
+            }
           }
         },
         changelog: {
@@ -79,6 +99,12 @@ describe('IssueAttributesBuilder', () => {
           summary: "Demo Issue 101",
           issuetype: {
             name: 'Story'
+          },
+          status: {
+            name: "Backlog",
+            statusCategory: {
+              name: "To Do"
+            }
           }
         },
         changelog: {
@@ -120,6 +146,12 @@ describe('IssueAttributesBuilder', () => {
           summary: "Demo Issue 101",
           issuetype: {
             name: 'Story'
+          },
+          status: {
+            name: "Backlog",
+            statusCategory: {
+              name: "To Do"
+            }
           }
         },
         changelog: {
@@ -162,6 +194,12 @@ describe('IssueAttributesBuilder', () => {
           summary: "Demo Issue 101",
           issuetype: {
             name: 'Story'
+          },
+          status: {
+            name: "Backlog",
+            statusCategory: {
+              name: "To Do"
+            }
           }
         },
         changelog: {
@@ -181,6 +219,12 @@ describe('IssueAttributesBuilder', () => {
           summary: "Demo Issue 101",
           issuetype: {
             name: 'Story'
+          },
+          status: {
+            name: "Backlog",
+            statusCategory: {
+              name: "To Do"
+            }
           }
         },
         changelog: {
@@ -231,6 +275,12 @@ describe('IssueAttributesBuilder', () => {
           summary: "Demo Issue 101",
           issuetype: {
             name: 'Story'
+          },
+          status: {
+            name: "Backlog",
+            statusCategory: {
+              name: "To Do"
+            }
           }
         },
         changelog: {

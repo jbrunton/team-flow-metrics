@@ -10,6 +10,8 @@ export class CreateIssues1603557556019 implements MigrationInterface {
             "key" character varying NOT NULL,
             "title" character varying NOT NULL,
             "issueType" character varying NOT NULL,
+            "status" character varying NOT NULL,
+            "statusCategory" character varying NOT NULL CHECK ("statusCategory" IN ('To Do', 'In Progress', 'Done')),
             "externalUrl" character varying NOT NULL,
 
             "parentKey" character varying,
