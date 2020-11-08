@@ -34,6 +34,12 @@
   </div>
 </template>
 
+<style scoped>
+.tag:not(body) {
+  width: 100%;
+}
+</style>
+
 <script lang="ts">
 import Vue from "vue";
 import axios from "axios";
