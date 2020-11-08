@@ -19,6 +19,7 @@ services:
       - JIRA_USER
       - JIRA_TOKEN
       - JIRA_HOST
+      - EPIC_CYCLE_TIME_STRATEGY
 
     command: npm run debug
     depends_on:
