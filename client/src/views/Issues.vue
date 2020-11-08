@@ -74,7 +74,7 @@ export default Vue.extend({
           issueType: issue.issueType,
           externalUrl: issue.externalUrl,
           status: issue.status,
-          statusType: statusTypes[issue.status],
+          statusType: statusTypes[issue.statusCategory],
           childCount: issue.childCount,
           started: this.formatDate(issue.started),
           completed: this.formatDate(issue.completed),

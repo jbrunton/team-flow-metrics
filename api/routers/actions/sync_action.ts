@@ -64,7 +64,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
         parent.started = null;
       }
 
-      if (parent.statusCategory == "Done") {
+      if (parent.statusCategory === "Done") {
         const completed = children
           .map(child => child.completed)
           .filter(date => date)
