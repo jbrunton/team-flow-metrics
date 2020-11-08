@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { HierarchyLevel } from "../../../models/entities/hierarchy_level";
 const request = require('supertest')
 const { createApp } = require('../../../app')
 const { Issue } = require('../../../models/entities/issue')
@@ -18,21 +19,28 @@ describe('issues_router', () => {
 
   beforeEach(async () => {
     const connection = getConnection();
-    const entities = connection.entityMetadatas;
 
-    entities.forEach(async (entity) => {
-      const repository = connection.getRepository(entity.name);
-      await repository.query(`DELETE FROM ${entity.tableName}`);
-    });
+    await connection.query("DELETE FROM issues");
+    await connection.query("DELETE FROM fields");
+    await connection.query("DELETE FROM hierarchy_levels");
+
+    const levels = await connection.getRepository(HierarchyLevel).create([
+      { name: "Story", issueType: "Story" },
+      { name: "Epic", issueType: "Epic" }
+    ])
+    await connection.getRepository(HierarchyLevel).save(levels);
   })
 
   it('should return a list of issues', async () => {
+    const levels = await getRepository(HierarchyLevel).find();
+    console.log("levels:", levels);
     const issue1 = await getRepository(Issue).save({
       key: 'DEMO-101',
       title: 'Demo Issue 101',
       issueType: 'Story',
       status: "Backlog",
       statusCategory: "To Do",
+      hierarchyLevel: "Story",
       externalUrl: 'https://jira.example.com/browse/DEMO-101',
       parentId: null,
       parentKey: null,
@@ -47,6 +55,7 @@ describe('issues_router', () => {
       issueType: 'Story',
       status: "Backlog",
       statusCategory: "To Do",
+      hierarchyLevel: "Story",
       externalUrl: 'https://jira.example.com/browse/DEMO-102',
       parentId: null,
       parentKey: null,
