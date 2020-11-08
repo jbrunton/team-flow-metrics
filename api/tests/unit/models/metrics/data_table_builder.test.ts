@@ -1,4 +1,4 @@
-import { DataTableBuilder } from '../../../models/metrics/data_table_builder';
+import { DataTableBuilder } from '../../../../models/metrics/data_table_builder';
 
 describe("DataTableBuilder", () => {
 
