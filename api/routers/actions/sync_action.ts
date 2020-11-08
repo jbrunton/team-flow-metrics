@@ -38,6 +38,18 @@ export async function syncIssues(): Promise<Array<Issue>> {
   }
   await issuesRepo.save(issues);
 
+  const statusCategoryOverrides = {};
+  (process.env.STATUS_CATEGORY_OVERRIDES || "")
+    .split(",")
+    .forEach(override => {
+      const [key, statusCategory] = override.split("=");
+      statusCategoryOverrides[key] = statusCategory;
+      console.log(`statusCategory override: ${key} = ${statusCategory}`);
+      issueCollection.getIssue(key).statusCategory = statusCategory;
+    });
+
+  await issuesRepo.save(issues);
+
   if (process.env.EPIC_CYCLE_TIME_STRATEGY === "STORIES") {
     console.log("EPIC_CYCLE_TIME_STRATEGY = STORIES, computing epic cycle times...");
     for (let parent of issueCollection.getParents()) {
@@ -51,7 +63,8 @@ export async function syncIssues(): Promise<Array<Issue>> {
       } else {
         parent.started = null;
       }
-      if (parent.completed) {
+
+      if (parent.statusCategory == "Done") {
         const completed = children
           .map(child => child.completed)
           .filter(date => date)
@@ -62,6 +75,9 @@ export async function syncIssues(): Promise<Array<Issue>> {
           parent.completed = null;
         }
       }
+
+      const cycleTime = parent.started && parent.completed ? moment(parent.completed).diff(moment(parent.started), 'hours') / 24 : null;
+      parent.cycleTime = cycleTime;
     }
     await issuesRepo.save(issues);
   }
