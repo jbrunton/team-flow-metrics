@@ -1,24 +1,25 @@
 import { Moment } from "moment";
 import { URL } from "url";
 import { Field } from "../../models/entities/field";
+import { TransitionJson, Transition } from "../../models/entities/issue";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
+import { Status } from "../../models/entities/status";
 
 const moment = require('moment');
-
-type StatusChange = {
-  date: Moment,
-  status: string
-}
 
 export class IssueAttributesBuilder {
   private epicLinkFieldId: string;
   private hierarchyLevels: { [issueType: string]: HierarchyLevel } = {};
+  private statusCategories: { [status: string]: string } = {};
 
-  constructor(fields: Array<Field>, hierarchyLevels: Array<HierarchyLevel>) {
+  constructor(fields: Array<Field>, statuses: Array<Status>, hierarchyLevels: Array<HierarchyLevel>) {
     for (let field of fields) {
       if (field.name === "Epic Link") {
         this.epicLinkFieldId = field.externalId;
       }
+    }
+    for (let status of statuses) {
+      this.statusCategories[status.name] = status.category;
     }
     for (let level of hierarchyLevels) {
       this.hierarchyLevels[level.issueType] = level;
@@ -34,13 +35,14 @@ export class IssueAttributesBuilder {
     statusCategory: string,
     hierarchyLevel: string,
     externalUrl: string,
+    transitions: Array<TransitionJson>,
     started: Date,
     completed: Date,
     cycleTime: number
   } {
-    const statusChanges = getStatusChanges(json);
-    const startedDate = getStartedDate(statusChanges);
-    const completedDate = getCompletedDate(statusChanges);
+    const transitions = this.getTransitions(json);
+    const startedDate = getStartedDate(transitions);
+    const completedDate = getCompletedDate(transitions);
     const cycleTime = startedDate && completedDate ? completedDate.diff(startedDate, 'hours') / 24 : null;
     const issueType = json["fields"]["issuetype"]["name"];
     const hierarchyLevel = this.hierarchyLevels[issueType] || this.hierarchyLevels["*"];
@@ -56,49 +58,70 @@ export class IssueAttributesBuilder {
       hierarchyLevel: hierarchyLevel.name,
       parentKey: json["fields"][this.epicLinkFieldId],
       externalUrl: new URL(`browse/${json["key"]}`, process.env.JIRA_HOST).href,
+      transitions: serializeTransitions(transitions),
       started: startedDate ? startedDate.toDate() : null,
       completed: completedDate ? completedDate.toDate() : null,
       cycleTime: cycleTime
     };
   }
+
+  private getTransitions(json): Array<Transition> {
+    // TODO: What if changelog.total > changelog.maxResults? Are all entries always returned?
+    return json.changelog.histories
+      .map(event => {
+        const statusChange = event.items.find(item => item.field == "status");
+        if (!statusChange) {
+          return null;
+        }
+        const fromStatus = {
+          name: statusChange.fromString,
+          category: this.statusCategories[statusChange.fromString]
+        };
+        const toStatus = {
+          name: statusChange.toString,
+          category: this.statusCategories[statusChange.toString]
+        };
+        return {
+          date: moment(event.created),
+          fromStatus,
+          toStatus
+        };
+      })
+      .filter(transition => transition)
+      .sort((t1, t2) => t1.date.diff(t2.date));
+  }
 }
 
-function getStatusChanges(json): Array<StatusChange> {
-  // TODO: What if changelog.total > changelog.maxResults? Are all entries always returned?
-  return json.changelog.histories
-    .map(event => {
-      const statusChange = event.items.find(item => item.field == "status");
-      if (!statusChange) {
-        return null;
-      }
-      return {
-        date: moment(event.created),
-        status: statusChange.toString
-      }
-    })
-    .filter(event => event)
-    .sort((e1, e2) => e1.date.diff(e2.date));
+function serializeTransitions(transitions: Array<Transition>): Array<TransitionJson> {
+  return transitions.map(transition => {
+    const json = {
+      date: transition.date.toISOString(),
+      fromStatus: transition.fromStatus,
+      toStatus: transition.toStatus
+    };
+    return json;
+  })
 }
 
-function getStartedDate(statusChanges: Array<StatusChange>): Moment {
-  const startedEvent = statusChanges.find(event => event.status === "In Progress");
+function getStartedDate(transitions: Array<Transition>): Moment {
+  const startedTransition = transitions.find(transition => transition.toStatus.category === "In Progress");
   
-  if (!startedEvent) {
+  if (!startedTransition) {
     return null;
   }
 
-  return startedEvent.date;
+  return startedTransition.date;
 }
 
-function getCompletedDate(statusChanges: Array<StatusChange>): Moment {
-  if (!statusChanges.length) {
+function getCompletedDate(transitions: Array<Transition>): Moment {
+  if (!transitions.length) {
     return null;
   }
 
-  const lastEvent = statusChanges[statusChanges.length - 1];
-  if (lastEvent.status != "Done") {
+  const lastTransition = transitions[transitions.length - 1];
+  if (lastTransition.toStatus.category != "Done") {
     return null;
   }
 
-  return lastEvent.date;
+  return lastTransition.date;
 }
