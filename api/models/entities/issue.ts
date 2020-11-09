@@ -44,4 +44,8 @@ export class Issue {
 
     @Column()
     cycleTime: number;
+
+    constructor(issue?: Partial<Issue>) {
+        Object.assign(this, issue);
+    }
 }

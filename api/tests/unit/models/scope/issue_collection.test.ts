@@ -1,4 +1,5 @@
-import { Issue } from "../../../../models/entities/issue"
+import { Issue } from "../../../../models/entities/issue";
+import { IssueFactory } from "../../../factories/issue_factory";
 import { IssueCollection } from "../../../../models/scope/issue_collection";
 
 describe("IssueCollection", () => {
@@ -7,19 +8,11 @@ describe("IssueCollection", () => {
   let issue1, issue2, issue3, epic1: Issue
 
   beforeEach(() => {
-    epic1 = new Issue();
-    epic1.key = "EPIC-101";
+    issue1 = IssueFactory.build({ key: "STORY-101", parentKey: "EPIC-101" });
+    issue2 = IssueFactory.build({ key: "STORY-102", parentKey: "EPIC-101" });
+    issue3 = IssueFactory.build({ key: "STORY-103", });
 
-    issue1 = new Issue();
-    issue1.key = "DEMO-101";
-    issue1.parentKey = "EPIC-101";
-    
-    issue2 = new Issue();
-    issue2.key = "DEMO-102";
-    issue2.parentKey = "EPIC-101";
-
-    issue3 = new Issue();
-    issue3.key = "DEMO-103";
+    epic1 = IssueFactory.build({ key: "EPIC-101", issueType: "Epic" });
 
     issues = [epic1, issue1, issue2, issue3];
     collection = new IssueCollection(issues);
@@ -37,17 +30,17 @@ describe("IssueCollection", () => {
     })
 
     it("returns undefined if the issue has no children", () => {
-      expect(collection.getChildrenFor("DEMO-101")).toBeUndefined();
+      expect(collection.getChildrenFor("STORY-101")).toBeUndefined();
     })
   })
 
   describe("#getIssue", () => {
     it("returns the issue for the given key", () => {
-      expect(collection.getIssue("DEMO-101")).toEqual(issue1);
+      expect(collection.getIssue("STORY-101")).toEqual(issue1);
     })
 
     it("returns undefined if the issue does not exist", () => {
-      expect(collection.getIssue("DEMO-201")).toBeUndefined();
+      expect(collection.getIssue("STORY-201")).toBeUndefined();
     })
   })
 

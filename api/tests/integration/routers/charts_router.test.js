@@ -3,6 +3,8 @@ import { HierarchyLevel } from "../../../models/entities/hierarchy_level";
 const request = require('supertest')
 const { createApp } = require('../../../app')
 const { Issue } = require('../../../models/entities/issue')
+const DbFactory = require('../fixtures/db_factory');
+import { IssueFactory } from "../../factories/issue_factory";
 
 const { getConnection, getRepository } = require('typeorm')
 
@@ -11,6 +13,7 @@ describe('charts_router', () => {
 
   beforeAll(async () => {
     app = await createApp();
+    await DbFactory.prepareDatabase();
   })
 
   afterAll(async () => {
@@ -18,45 +21,25 @@ describe('charts_router', () => {
   })
 
   beforeEach(async () => {
-    const connection = getConnection();
-
-    await connection.query("DELETE FROM issues");
-    await connection.query("DELETE FROM fields");
-    await connection.query("DELETE FROM hierarchy_levels");
-
-    const levels = await connection.getRepository(HierarchyLevel).create([
-      { name: "Story", issueType: "Story" },
-      { name: "Epic", issueType: "Epic" }
-    ])
-    await connection.getRepository(HierarchyLevel).save(levels);
+    await DbFactory.resetDatabase();
   })
 
   describe('/scatterplot', () => {
     it('should return cycle time data', async () => {
-      const issue1 = await getRepository(Issue).save({
-        key: 'DEMO-101',
-        title: 'Demo Issue 101',
-        issueType: 'Story',
+      await getRepository(Issue).save(IssueFactory.build({
         status: "Done",
         statusCategory: "Done",
-        hierarchyLevel: "Story",
-        externalUrl: 'https://jira.example.com/browse/DEMO-101',
         started: new Date(2020, 1, 1, 0, 0),
         completed: new Date(2020, 1, 2, 0, 0),
         cycleTime: 1
-      });
-      const issue2 = await getRepository(Issue).save({
-        key: 'DEMO-102',
-        title: 'Demo Issue 102',
-        issueType: 'Story',
+      }));
+      await getRepository(Issue).save(IssueFactory.build({
         status: "Done",
         statusCategory: "Done",
-        hierarchyLevel: "Story",
-        externalUrl: 'https://jira.example.com/browse/DEMO-102',
         started: new Date(2020, 1, 3, 0, 0),
         completed: new Date(2020, 1, 5, 0, 0),
         cycleTime: 2
-      });
+      }));
 
       const res = await request(app)
         .get('/charts/scatterplot?fromDate=2020-01-01&toDate=2020-03-01&hierarchyLevel=Story')
@@ -135,30 +118,24 @@ describe('charts_router', () => {
     })
 
     it('filters out epics', async () => {
-      const issue1 = await getRepository(Issue).save({
-        key: 'DEMO-101',
-        title: 'Demo Issue 101',
+      const issue1 = await getRepository(Issue).save(IssueFactory.build({
         issueType: 'Story',
         status: "Done",
         statusCategory: "Done",
         hierarchyLevel: "Story",
-        externalUrl: 'https://jira.example.com/browse/DEMO-101',
         started: new Date(2020, 1, 1, 0, 0),
         completed: new Date(2020, 1, 2, 0, 0),
         cycleTime: 1
-      });
-      const issue2 = await getRepository(Issue).save({
-        key: 'DEMO-102',
-        title: 'Demo Epic 102',
+      }));
+      const issue2 = await getRepository(Issue).save(IssueFactory.build({
         issueType: 'Epic',
         status: "Done",
         statusCategory: "Done",
         hierarchyLevel: "Epic",
-        externalUrl: 'https://jira.example.com/browse/DEMO-102',
         started: new Date(2020, 1, 3, 0, 0),
         completed: new Date(2020, 1, 5, 0, 0),
         cycleTime: 2
-      });
+      }));
 
       const res = await request(app)
         .get('/charts/scatterplot?fromDate=2020-01-01&toDate=2020-03-01&hierarchyLevel=Story')
