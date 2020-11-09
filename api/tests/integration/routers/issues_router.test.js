@@ -25,8 +25,8 @@ describe('issues_router', () => {
   })
 
   it('should return a list of issues', async () => {
-    const issue1 = await getRepository(Issue).save(IssueFactory.build());
-    const issue2 = await getRepository(Issue).save(IssueFactory.build());
+    const issue1 = await getRepository(Issue).save(IssueFactory.build({ created: new Date(2020, 0, 1) }));
+    const issue2 = await getRepository(Issue).save(IssueFactory.build({ created: new Date(2020, 0, 1) }));
     
     const res = await request(app)
       .get('/issues')
@@ -35,8 +35,8 @@ describe('issues_router', () => {
     expect(res.body).toEqual({
       count: 2,
       issues: [
-        issue1,
-        issue2
+        Object.assign({}, issue1, { created: "2020-01-01T00:00:00.000Z" }),
+        Object.assign({}, issue2, { created: "2020-01-01T00:00:00.000Z" })
       ]
     })
   })
