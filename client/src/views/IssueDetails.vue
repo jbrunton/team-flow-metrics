@@ -9,7 +9,7 @@
             Summary
           </p>
           <div class="panel-block">
-            <table class="table" style="width: 100%;">
+            <table v-if="issue" class="table" style="width: 100%;">
               <tr>
                 <th style="width: 35%;">Issue Type</th>
                 <td>{{ issue.issueType }}</td>
@@ -27,8 +27,11 @@
                 <td>{{ issue.created }}</td>
               </tr>
               <tr>
-                <th style="width: 35%;">Epic Link</th>
-                <td>{{ issue.parentKey }}</td>
+                <th style="width: 35%;">Parent</th>
+                <td>
+                  <a v-if="issue.parentKey">{{ issue.parentKey }}</a>
+                  {{ this.parent ? `- ${this.parent.title}` : "" }}
+                </td>
               </tr>
             </table>
           </div>
@@ -40,8 +43,11 @@
             Transitions
           </p>
           <div class="panel-block">
-            <table class="table" style="width: 100%;">
-              <tr v-for="transition in issue.transitions" :key="transition">
+            <table v-if="issue" class="table" style="width: 100%;">
+              <tr
+                v-for="transition in issue.transitions"
+                :key="transition.date"
+              >
                 <td>{{ transition.date }}</td>
                 <td>{{ transition.fromStatus.name }}</td>
                 <td>→</td>
@@ -73,13 +79,25 @@ export default Vue.extend({
   data() {
     return {
       key: this.$route.params.key,
-      issue: null
+      issue: null,
+      parent: null
     };
   },
   mounted() {
-    axios.get(`/api/issues/${this.key}`).then(response => {
-      this.issue = response.data.issue;
-    });
+    this.fetchData();
+  },
+  methods: {
+    async fetchData() {
+      const issueResponse = await axios.get(`/api/issues/${this.key}`);
+      this.issue = issueResponse.data.issue;
+
+      if (this.issue.parentKey) {
+        const parentResponse = await axios.get(
+          `/api/issues/${this.issue.parentKey}`
+        );
+        this.parent = parentResponse.data.issue;
+      }
+    }
   },
   computed: {
     title() {
