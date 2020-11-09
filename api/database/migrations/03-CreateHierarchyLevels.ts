@@ -1,6 +1,6 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class CreateHierarchyLevels0000000000002 implements MigrationInterface {
+export class CreateHierarchyLevels0000000000003 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "hierarchy_levels" (

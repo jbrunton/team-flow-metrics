@@ -4,6 +4,7 @@ import { Field } from "../../models/entities/field";
 import { Issue } from "../../models/entities/issue";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { IssueCollection } from "../../models/scope/issue_collection";
+import { Status } from "../../models/entities/status";
 
 const moment = require('moment');
 
@@ -11,10 +12,12 @@ export async function syncIssues(): Promise<Array<Issue>> {
   const client = new JiraClient();
   const issuesRepo = getRepository(Issue);
   const fieldsRepo = getRepository(Field);
+  const statusesRepo = getRepository(Status);
   const hierarchyLevelsRepo = getRepository(HierarchyLevel);
 
   await issuesRepo.clear();
   await fieldsRepo.clear();
+  await statusesRepo.query('DELETE FROM statuses');
   await hierarchyLevelsRepo.query('DELETE FROM hierarchy_levels');
 
   console.log("Syncing Jira data...");
@@ -27,8 +30,10 @@ export async function syncIssues(): Promise<Array<Issue>> {
   const fields = await client.getFields();
   await fieldsRepo.save(fields);
 
-  console.log("hierarchyLevels:", hierarchyLevels);
-  const issues = await client.search(fields, hierarchyLevels, 'project=LIST');
+  const statuses = await client.getStatuses();
+  await statusesRepo.save(statuses);
+
+  const issues = await client.search(fields, statuses, hierarchyLevels, 'project=LIST');
   await issuesRepo.save(issues);
 
   console.log("Building parent/child relationships...");

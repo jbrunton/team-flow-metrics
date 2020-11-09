@@ -4,6 +4,7 @@ import { Field } from "../../models/entities/field";
 import { getConnection } from "typeorm";
 import { IssueAttributesBuilder } from "./issue_attributes_builder";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
+import { Status } from "../../models/entities/status";
 
 export class JiraClient {
   _client: Client
@@ -20,7 +21,7 @@ export class JiraClient {
     })
   }
 
-  async search(fields: Array<Field>, hierarchyLevels: Array<HierarchyLevel>, jql: string): Promise<Array<Issue>> {
+  async search(fields: Array<Field>, statuses: Array<Status>, hierarchyLevels: Array<HierarchyLevel>, jql: string): Promise<Array<Issue>> {
     console.log(`starting search: ${jql}`)
     console.time(`search: ${jql}`)
     const connection = getConnection();
@@ -41,7 +42,7 @@ export class JiraClient {
     }
 
     const issues = [];
-    const builder = new IssueAttributesBuilder(fields, hierarchyLevels);
+    const builder = new IssueAttributesBuilder(fields, statuses, hierarchyLevels);
 
     results.forEach(result => {
       result.issues.forEach(issue => {
@@ -61,6 +62,17 @@ export class JiraClient {
     return fields.map(field => repo.create({
       externalId: field["id"],
       name: field["name"]
+    }));
+  }
+
+  async getStatuses(): Promise<Array<Status>> {
+    console.log("Fetching Jira statuses");
+    const connection = getConnection();
+    const repo = connection.getRepository(Status);
+    const statuses = await this._client.workflowStatuses.getAllStatuses();
+    return statuses.map(status => repo.create({
+      name: status["name"],
+      category: status["statusCategory"]["name"]
     }));
   }
 }

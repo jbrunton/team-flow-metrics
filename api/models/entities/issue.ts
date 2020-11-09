@@ -1,4 +1,22 @@
 import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import { Moment } from "moment";
+
+export type TransitionStatus = {
+    name: string,
+    category: string
+}
+
+export type Transition = {
+    date: Moment,
+    fromStatus: TransitionStatus,
+    toStatus: TransitionStatus
+}
+
+export type TransitionJson = {
+    date: string,
+    fromStatus: TransitionStatus,
+    toStatus: TransitionStatus
+}
 
 @Entity({ name: 'issues' })
 export class Issue {
@@ -35,6 +53,12 @@ export class Issue {
 
     @Column()
     childCount: number;
+
+    @Column({
+        type: 'jsonb',
+        array: false
+    })
+    transitions: Array<TransitionJson>;
 
     @Column("timestamp")
     started: Date;

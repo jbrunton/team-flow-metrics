@@ -14,6 +14,22 @@
                 <th style="width: 35%;">Issue Type</th>
                 <td>{{ issue.issueType }}</td>
               </tr>
+              <tr>
+                <th style="width: 35%;">Status</th>
+                <td>{{ issue.status }}</td>
+              </tr>
+              <tr>
+                <th style="width: 35%;">Resolution</th>
+                <td>{{ issue.resolution }}</td>
+              </tr>
+              <tr>
+                <th style="width: 35%;">Created</th>
+                <td>{{ issue.created }}</td>
+              </tr>
+              <tr>
+                <th style="width: 35%;">Epic Link</th>
+                <td>{{ issue.parentKey }}</td>
+              </tr>
             </table>
           </div>
         </nav>
@@ -24,13 +40,29 @@
             Transitions
           </p>
           <div class="panel-block">
-            <table class="table" style="width: 100%;"></table>
+            <table class="table" style="width: 100%;">
+              <tr v-for="transition in issue.transitions" :key="transition">
+                <td>{{ transition.date }}</td>
+                <td>{{ transition.fromStatus.name }}</td>
+                <td>→</td>
+                <td>{{ transition.toStatus.name }}</td>
+              </tr>
+            </table>
           </div>
         </nav>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+table tr:last-child {
+  td,
+  th {
+    border: none;
+  }
+}
+</style>
 
 <script lang="ts">
 import Vue from "vue";
