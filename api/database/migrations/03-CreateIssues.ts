@@ -6,7 +6,7 @@ export class CreateIssues0000000000003 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "issues" (
             "id" SERIAL NOT NULL,
 
-            "key" character varying NOT NULL,
+            "key" character varying NOT NULL UNIQUE,
             "title" character varying NOT NULL,
             "issueType" character varying NOT NULL,
             "status" character varying NOT NULL,

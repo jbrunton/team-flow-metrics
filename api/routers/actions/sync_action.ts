@@ -49,16 +49,18 @@ export async function syncIssues(): Promise<Array<Issue>> {
   await issuesRepo.save(issues);
 
   const statusCategoryOverrides = {};
-  (process.env.STATUS_CATEGORY_OVERRIDES || "")
-    .split(",")
-    .forEach(override => {
-      const [key, statusCategory] = override.split("=");
-      statusCategoryOverrides[key] = statusCategory;
-      console.log(`statusCategory override: ${key} = ${statusCategory}`);
-      issueCollection.getIssue(key).statusCategory = statusCategory;
-    });
+  if (process.env.STATUS_CATEGORY_OVERRIDES) {
+    (process.env.STATUS_CATEGORY_OVERRIDES || "")
+      .split(",")
+      .forEach(override => {
+        const [key, statusCategory] = override.split("=");
+        statusCategoryOverrides[key] = statusCategory;
+        console.log(`statusCategory override: ${key} = ${statusCategory}`);
+        issueCollection.getIssue(key).statusCategory = statusCategory;
+      });
 
-  await issuesRepo.save(issues);
+    await issuesRepo.save(issues);
+  }
 
   if (process.env.EPIC_CYCLE_TIME_STRATEGY === "STORIES") {
     console.log("EPIC_CYCLE_TIME_STRATEGY = STORIES, computing epic cycle times...");

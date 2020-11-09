@@ -12,6 +12,13 @@ router.get('/', async (req, res) => {
   })
 })
 
+router.get('/:key', async (req, res) => {
+  const issue = await getRepository(Issue).findOne({ key: req.params.key});
+  res.json({
+    issue: issue
+  });
+})
+
 module.exports = {
   routerPath: '/issues',
   router: router
