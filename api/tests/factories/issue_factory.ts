@@ -15,5 +15,6 @@ export const IssueFactory = Factory.define("Issue", Issue)
     childCount: null,
     started: null,
     completed: null,
-    cycleTime: null
+    cycleTime: null,
+    transitions: []
   });

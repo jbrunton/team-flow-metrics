@@ -21,7 +21,6 @@ export class IssueAttributesBuilder {
     for (let status of statuses) {
       this.statusCategories[status.name] = status.category;
     }
-    console.log(this.statusCategories);
     for (let level of hierarchyLevels) {
       this.hierarchyLevels[level.issueType] = level;
     }

@@ -3,6 +3,11 @@ const { getRepository } = require('typeorm');
 const { Field } = require('../../../../models/entities/field');
 
 describe('IssueAttributesBuilder', () => {
+  const statuses = [
+    { name: "Backlog", category: "To Do" },
+    { name: "In Progress", category: "In Progress" },
+    { name: "Done", category: "Done" }
+  ]
   const hierarchyLevels = [
     { name: "Epic", issueType: "Epic" },
     { name: "Story", issueType: "Story" }
@@ -28,7 +33,7 @@ describe('IssueAttributesBuilder', () => {
       }
     };
 
-    const issue = new IssueAttributesBuilder([], hierarchyLevels).build(json);
+    const issue = new IssueAttributesBuilder([], statuses, hierarchyLevels).build(json);
 
     expect(issue.key).toEqual('DEMO-101');
     expect(issue.title).toEqual('Demo Issue 101');
@@ -64,7 +69,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder(fields, hierarchyLevels).build(json);
+      const issue = new IssueAttributesBuilder(fields, statuses, hierarchyLevels).build(json);
   
       expect(issue.parentKey).toEqual('DEMO-102');
     });
@@ -91,7 +96,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder([], hierarchyLevels).build(json);
+      const issue = new IssueAttributesBuilder([], statuses, hierarchyLevels).build(json);
   
       expect(issue.started).toBeNull();
     })
@@ -137,7 +142,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder([], hierarchyLevels).build(json);
+      const issue = new IssueAttributesBuilder([], statuses, hierarchyLevels).build(json);
   
       expect(issue.started).toEqual(new Date("2020-01-02T09:00:00.000Z"))
     })
@@ -184,7 +189,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder([], hierarchyLevels).build(json);
+      const issue = new IssueAttributesBuilder([], statuses, hierarchyLevels).build(json);
   
       expect(issue.started).toBeNull();
     })
@@ -211,7 +216,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder([], hierarchyLevels).build(json);
+      const issue = new IssueAttributesBuilder([], statuses, hierarchyLevels).build(json);
   
       expect(issue.completed).toBeNull();
     })
@@ -267,7 +272,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder([], hierarchyLevels).build(json);
+      const issue = new IssueAttributesBuilder([], statuses, hierarchyLevels).build(json);
   
       expect(issue.completed).toEqual(new Date("2020-01-03T09:00:00.000Z"))
     })
@@ -313,7 +318,7 @@ describe('IssueAttributesBuilder', () => {
         }
       };
   
-      const issue = new IssueAttributesBuilder([], hierarchyLevels).build(json);
+      const issue = new IssueAttributesBuilder([], statuses, hierarchyLevels).build(json);
   
       expect(issue.completed).toBeNull()
     })
