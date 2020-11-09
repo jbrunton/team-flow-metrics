@@ -1,5 +1,6 @@
 import * as express from 'express';
 import { Between, IsNull, Not } from 'typeorm';
+import { HierarchyLevel } from '../models/entities/hierarchy_level';
 import { DataTableBuilder } from '../models/metrics/data_table_builder';
 const moment = require('moment');
 const { jStat } = require('jstat');
@@ -19,13 +20,19 @@ router.get('/scatterplot', async (req, res) => {
       error: "Required toDate query param"
     })
   }
+  if (!req.query.hierarchyLevel) {
+    res.status(400).json({
+      error: "Required hierarchyLevel query param"
+    })
+  }
   
   const fromDate = moment(req.query.fromDate).toDate();
   const toDate = moment(req.query.toDate).toDate();
+  const hierarchyLevel = req.query.hierarchyLevel;
   const issues = await getRepository(Issue)
     .find({
       completed: Between(fromDate, toDate),
-      issueType: Not("Epic"),
+      issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
       started: Not(IsNull())
     })
   const chartOpts = {

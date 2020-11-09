@@ -14,6 +14,19 @@
           </b-datepicker>
         </b-field>
       </div>
+      <div class="column is-one-quarter">
+        <b-field label="Hierarchy Level">
+          <b-select aria-role="list" v-model="selectedLevel">
+            <option
+              v-for="level in hierarchyLevels"
+              :value="level.name"
+              :key="level.name"
+            >
+              {{ level.name }}
+            </option>
+          </b-select>
+        </b-field>
+      </div>
     </div>
 
     <div id="chart_div"></div>
@@ -35,12 +48,14 @@ export default Vue.extend({
     return {
       chartOps: {},
       chartData: [],
+      hierarchyLevels: [],
+      selectedLevel: null,
       dates: []
     };
   },
 
   mounted() {
-    this.initCharts();
+    this.initForm().then(this.initCharts);
   },
 
   methods: {
@@ -61,19 +76,25 @@ export default Vue.extend({
       });
     },
 
-    fetchData() {
+    async initForm() {
+      const response = await axios.get("/api/meta/hierarchy-levels");
+      this.hierarchyLevels = response.data.levels;
+      this.selectedLevel = this.hierarchyLevels[0].name;
+    },
+
+    async fetchData() {
       const fromDate = this.dates[0];
       const toDate = this.dates[1];
 
-      axios
-        .get(
-          `/api/charts/scatterplot?fromDate=${fromDate.toString()}&toDate=${toDate.toString()}`
-        )
-        .then(response => {
-          this.chartData = response.data.chartData;
-          this.chartOpts = response.data.chartOpts;
-          this.drawChart();
-        });
+      const response = await axios.get(
+        `/api/charts/scatterplot?fromDate=${fromDate.toString()}&toDate=${toDate.toString()}&hierarchyLevel=${
+          this.selectedLevel
+        }`
+      );
+
+      this.chartData = response.data.chartData;
+      this.chartOpts = response.data.chartOpts;
+      this.drawChart();
     },
 
     drawChart() {
@@ -107,6 +128,9 @@ export default Vue.extend({
           query: query
         });
       }
+    },
+    selectedLevel() {
+      this.fetchData();
     }
   }
 });

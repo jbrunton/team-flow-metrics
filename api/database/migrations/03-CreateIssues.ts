@@ -1,7 +1,6 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class CreateIssues1603557556019 implements MigrationInterface {
-    name = 'CreateIssues1603557556019'
+export class CreateIssues0000000000003 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "issues" (
@@ -13,6 +12,7 @@ export class CreateIssues1603557556019 implements MigrationInterface {
             "status" character varying NOT NULL,
             "statusCategory" character varying NOT NULL CHECK ("statusCategory" IN ('To Do', 'In Progress', 'Done')),
             "externalUrl" character varying NOT NULL,
+            "hierarchyLevel" character varying NOT NULL REFERENCES hierarchy_levels(name),
 
             "parentKey" character varying,
             "parentId" integer REFERENCES issues(id),

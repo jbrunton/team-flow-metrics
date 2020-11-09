@@ -22,6 +22,9 @@ export class Issue {
     statusCategory: string;
 
     @Column()
+    hierarchyLevel: string;
+
+    @Column()
     externalUrl: string;
 
     @Column()
