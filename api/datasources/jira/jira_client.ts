@@ -6,20 +6,22 @@ import { IssueAttributesBuilder } from "./issue_attributes_builder";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
 import { JiraField, JiraSearchResult, JiraStatus } from "./types";
+import config from "../../config";
 
 export class JiraClient {
   _client: Client;
 
   constructor() {
+    const jiraConfig = config.jira;
     console.log(
-      `Creating client for host ${process.env.JIRA_HOST}, user ${process.env.JIRA_USER}`
+      `Creating client for host ${config.jira.host}, user ${config.jira.credentials.username}`
     );
     this._client = new Client({
-      host: process.env.JIRA_HOST,
+      host: config.jira.host,
       authentication: {
         basic: {
-          username: process.env.JIRA_USER,
-          apiToken: process.env.JIRA_TOKEN,
+          username: config.jira.credentials.username,
+          apiToken: config.jira.credentials.token,
         },
       },
     });

@@ -5,7 +5,8 @@ import { Issue, Transition } from "../../models/types";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
 import { compareDateTimes, getCycleTime } from "../../helpers/date_helper";
-import { JiraIssue, JiraStatusChange } from "./types";
+import { JiraIssue } from "./types";
+import config from "../../config";
 
 export class IssueAttributesBuilder {
   private epicLinkFieldId: string;
@@ -57,7 +58,7 @@ export class IssueAttributesBuilder {
       created: DateTime.fromISO(json.fields.created),
       hierarchyLevel: hierarchyLevel.name,
       epicKey: json["fields"][this.epicLinkFieldId] as string,
-      externalUrl: new URL(`browse/${json.key}`, process.env.JIRA_HOST).href,
+      externalUrl: new URL(`browse/${json.key}`, config.jira.host).href,
       transitions: transitions,
       started: startedDate,
       completed: completedDate,
