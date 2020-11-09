@@ -3,6 +3,7 @@ import { HierarchyLevel } from "../../../models/entities/hierarchy_level";
 const request = require('supertest')
 const { createApp } = require('../../../app')
 const { Issue } = require('../../../models/entities/issue')
+const DbFactory = require('../fixtures/db_factory');
 import { IssueFactory } from "../../factories/issue_factory";
 
 const { getConnection, getRepository } = require('typeorm')
@@ -12,6 +13,7 @@ describe('charts_router', () => {
 
   beforeAll(async () => {
     app = await createApp();
+    await DbFactory.prepareDatabase();
   })
 
   afterAll(async () => {
@@ -19,17 +21,7 @@ describe('charts_router', () => {
   })
 
   beforeEach(async () => {
-    const connection = getConnection();
-
-    await connection.query("DELETE FROM issues");
-    await connection.query("DELETE FROM fields");
-    await connection.query("DELETE FROM hierarchy_levels");
-
-    const levels = await connection.getRepository(HierarchyLevel).create([
-      { name: "Story", issueType: "Story" },
-      { name: "Epic", issueType: "Epic" }
-    ])
-    await connection.getRepository(HierarchyLevel).save(levels);
+    await DbFactory.resetDatabase();
   })
 
   describe('/scatterplot', () => {
