@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import { HierarchyLevel } from "../../../models/entities/hierarchy_level";
+import { IssueFactory } from "../../factories/issue_factory";
 const request = require('supertest')
 const { createApp } = require('../../../app')
 const { Issue } = require('../../../models/entities/issue')
@@ -32,38 +33,8 @@ describe('issues_router', () => {
   })
 
   it('should return a list of issues', async () => {
-    const levels = await getRepository(HierarchyLevel).find();
-    console.log("levels:", levels);
-    const issue1 = await getRepository(Issue).save({
-      key: 'DEMO-101',
-      title: 'Demo Issue 101',
-      issueType: 'Story',
-      status: "Backlog",
-      statusCategory: "To Do",
-      hierarchyLevel: "Story",
-      externalUrl: 'https://jira.example.com/browse/DEMO-101',
-      parentId: null,
-      parentKey: null,
-      childCount: null,
-      started: null,
-      completed: null,
-      cycleTime: null
-    });
-    const issue2 = await getRepository(Issue).save({
-      key: 'DEMO-102',
-      title: 'Demo Issue 102',
-      issueType: 'Story',
-      status: "Backlog",
-      statusCategory: "To Do",
-      hierarchyLevel: "Story",
-      externalUrl: 'https://jira.example.com/browse/DEMO-102',
-      parentId: null,
-      parentKey: null,
-      childCount: null,
-      started: null,
-      completed: null,
-      cycleTime: null
-    });
+    const issue1 = await getRepository(Issue).save(IssueFactory.build());
+    const issue2 = await getRepository(Issue).save(IssueFactory.build());
     
     const res = await request(app)
       .get('/issues')
