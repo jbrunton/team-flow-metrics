@@ -40,6 +40,12 @@ export class Issue {
     statusCategory: string;
 
     @Column()
+    resolution: string;
+
+    @Column()
+    created: Date;
+
+    @Column()
     hierarchyLevel: string;
 
     @Column()
