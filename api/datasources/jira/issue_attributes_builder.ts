@@ -33,6 +33,8 @@ export class IssueAttributesBuilder {
     parentKey: string,
     status: string,
     statusCategory: string,
+    resolution: string,
+    created: Date,
     hierarchyLevel: string,
     externalUrl: string,
     transitions: Array<TransitionJson>,
@@ -49,12 +51,15 @@ export class IssueAttributesBuilder {
     if (!hierarchyLevel) {
       console.warn(`Could not find hierarchy level for ${json["key"]} (${issueType})`);
     }
+    const resolution = getResolution(json);
     return {
       key: json["key"],
       title: json["fields"]["summary"],
       issueType: issueType,
       status: json["fields"]["status"]["name"],
       statusCategory: json["fields"]["status"]["statusCategory"]["name"],
+      resolution: resolution,
+      created: moment(json["fields"]["created"]).toDate(),
       hierarchyLevel: hierarchyLevel.name,
       parentKey: json["fields"][this.epicLinkFieldId],
       externalUrl: new URL(`browse/${json["key"]}`, process.env.JIRA_HOST).href,
@@ -124,4 +129,12 @@ function getCompletedDate(transitions: Array<Transition>): Moment {
   }
 
   return lastTransition.date;
+}
+
+function getResolution(json: JSON): string {
+  const resolution = json["fields"]["resolution"];
+  if (!resolution) {
+    return null;
+  }
+  return resolution["name"];
 }

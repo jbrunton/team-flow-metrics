@@ -9,7 +9,9 @@ export const IssueFactory = Factory.define("Issue", Issue)
   .attr("statusCategory", "To Do")
   .attr("hierarchyLevel", "Story")
   .attr("externalUrl", ["key"], (key) => `https://jira.example.com/browse/${key}`)
+  .attr("created", () => new Date())
   .attrs({
+    resolution: null,
     parentKey: null,
     parentId: null,
     childCount: null,

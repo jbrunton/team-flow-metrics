@@ -11,6 +11,9 @@ export class CreateIssues0000000000004 implements MigrationInterface {
             "issueType" character varying NOT NULL,
             "status" character varying NOT NULL REFERENCES statuses(name),
             "statusCategory" status_category NOT NULL,
+            "resolution" character varying,
+            "created" timestamp NOT NULL,
+
             "externalUrl" character varying NOT NULL,
             "hierarchyLevel" character varying NOT NULL REFERENCES hierarchy_levels(name),
 

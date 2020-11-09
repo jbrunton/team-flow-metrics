@@ -40,9 +40,29 @@
       <div class="column">
         <nav class="panel">
           <p class="panel-heading">
-            Transitions
+            Status History
           </p>
-          <div class="panel-block">
+          <div class="panel-block is-flex-direction-column">
+            <table v-if="issue" class="table" style="width: 100%;">
+              <tr>
+                <th style="width: 35%;">Started</th>
+                <td>{{ issue.started }}</td>
+              </tr>
+              <tr>
+                <th style="width: 35%;">Completed</th>
+                <td>{{ issue.completed }}</td>
+              </tr>
+              <tr>
+                <th style="width: 35%;">Cycle Time</th>
+                <td>
+                  {{
+                    issue.cycleTime !== null ? issue.cycleTime.toFixed(2) : "-"
+                  }}
+                </td>
+              </tr>
+            </table>
+
+            <h2 class="subtitle">Transitions</h2>
             <table v-if="issue" class="table" style="width: 100%;">
               <tr
                 v-for="transition in issue.transitions"
