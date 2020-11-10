@@ -16,7 +16,12 @@
               </tr>
               <tr>
                 <th style="width: 35%;">Status</th>
-                <td>{{ issue.status }}</td>
+                <td>
+                  <StatusTag
+                    :status="issue.status"
+                    :statusCategory="issue.statusCategory"
+                  ></StatusTag>
+                </td>
               </tr>
               <tr>
                 <th style="width: 35%;">Resolution</th>
@@ -93,9 +98,13 @@ table tr:last-child {
 <script lang="ts">
 import Vue from "vue";
 import axios from "axios";
+import StatusTag from "@/components/StatusTag.vue";
 
 export default Vue.extend({
   name: "IssueDetails",
+  components: {
+    StatusTag
+  },
   data() {
     return {
       key: this.$route.params.key,

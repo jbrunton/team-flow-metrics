@@ -16,9 +16,10 @@
         {{ props.row.issueType }}
       </b-table-column>
       <b-table-column field="status" label="Status" v-slot="props">
-        <b-tag style="font-weight: bold;" :type="props.row.statusType">{{
-          props.row.status
-        }}</b-tag>
+        <StatusTag
+          :status="props.row.status"
+          :statusCategory="props.row.statusCategory"
+        ></StatusTag>
       </b-table-column>
       <b-table-column field="childCount" label="Children" v-slot="props">
         {{ props.row.childCount }}
@@ -44,11 +45,15 @@
 
 <script lang="ts">
 import Vue from "vue";
+import StatusTag from "@/components/StatusTag.vue";
 import axios from "axios";
 import moment from "moment";
 
 export default Vue.extend({
   name: "Issues",
+  components: {
+    StatusTag
+  },
   data() {
     return {
       issues: [],
@@ -76,6 +81,7 @@ export default Vue.extend({
           issueType: issue.issueType,
           externalUrl: issue.externalUrl,
           status: issue.status,
+          statusCategory: issue.statusCategory,
           statusType: statusTypes[issue.statusCategory],
           childCount: issue.childCount,
           started: this.formatDate(issue.started),

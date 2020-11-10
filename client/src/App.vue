@@ -38,15 +38,15 @@
 $colors: mergeColorMaps(
   (
     "to-do": (
-      $red,
+      #db2828,
       $white
     ),
     "in-progress": (
-      $green,
+      #21ba45,
       $white
     ),
     "done": (
-      $blue,
+      #2185d0,
       $white
     )
   ),
