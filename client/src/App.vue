@@ -29,3 +29,52 @@
     </div>
   </div>
 </template>
+
+<style lang="scss">
+// Import Bulma's core
+@import "~bulma/sass/utilities/_all";
+
+$primary: #8c67ef;
+$primary-light: findLightColor($primary);
+$primary-dark: findDarkColor($primary);
+$primary-invert: findColorInvert($primary);
+
+// Setup $colors to use as bulma classes (e.g. 'is-twitter')
+$colors: mergeColorMaps(
+  (
+    "to-do": (
+      #db2828,
+      $white
+    ),
+    "in-progress": (
+      #21ba45,
+      $white
+    ),
+    "done": (
+      #2185d0,
+      $white
+    ),
+    "to-do-bg": (
+      #ffcdd2,
+      $black
+    ),
+    "in-progress-bg": (
+      #c8e6c9,
+      $black
+    ),
+    "done-bg": (
+      #bbdefb,
+      $black
+    )
+  ),
+  $custom-colors
+);
+
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
+
+// Import Bulma and Buefy styles
+@import "~bulma";
+@import "~buefy/src/scss/buefy";
+</style>
