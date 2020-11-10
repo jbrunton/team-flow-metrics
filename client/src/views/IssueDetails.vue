@@ -74,9 +74,13 @@
                 :key="transition.date"
               >
                 <td>{{ transition.date }}</td>
-                <td>{{ transition.fromStatus.name }}</td>
-                <td>→</td>
-                <td>{{ transition.toStatus.name }}</td>
+                <td :class="categoryClass(transition.fromStatus.category)">
+                  {{ transition.fromStatus.name }}
+                </td>
+                <td style="text-align: center;">→</td>
+                <td :class="categoryClass(transition.toStatus.category)">
+                  {{ transition.toStatus.name }}
+                </td>
               </tr>
             </table>
           </div>
@@ -126,6 +130,14 @@ export default Vue.extend({
         );
         this.parent = parentResponse.data.issue;
       }
+    },
+    categoryClass(category: string): string {
+      const statusTypes = {
+        "To Do": "is-to-do",
+        "In Progress": "is-in-progress",
+        Done: "is-done"
+      };
+      return `${statusTypes[category]}-bg`;
     }
   },
   computed: {

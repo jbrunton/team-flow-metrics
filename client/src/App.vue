@@ -48,6 +48,18 @@ $colors: mergeColorMaps(
     "done": (
       #2185d0,
       $white
+    ),
+    "to-do-bg": (
+      #ffcdd2,
+      $black
+    ),
+    "in-progress-bg": (
+      #c8e6c9,
+      $black
+    ),
+    "done-bg": (
+      #bbdefb,
+      $black
     )
   ),
   $custom-colors
