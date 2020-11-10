@@ -34,6 +34,11 @@
 // Import Bulma's core
 @import "~bulma/sass/utilities/_all";
 
+$primary: #8c67ef;
+$primary-light: findLightColor($primary);
+$primary-dark: findDarkColor($primary);
+$primary-invert: findColorInvert($primary);
+
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')
 $colors: mergeColorMaps(
   (
@@ -64,6 +69,10 @@ $colors: mergeColorMaps(
   ),
   $custom-colors
 );
+
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
 
 // Import Bulma and Buefy styles
 @import "~bulma";
