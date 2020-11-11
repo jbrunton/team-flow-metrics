@@ -25,7 +25,7 @@ router.get('/:key/children', async (req, res) => {
     parentId: parent.id
   });
   res.json({
-    cound: children.length,
+    count: children.length,
     issues: children
   });
 })
