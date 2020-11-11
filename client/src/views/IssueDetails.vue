@@ -34,8 +34,38 @@
               <tr>
                 <th style="width: 35%;">Parent</th>
                 <td>
-                  <a v-if="issue.parentKey">{{ issue.parentKey }}</a>
+                  <a
+                    v-if="issue.parentKey"
+                    :href="`/issues/${issue.parentKey}`"
+                    >{{ issue.parentKey }}</a
+                  >
                   {{ this.parent ? `- ${this.parent.title}` : "" }}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </nav>
+
+        <nav v-if="children" class="panel">
+          <p class="panel-heading">
+            Issues In Epic
+          </p>
+          <div class="panel-block">
+            <table class="table" style="width: 100%;">
+              <tr>
+                <th colspan="2">Issue</th>
+                <th>Status</th>
+              </tr>
+              <tr v-for="child in children" :key="child.id">
+                <td>
+                  <a :href="`/issues/${child.key}`">{{ child.key }}</a>
+                </td>
+                <td>{{ child.title }}</td>
+                <td>
+                  <StatusTag
+                    :status="child.status"
+                    :statusCategory="child.statusCategory"
+                  ></StatusTag>
                 </td>
               </tr>
             </table>
@@ -113,7 +143,8 @@ export default Vue.extend({
     return {
       key: this.$route.params.key,
       issue: null,
-      parent: null
+      parent: null,
+      children: null
     };
   },
   mounted() {
@@ -129,6 +160,13 @@ export default Vue.extend({
           `/api/issues/${this.issue.parentKey}`
         );
         this.parent = parentResponse.data.issue;
+      }
+
+      if (this.issue.issueType === "Epic") {
+        const childrenResponse = await axios.get(
+          `/api/issues/${this.issue.key}/children`
+        );
+        this.children = childrenResponse.data.issues;
       }
     },
     categoryClass(category: string): string {

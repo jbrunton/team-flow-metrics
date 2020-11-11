@@ -13,9 +13,20 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/:key', async (req, res) => {
-  const issue = await getRepository(Issue).findOne({ key: req.params.key});
+  const issue = await getRepository(Issue).findOne({ key: req.params.key });
   res.json({
     issue: issue
+  });
+})
+
+router.get('/:key/children', async (req, res) => {
+  const parent = await getRepository(Issue).findOne({ key: req.params.key });
+  const children = await getRepository(Issue).find({
+    parentId: parent.id
+  });
+  res.json({
+    cound: children.length,
+    issues: children
   });
 })
 
