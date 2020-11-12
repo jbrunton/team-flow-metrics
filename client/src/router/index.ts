@@ -23,19 +23,19 @@ const routes: Array<RouteConfig> = [
     path: "/issues",
     name: "Issues",
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/Issues.vue")
+      import(/* webpackChunkName: "issues" */ "../views/Issues.vue")
   },
   {
     path: "/issues/:key",
     name: "IssueDetails",
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/IssueDetails.vue")
+      import(/* webpackChunkName: "issuedetails" */ "../views/IssueDetails.vue")
   },
   {
     path: "/scatterplot",
     name: "Scatterplot",
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/Scatterplot.vue")
+      import(/* webpackChunkName: "scatterplot" */ "../views/Scatterplot.vue")
   }
 ];
 
