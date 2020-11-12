@@ -19,7 +19,7 @@
           <b-icon icon="open-in-new" size="is-small"></b-icon>
         </a>
       </b-table-column>
-      <b-table-column field="title" label="Title" v-slot="props">
+      <b-table-column field="title" label="Title" v-slot="props" sortable>
         {{ props.row.title }}
       </b-table-column>
       <b-table-column field="issueType" label="Type" v-slot="props" sortable>
