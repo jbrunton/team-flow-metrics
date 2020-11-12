@@ -2,8 +2,8 @@
   <div class="issues">
     <h1>Issues</h1>
 
-    <b-table :data="issues">
-      <b-table-column field="key" label="Key" v-slot="props">
+    <b-table :data="issues" :narrowed="true" :striped="true">
+      <b-table-column width="120px" field="key" label="Key" v-slot="props">
         <router-link
           :to="{ name: 'IssueDetails', params: { key: props.row.key } }"
         >
@@ -16,7 +16,7 @@
       <b-table-column field="title" label="Title" v-slot="props">
         {{ props.row.title }}
       </b-table-column>
-      <b-table-column field="issueType" label="Issue Type" v-slot="props">
+      <b-table-column field="issueType" label="Type" v-slot="props">
         {{ props.row.issueType }}
       </b-table-column>
       <b-table-column field="status" label="Status" v-slot="props">
@@ -28,13 +28,28 @@
       <b-table-column field="childCount" label="Children" v-slot="props">
         {{ props.row.childCount }}
       </b-table-column>
-      <b-table-column field="started" label="Started" v-slot="props">
+      <b-table-column
+        width="200px"
+        field="started"
+        label="Started"
+        v-slot="props"
+      >
         {{ props.row.started }}
       </b-table-column>
-      <b-table-column field="completed" label="Completed" v-slot="props">
+      <b-table-column
+        width="200px"
+        field="completed"
+        label="Completed"
+        v-slot="props"
+      >
         {{ props.row.completed }}
       </b-table-column>
-      <b-table-column field="cycleTime" label="Cycle Time" v-slot="props">
+      <b-table-column
+        width="120px"
+        field="cycleTime"
+        label="Cycle Time"
+        v-slot="props"
+      >
         {{ props.row.cycleTime }}
       </b-table-column>
     </b-table>
@@ -52,6 +67,7 @@ import Vue from "vue";
 import StatusTag from "@/components/StatusTag.vue";
 import axios from "axios";
 import moment from "moment";
+import { formatTimeString } from "../helpers/date_helper";
 
 export default Vue.extend({
   name: "Issues",
@@ -88,8 +104,8 @@ export default Vue.extend({
           statusCategory: issue.statusCategory,
           statusType: statusTypes[issue.statusCategory],
           childCount: issue.childCount,
-          started: this.formatDate(issue.started),
-          completed: this.formatDate(issue.completed),
+          started: formatTimeString(issue.started),
+          completed: formatTimeString(issue.completed),
           cycleTime: this.formatNumber(issue.cycleTime)
         };
       });
@@ -97,12 +113,6 @@ export default Vue.extend({
   },
   methods: {
     moment: moment,
-    formatDate(date) {
-      if (!date) {
-        return "-";
-      }
-      return moment(date).format("DD MMM YYYY hh:mm Z");
-    },
     formatNumber(number) {
       if (!number) {
         return "-";
