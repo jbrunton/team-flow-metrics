@@ -111,7 +111,7 @@ export default Vue.extend({
     },
 
     dateFormatter(dates) {
-      return formatDateRange(this.locale, dates);
+      return formatDateRange(dates);
     }
   },
 

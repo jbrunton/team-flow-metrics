@@ -9,6 +9,20 @@ export function getDefaultDateRange(now = new Date()): Array<Date> {
   return [fromDate, toDate];
 }
 
-export function formatDateRange(locale: string, dates: Array<Date>): string {
-  return dates.map(date => moment(date).format("D MMM YYYY")).join(" - ");
+export function formatDate(date?: Date): string {
+  if (!date) {
+    return "-";
+  }
+  return moment(date).format("D MMM YYYY");
+}
+
+export function formatTime(time?: Date): string {
+  if (!time) {
+    return "-";
+  }
+  return moment(time).format("D MMM YYYY hh:mm");
+}
+
+export function formatDateRange(dates: Array<Date>): string {
+  return dates.map(date => formatDate(date)).join(" - ");
 }

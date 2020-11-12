@@ -2,8 +2,14 @@
   <div class="issues">
     <h1>Issues</h1>
 
-    <b-table :data="issues">
-      <b-table-column field="key" label="Key" v-slot="props">
+    <b-table :data="issues" :narrowed="true" :striped="true" :paginated="true">
+      <b-table-column
+        width="120px"
+        field="key"
+        label="Key"
+        v-slot="props"
+        sortable
+      >
         <router-link
           :to="{ name: 'IssueDetails', params: { key: props.row.key } }"
         >
@@ -13,13 +19,13 @@
           <b-icon icon="open-in-new" size="is-small"></b-icon>
         </a>
       </b-table-column>
-      <b-table-column field="title" label="Title" v-slot="props">
+      <b-table-column field="title" label="Title" v-slot="props" sortable>
         {{ props.row.title }}
       </b-table-column>
-      <b-table-column field="issueType" label="Issue Type" v-slot="props">
+      <b-table-column field="issueType" label="Type" v-slot="props" sortable>
         {{ props.row.issueType }}
       </b-table-column>
-      <b-table-column field="status" label="Status" v-slot="props">
+      <b-table-column field="status" label="Status" v-slot="props" sortable>
         <StatusTag
           :status="props.row.status"
           :statusCategory="props.row.statusCategory"
@@ -28,14 +34,41 @@
       <b-table-column field="childCount" label="Children" v-slot="props">
         {{ props.row.childCount }}
       </b-table-column>
-      <b-table-column field="started" label="Started" v-slot="props">
-        {{ props.row.started }}
+      <b-table-column
+        width="150px"
+        field="created"
+        label="Created"
+        v-slot="props"
+        sortable
+      >
+        {{ formatDate(props.row.created) }}
       </b-table-column>
-      <b-table-column field="completed" label="Completed" v-slot="props">
-        {{ props.row.completed }}
+      <b-table-column
+        width="150px"
+        field="started"
+        label="Started"
+        v-slot="props"
+        sortable
+      >
+        {{ formatDate(props.row.started) }}
       </b-table-column>
-      <b-table-column field="cycleTime" label="Cycle Time" v-slot="props">
-        {{ props.row.cycleTime }}
+      <b-table-column
+        width="150px"
+        field="completed"
+        label="Completed"
+        v-slot="props"
+        sortable
+      >
+        {{ formatDate(props.row.completed) }}
+      </b-table-column>
+      <b-table-column
+        width="120px"
+        field="cycleTime"
+        label="Cycle Time"
+        v-slot="props"
+        sortable
+      >
+        {{ formatNumber(props.row.cycleTime) }}
       </b-table-column>
     </b-table>
   </div>
@@ -52,6 +85,7 @@ import Vue from "vue";
 import StatusTag from "@/components/StatusTag.vue";
 import axios from "axios";
 import moment from "moment";
+import { formatDate } from "../helpers/date_helper";
 
 export default Vue.extend({
   name: "Issues",
@@ -65,6 +99,7 @@ export default Vue.extend({
         { field: "key", label: "Key" },
         { field: "title", label: "Title" },
         { field: "issueType", label: "Issue Type" },
+        { field: "created", label: "created" },
         { field: "started", label: "Started" },
         { field: "completed", label: "Completed" },
         { field: "cycleTime", label: "Cycle Time" }
@@ -88,26 +123,28 @@ export default Vue.extend({
           statusCategory: issue.statusCategory,
           statusType: statusTypes[issue.statusCategory],
           childCount: issue.childCount,
-          started: this.formatDate(issue.started),
-          completed: this.formatDate(issue.completed),
-          cycleTime: this.formatNumber(issue.cycleTime)
+          created: this.parseDate(issue.created),
+          started: this.parseDate(issue.started),
+          completed: this.parseDate(issue.completed),
+          cycleTime: issue.cycleTime
         };
       });
     });
   },
   methods: {
     moment: moment,
-    formatDate(date) {
-      if (!date) {
-        return "-";
-      }
-      return moment(date).format("DD MMM YYYY hh:mm Z");
-    },
+    formatDate: formatDate,
     formatNumber(number) {
       if (!number) {
         return "-";
       }
       return number.toFixed(2);
+    },
+    parseDate(input?: string): Date {
+      if (!input) {
+        return null;
+      }
+      return new Date(input);
     }
   }
 });
