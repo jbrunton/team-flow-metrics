@@ -34,11 +34,15 @@
               <tr>
                 <th style="width: 35%;">Parent</th>
                 <td>
-                  <a
+                  <router-link
                     v-if="issue.parentKey"
-                    :href="`/issues/${issue.parentKey}`"
-                    >{{ issue.parentKey }}</a
+                    :to="{
+                      name: 'IssueDetails',
+                      params: { key: issue.parentKey }
+                    }"
                   >
+                    {{ issue.parentKey }}
+                  </router-link>
                   {{ this.parent ? `- ${this.parent.title}` : "" }}
                 </td>
               </tr>
@@ -58,7 +62,11 @@
               </tr>
               <tr v-for="child in children" :key="child.id">
                 <td>
-                  <a :href="`/issues/${child.key}`">{{ child.key }}</a>
+                  <router-link
+                    :to="{ name: 'IssueDetails', params: { key: child.key } }"
+                  >
+                    {{ child.key }}
+                  </router-link>
                 </td>
                 <td>{{ child.title }}</td>
                 <td>

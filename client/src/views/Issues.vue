@@ -4,7 +4,11 @@
 
     <b-table :data="issues">
       <b-table-column field="key" label="Key" v-slot="props">
-        {{ props.row.key }}
+        <router-link
+          :to="{ name: 'IssueDetails', params: { key: props.row.key } }"
+        >
+          {{ props.row.key }}
+        </router-link>
         <a :href="props.row.externalUrl" target="_blank">
           <b-icon icon="open-in-new" size="is-small"></b-icon>
         </a>
