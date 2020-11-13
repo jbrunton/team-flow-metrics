@@ -98,7 +98,7 @@ router.get('/scatterplot', async (req, res) => {
     issue.cycleTime
   ]))
   
-  builder.addPercentiles(1, [50, 70, 85, 95]);
+  builder.addPercentiles(1, [50, 70, 85, 95], formatDate(fromDate), formatDate(toDate));
 
   res.json({
     meta: {

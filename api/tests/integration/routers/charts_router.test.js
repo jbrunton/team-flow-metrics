@@ -95,7 +95,7 @@ describe('charts_router', () => {
           },
           {
             c: [
-              { v: "Date(2020, 1, 1, 0, 0)" },
+              { v: "Date(2020, 0, 1, 0, 0)" },
               { v: null },
               { v: 1 },
               { v: 1 },
@@ -105,7 +105,7 @@ describe('charts_router', () => {
           },
           {
             c: [
-              { v: "Date(2020, 1, 3, 0, 0)" },
+              { v: "Date(2020, 2, 1, 0, 0)" },
               { v: null },
               { v: 1 },
               { v: 1 },

@@ -78,12 +78,15 @@ $link-focus-border: $primary;
 @import "~bulma";
 @import "~buefy/src/scss/buefy";
 
-.dropdown {
+.dropdown.is-fullwidth {
   display: flex;
-}
+  * {
+    width: 100%;
+    text-align: left;
 
-.dropdown * {
-  width: 100%;
-  text-align: left;
+    .icon {
+      width: auto;
+    }
+  }
 }
 </style>
