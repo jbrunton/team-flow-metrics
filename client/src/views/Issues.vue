@@ -7,7 +7,12 @@
         <b-input v-model="searchQuery"></b-input>
       </b-field>
       <b-field label="Issue Type" class="column">
-        <b-dropdown v-model="selectedIssueTypes" multiple aria-role="list">
+        <b-dropdown
+          v-model="selectedIssueTypes"
+          multiple
+          aria-role="list"
+          class="is-fullwidth"
+        >
           <button class="button is-primary" type="button" slot="trigger">
             <span>{{ selectedIssueTypes.join(", ") }}</span>
             <b-icon icon="menu-down"></b-icon>
@@ -24,7 +29,12 @@
         </b-dropdown>
       </b-field>
       <b-field label="Status" class="column">
-        <b-dropdown v-model="selectedStatuses" multiple aria-role="list">
+        <b-dropdown
+          v-model="selectedStatuses"
+          multiple
+          aria-role="list"
+          class="is-fullwidth"
+        >
           <button class="button is-primary" type="button" slot="trigger">
             <span>{{ selectedStatuses.join(", ") }}</span>
             <b-icon icon="menu-down"></b-icon>
