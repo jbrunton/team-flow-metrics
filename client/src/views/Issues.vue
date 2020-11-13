@@ -1,8 +1,48 @@
 <template>
   <div class="issues">
-    <h1>Issues</h1>
+    <h1 class="title">Issues</h1>
 
-    <b-table :data="issues" :narrowed="true" :striped="true" :paginated="true">
+    <section class="content columns">
+      <b-field label="Search" class="column is-half">
+        <b-input v-model="searchQuery"></b-input>
+      </b-field>
+      <b-field label="Issue Type" class="column">
+        <b-dropdown v-model="selectedIssueTypes" multiple aria-role="list">
+          <button class="button is-primary" type="button" slot="trigger">
+            <span>{{ selectedIssueTypes.join(", ") }}</span>
+            <b-icon icon="menu-down"></b-icon>
+          </button>
+
+          <b-dropdown-item
+            v-for="issueType in issueTypes"
+            :value="issueType"
+            :key="issueType"
+            aria-role="listitem"
+          >
+            <span>{{ issueType }}</span>
+          </b-dropdown-item>
+        </b-dropdown>
+      </b-field>
+      <b-field label="Status" class="column">
+        <b-dropdown v-model="selectedStatuses" multiple aria-role="list">
+          <button class="button is-primary" type="button" slot="trigger">
+            <span>{{ selectedStatuses.join(", ") }}</span>
+            <b-icon icon="menu-down"></b-icon>
+          </button>
+
+          <b-dropdown-item
+            v-for="status in statuses"
+            :value="status"
+            :key="status"
+            aria-role="listitem"
+          >
+            <span>{{ status }}</span>
+          </b-dropdown-item>
+        </b-dropdown>
+      </b-field>
+    </section>
+
+    <b-table :data="results" :narrowed="true" :striped="true" :paginated="true">
       <b-table-column
         width="120px"
         field="key"
@@ -31,7 +71,12 @@
           :statusCategory="props.row.statusCategory"
         ></StatusTag>
       </b-table-column>
-      <b-table-column field="childCount" label="Children" v-slot="props">
+      <b-table-column
+        field="childCount"
+        label="Children"
+        v-slot="props"
+        sortable
+      >
         {{ props.row.childCount }}
       </b-table-column>
       <b-table-column
@@ -74,7 +119,7 @@
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .tag:not(body) {
   width: 100%;
 }
@@ -87,6 +132,20 @@ import axios from "axios";
 import moment from "moment";
 import { formatDate } from "../helpers/date_helper";
 
+type Issue = {
+  key: string;
+  title: string;
+  issueType: string;
+  externalUrl: string;
+  status: string;
+  statusCategory: string;
+  childCount?: number;
+  created?: Date;
+  started?: Date;
+  completed?: Date;
+  cycleTime?: number;
+};
+
 export default Vue.extend({
   name: "Issues",
   components: {
@@ -95,6 +154,9 @@ export default Vue.extend({
   data() {
     return {
       issues: [],
+      searchQuery: "",
+      selectedIssueTypes: [],
+      selectedStatuses: [],
       columns: [
         { field: "key", label: "Key" },
         { field: "title", label: "Title" },
@@ -107,11 +169,6 @@ export default Vue.extend({
     };
   },
   mounted() {
-    const statusTypes = {
-      "To Do": "is-to-do",
-      "In Progress": "is-in-progress",
-      Done: "is-done"
-    };
     axios.get(`/api/issues`).then(response => {
       this.issues = response.data.issues.map(issue => {
         return {
@@ -121,7 +178,6 @@ export default Vue.extend({
           externalUrl: issue.externalUrl,
           status: issue.status,
           statusCategory: issue.statusCategory,
-          statusType: statusTypes[issue.statusCategory],
           childCount: issue.childCount,
           created: this.parseDate(issue.created),
           started: this.parseDate(issue.started),
@@ -130,6 +186,23 @@ export default Vue.extend({
         };
       });
     });
+  },
+  computed: {
+    results: function() {
+      return this.issues.filter(issue => {
+        return (
+          this.matchQuery(issue) &&
+          this.matchIssueType(issue) &&
+          this.matchStatus(issue)
+        );
+      });
+    },
+    issueTypes: function() {
+      return Array.from(new Set(this.issues.map(issue => issue.issueType)));
+    },
+    statuses: function() {
+      return Array.from(new Set(this.issues.map(issue => issue.status)));
+    }
   },
   methods: {
     moment: moment,
@@ -145,6 +218,25 @@ export default Vue.extend({
         return null;
       }
       return new Date(input);
+    },
+    matchQuery(issue: Issue) {
+      const query = this.searchQuery.trim();
+      if (query === "") {
+        return true;
+      }
+      return issue.key.includes(query) || issue.title.includes(query);
+    },
+    matchIssueType(issue: Issue) {
+      if (!this.selectedIssueTypes.length) {
+        return true;
+      }
+      return this.selectedIssueTypes.includes(issue.issueType);
+    },
+    matchStatus(issue: Issue) {
+      if (!this.selectedStatuses.length) {
+        return true;
+      }
+      return this.selectedStatuses.includes(issue.status);
     }
   }
 });
