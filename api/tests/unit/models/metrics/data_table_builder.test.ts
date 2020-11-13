@@ -76,7 +76,7 @@ describe("DataTableBuilder", () => {
       })
 
       it("adds percentile columns", () => {
-        builder.addPercentiles(1, [50, 80]);
+        builder.addPercentiles(1, [50, 80], 1, 5);
         expect(builder.cols).toEqual([
           { label: "X", type: "number" },
           { label: "Y", type: "number" },
@@ -86,7 +86,7 @@ describe("DataTableBuilder", () => {
       })
   
       it("adds percentile rows", () => {
-        builder.addPercentiles(1, [50, 80]);
+        builder.addPercentiles(1, [50, 80], 1, 5);
         expect(builder.rows).toEqual([
           [1, 10, null, null],
           [2, 10, null, null],
@@ -99,7 +99,7 @@ describe("DataTableBuilder", () => {
       })
   
       it("adds null rows if there are no data", () => {
-        builder.addPercentiles(1, [50, 80]);
+        builder.addPercentiles(1, [50, 80], 1, 5);
         expect(builder.rows).toEqual([
           [1, 10, null, null],
           [2, 10, null, null],
