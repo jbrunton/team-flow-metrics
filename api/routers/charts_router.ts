@@ -29,12 +29,24 @@ router.get('/scatterplot', async (req, res) => {
   const fromDate = moment(req.query.fromDate).toDate();
   const toDate = moment(req.query.toDate).toDate();
   const hierarchyLevel = req.query.hierarchyLevel;
-  const issues = await getRepository(Issue)
+  let issues = await getRepository(Issue)
     .find({
       completed: Between(fromDate, toDate),
       issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
       started: Not(IsNull())
-    })
+    });
+
+  if (req.query.excludeOutliers === "true") {
+    const cycleTimes = issues.map(issue => issue.cycleTime);
+    const [q25, _, q75] = jStat.quartiles(cycleTimes);
+    const iqr = q75 - q25;
+    const cutoff = iqr * 1.5;
+    const outlierFilter = (issue) => {
+      return q25 - cutoff <= issue.cycleTime && issue.cycleTime <= q75 + cutoff;
+    }
+    issues = issues.filter(outlierFilter);
+  }
+  
   const chartOpts = {
     seriesType: "scatter",
     interpolateNulls: true,

@@ -6,7 +6,7 @@
       <div class="column is-half">
         <b-field label="Date Range">
           <p class="control">
-            <b-dropdown :triggers="['hover']" aria-role="list">
+            <b-dropdown aria-role="list">
               <button class="button is-info" slot="trigger">
                 <a
                   ><b-icon icon="calendar-month-outline"></b-icon>
@@ -69,6 +69,12 @@
       </div>
     </div>
 
+    <div class="field">
+      <b-checkbox v-model="excludeOutliers">
+        Exclude outliers
+      </b-checkbox>
+    </div>
+
     <div id="chart_div"></div>
   </div>
 </template>
@@ -105,6 +111,7 @@ export default Vue.extend({
       selectedLevel: null,
       relativeDateRanges: [],
       calendarMonthRange: [],
+      excludeOutliers: false,
       dates: []
     };
   },
@@ -147,11 +154,17 @@ export default Vue.extend({
       const fromDate = this.dates[0];
       const toDate = this.dates[1];
 
-      const response = await axios.get(
-        `/api/charts/scatterplot?fromDate=${fromDate.toString()}&toDate=${toDate.toString()}&hierarchyLevel=${
-          this.selectedLevel
-        }`
-      );
+      const params = {
+        fromDate: fromDate.toString(),
+        toDate: toDate.toString(),
+        hierarchyLevel: this.selectedLevel,
+        excludeOutliers: this.excludeOutliers
+      };
+      const url = `/api/charts/scatterplot?fromDate=${new URLSearchParams(
+        params
+      ).toString()}`;
+
+      const response = await axios.get(url);
 
       this.chartData = response.data.chartData;
       this.chartOpts = response.data.chartOpts;
@@ -191,6 +204,9 @@ export default Vue.extend({
       }
     },
     selectedLevel() {
+      this.fetchData();
+    },
+    excludeOutliers() {
       this.fetchData();
     }
   }
