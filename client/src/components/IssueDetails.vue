@@ -81,6 +81,18 @@
         </nav>
       </div>
       <div class="column">
+        <nav class="panel" v-if="issue && issue.issueType === 'Epic'">
+          <p class="panel-heading">
+            Reports
+          </p>
+          <div class="panel-block">
+            <router-link
+              :to="{ name: 'EpicReport', params: { key: issue.key } }"
+            >
+              Epic Report
+            </router-link>
+          </div>
+        </nav>
         <nav class="panel">
           <p class="panel-heading">
             Status History

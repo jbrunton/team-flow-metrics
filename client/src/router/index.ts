@@ -34,6 +34,12 @@ const routes: Array<RouteConfig> = [
       )
   },
   {
+    path: "/epics/:key",
+    name: "EpicReport",
+    component: () =>
+      import(/* webpackChunkName: "epicreport" */ "../views/EpicReport.vue")
+  },
+  {
     path: "/scatterplot",
     name: "Scatterplot",
     component: () =>
