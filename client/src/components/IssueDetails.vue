@@ -144,12 +144,14 @@ import StatusTag from "@/components/StatusTag.vue";
 
 export default Vue.extend({
   name: "IssueDetails",
+  props: {
+    issueKey: String
+  },
   components: {
     StatusTag
   },
   data() {
     return {
-      key: this.$route.params.key,
       issue: null,
       parent: null,
       children: null
@@ -160,7 +162,7 @@ export default Vue.extend({
   },
   methods: {
     async fetchData() {
-      const issueResponse = await axios.get(`/api/issues/${this.key}`);
+      const issueResponse = await axios.get(`/api/issues/${this.issueKey}`);
       this.issue = issueResponse.data.issue;
 
       if (this.issue.parentKey) {
@@ -189,9 +191,9 @@ export default Vue.extend({
   computed: {
     title() {
       if (!this.issue) {
-        return this.key;
+        return this.issueKey;
       }
-      return `${this.key} – ${this.issue.title}`;
+      return `${this.issueKey} – ${this.issue.title}`;
     }
   }
 });

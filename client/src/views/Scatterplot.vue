@@ -76,6 +76,12 @@
     </div>
 
     <div id="chart_div"></div>
+
+    <IssueDetails
+      v-if="selectedIssueKey"
+      :issueKey="selectedIssueKey"
+      :key="selectedIssueKey"
+    ></IssueDetails>
   </div>
 </template>
 
@@ -99,20 +105,27 @@ import {
   getCalendarMonthRanges,
   DateRange
 } from "../helpers/date_helper";
+import IssueDetails from "@/components/IssueDetails.vue";
 
 export default Vue.extend({
   name: "Issues",
+
+  components: {
+    IssueDetails
+  },
 
   data() {
     return {
       chartOps: {},
       chartData: [],
+      chart: null,
       hierarchyLevels: [],
       selectedLevel: null,
       relativeDateRanges: [],
       calendarMonthRange: [],
       excludeOutliers: false,
-      dates: []
+      dates: [],
+      selectedIssueKey: null
     };
   },
 
@@ -182,10 +195,29 @@ export default Vue.extend({
       const data = new google.visualization.DataTable(this.chartData);
       const chart = new google.visualization.ComboChart(container);
       chart.draw(data, this.chartOpts);
+      google.visualization.events.addListener(
+        chart,
+        "select",
+        this.issueSelected
+      );
+      this.chart = {
+        gchart: chart,
+        data: data
+      };
     },
 
     dateFormatter(dates) {
       return formatDateRange(dates);
+    },
+
+    issueSelected() {
+      const selection = this.chart.gchart.getSelection()[0];
+      // completed issues column
+      if (selection.column == 1) {
+        //$('#spinner').show().html(render('spinner', { margin: 20 }));
+        const key = this.chart.data.getValue(selection.row, 2);
+        this.selectedIssueKey = key;
+      }
     }
   },
 
