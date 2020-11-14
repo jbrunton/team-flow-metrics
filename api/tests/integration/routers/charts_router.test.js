@@ -26,14 +26,14 @@ describe('charts_router', () => {
 
   describe('/scatterplot', () => {
     it('should return cycle time data', async () => {
-      await getRepository(Issue).save(IssueFactory.build({
+      const issue1 = await getRepository(Issue).save(IssueFactory.build({
         status: "Done",
         statusCategory: "Done",
         started: new Date(2020, 1, 1, 0, 0),
         completed: new Date(2020, 1, 2, 0, 0),
         cycleTime: 1
       }));
-      await getRepository(Issue).save(IssueFactory.build({
+      const issue2 = await getRepository(Issue).save(IssueFactory.build({
         status: "Done",
         statusCategory: "Done",
         started: new Date(2020, 1, 3, 0, 0),
@@ -54,6 +54,11 @@ describe('charts_router', () => {
           {
             label: "cycle_time",
             type: "number"
+          },
+          {
+            label: "key",
+            type: "string",
+            role: "annotationText"
           },
           {
             label: "95th Percentile",
@@ -77,6 +82,7 @@ describe('charts_router', () => {
             c: [
               { v: "Date(2020, 1, 1, 0, 0)" },
               { v: 1 },
+              { v: issue1.key },
               { v: null },
               { v: null },
               { v: null },
@@ -87,6 +93,7 @@ describe('charts_router', () => {
             c: [
               { v: "Date(2020, 1, 3, 0, 0)" },
               { v: 2 },
+              { v: issue2.key },
               { v: null },
               { v: null },
               { v: null },
@@ -97,6 +104,7 @@ describe('charts_router', () => {
             c: [
               { v: "Date(2020, 0, 1, 0, 0)" },
               { v: null },
+              { v: null },
               { v: 1 },
               { v: 1 },
               { v: 1 },
@@ -106,6 +114,7 @@ describe('charts_router', () => {
           {
             c: [
               { v: "Date(2020, 2, 1, 0, 0)" },
+              { v: null },
               { v: null },
               { v: 1 },
               { v: 1 },
@@ -127,7 +136,7 @@ describe('charts_router', () => {
         completed: new Date(2020, 1, 2, 0, 0),
         cycleTime: 1
       }));
-      const issue2 = await getRepository(Issue).save(IssueFactory.build({
+      await getRepository(Issue).save(IssueFactory.build({
         issueType: 'Epic',
         status: "Done",
         statusCategory: "Done",
@@ -150,13 +159,20 @@ describe('charts_router', () => {
           {
             label: "cycle_time",
             type: "number"
-          }
+          },
+          {
+            label: "key",
+            type: "string",
+            role: "annotationText"
+          },
+
         ],
         rows: [
           {
             c: [
               { v: "Date(2020, 1, 1, 0, 0)" },
-              { v: 1 }
+              { v: 1 },
+              { v: issue1.key }
             ]
           }
         ]
