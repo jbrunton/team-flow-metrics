@@ -102,12 +102,18 @@ router.get('/scatterplot', async (req, res) => {
     {
       label: "cycle_time",
       type: "number"
+    },
+    {
+      label: "key",
+      type: "string",
+      role: "annotationText"
     }
   ])
   
   builder.addRows(issues.map(issue => [
     formatDate(issue.started),
-    issue.cycleTime
+    issue.cycleTime,
+    issue.key
   ]))
   
   builder.addPercentiles(1, [50, 70, 85, 95], formatDate(fromDate), formatDate(toDate));

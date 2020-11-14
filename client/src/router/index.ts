@@ -29,7 +29,9 @@ const routes: Array<RouteConfig> = [
     path: "/issues/:key",
     name: "IssueDetails",
     component: () =>
-      import(/* webpackChunkName: "issuedetails" */ "../views/IssueDetails.vue")
+      import(
+        /* webpackChunkName: "issuedetailsreport" */ "../views/IssueDetailsReport.vue"
+      )
   },
   {
     path: "/scatterplot",

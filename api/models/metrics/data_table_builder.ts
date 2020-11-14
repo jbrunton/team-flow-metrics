@@ -3,7 +3,8 @@ const moment = require('moment')
 
 type DataTableColumn = {
   label: string,
-  type: string
+  type: string,
+  role?: string
 }
 
 type DataTableValue = {
