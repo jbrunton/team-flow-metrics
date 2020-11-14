@@ -141,6 +141,7 @@ import StatusTag from "@/components/StatusTag.vue";
 import axios from "axios";
 import moment from "moment";
 import { formatDate } from "../helpers/date_helper";
+import { formatNumber } from "../helpers/format_helper";
 
 type Issue = {
   key: string;
@@ -216,13 +217,8 @@ export default Vue.extend({
   },
   methods: {
     moment: moment,
-    formatDate: formatDate,
-    formatNumber(number) {
-      if (!number) {
-        return "-";
-      }
-      return number.toFixed(2);
-    },
+    formatDate,
+    formatNumber,
     parseDate(input?: string): Date {
       if (!input) {
         return null;
