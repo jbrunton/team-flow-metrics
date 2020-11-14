@@ -14,16 +14,33 @@
                 ></a>
               </button>
 
-              <b-dropdown-item custom aria-role="menuitem">
-                <span class="menu-label">Jump To</span>
-              </b-dropdown-item>
-              <b-dropdown-item
-                v-for="range in dateRanges"
-                :key="range.description"
-                aria-role="listitem"
-                @click="selectRange(range)"
-              >
-                {{ range.description }}
+              <b-dropdown-item custom>
+                <div class="columns">
+                  <b-menu class="column">
+                    <b-menu-list label="Absolute" style="whitespace: no-wrap;">
+                      <b-menu-item
+                        v-for="range in calendarMonthRanges"
+                        :key="range.description"
+                        aria-role="listitem"
+                        :label="range.description"
+                        @click="selectRange(range)"
+                      >
+                      </b-menu-item>
+                    </b-menu-list>
+                  </b-menu>
+                  <b-menu class="column">
+                    <b-menu-list label="Relative" style="white-space: no-wrap;">
+                      <b-menu-item
+                        v-for="range in relativeDateRanges"
+                        :key="range.description"
+                        aria-role="listitem"
+                        :label="range.description"
+                        @click="selectRange(range)"
+                      >
+                      </b-menu-item>
+                    </b-menu-list>
+                  </b-menu>
+                </div>
               </b-dropdown-item>
             </b-dropdown>
           </p>
@@ -56,6 +73,13 @@
   </div>
 </template>
 
+<style lang="scss" scoped>
+.menu-label,
+.menu-list {
+  white-space: nowrap;
+}
+</style>
+
 <script lang="ts">
 /* global google */
 
@@ -65,7 +89,8 @@ import moment from "moment";
 import {
   getDefaultDateRange,
   formatDateRange,
-  getDefaultDateRanges,
+  getRelativeDateRanges,
+  getCalendarMonthRanges,
   DateRange
 } from "../helpers/date_helper";
 
@@ -78,7 +103,8 @@ export default Vue.extend({
       chartData: [],
       hierarchyLevels: [],
       selectedLevel: null,
-      dateRanges: [],
+      relativeDateRanges: [],
+      calendarMonthRange: [],
       dates: []
     };
   },
@@ -106,7 +132,8 @@ export default Vue.extend({
     },
 
     async initForm() {
-      this.dateRanges = getDefaultDateRanges();
+      this.relativeDateRanges = getRelativeDateRanges();
+      this.calendarMonthRanges = getCalendarMonthRanges();
       const response = await axios.get("/api/meta/hierarchy-levels");
       this.hierarchyLevels = response.data.levels;
       this.selectedLevel = this.hierarchyLevels[0].name;

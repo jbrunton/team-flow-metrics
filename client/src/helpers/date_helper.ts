@@ -15,7 +15,7 @@ export function getDefaultDateRange(now = new Date()): Array<Date> {
   return [fromDate, toDate];
 }
 
-export function getDefaultDateRanges(now = new Date()): Array<DateRange> {
+export function getRelativeDateRanges(now = new Date()): Array<DateRange> {
   const today = moment(now).startOf("day");
   const toDate = today.add(1, "day").toDate();
   return [
@@ -55,6 +55,33 @@ export function getDefaultDateRanges(now = new Date()): Array<DateRange> {
       description: "Last 1 year"
     }
   ];
+}
+
+export function getCalendarMonthRanges(now = new Date()): Array<DateRange> {
+  const thisMonth = moment(now).startOf("month");
+  const fromDate = thisMonth;
+  const ranges = [
+    {
+      fromDate: thisMonth.toDate(),
+      toDate: moment(fromDate)
+        .add(1, "month")
+        .toDate(),
+      description: "This month"
+    }
+  ];
+
+  for (let i = 0; i < 5; ++i) {
+    fromDate.subtract(1, "month");
+    ranges.push({
+      fromDate: fromDate.toDate(),
+      toDate: moment(fromDate)
+        .add(1, "month")
+        .toDate(),
+      description: fromDate.format("MMMM")
+    });
+  }
+
+  return ranges;
 }
 
 export function formatDate(date?: Date): string {
