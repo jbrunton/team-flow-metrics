@@ -1,6 +1,11 @@
 <template>
   <div class="issue">
-    <h1 class="title">{{ title }}</h1>
+    <h1 class="title">
+      <router-link :to="{ name: 'IssueDetails', params: { key: key } }">
+        {{ key }}
+      </router-link>
+      <span v-if="epic">– {{ epic.title }}</span>
+    </h1>
 
     <div class="columns">
       <div class="column is-half">
@@ -80,15 +85,6 @@ export default Vue.extend({
       this.stats.percentDone = Math.round(
         (this.stats["Done"] / this.children.length) * 100
       );
-    }
-  },
-
-  computed: {
-    title() {
-      if (!this.epic) {
-        return this.key;
-      }
-      return `${this.key} – ${this.epic.title}`;
     }
   }
 });
