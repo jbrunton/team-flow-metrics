@@ -39,14 +39,86 @@
         ></b-progress>
       </div>
     </div>
+
+    <nav v-if="children" class="panel">
+      <p class="panel-heading">
+        Issues In Epic
+      </p>
+      <div class="panel-block">
+        <b-table
+          :data="children"
+          :narrowed="true"
+          :striped="true"
+          style="width:100%;"
+        >
+          <b-table-column
+            width="120px"
+            field="key"
+            label="Key"
+            v-slot="props"
+            sortable
+          >
+            <router-link
+              :to="{ name: 'IssueDetails', params: { key: props.row.key } }"
+            >
+              {{ props.row.key }}
+            </router-link>
+            <a :href="props.row.externalUrl" target="_blank">
+              <b-icon icon="open-in-new" size="is-small"></b-icon>
+            </a>
+          </b-table-column>
+          <b-table-column field="title" label="Title" v-slot="props" sortable>
+            {{ props.row.title }}
+          </b-table-column>
+          <b-table-column
+            field="issueType"
+            label="Type"
+            v-slot="props"
+            sortable
+          >
+            {{ props.row.issueType }}
+          </b-table-column>
+          <b-table-column field="status" label="Status" v-slot="props" sortable>
+            <StatusTag
+              :status="props.row.status"
+              :statusCategory="props.row.statusCategory"
+            ></StatusTag>
+          </b-table-column>
+          <b-table-column
+            width="150px"
+            field="started"
+            label="Started"
+            v-slot="props"
+            sortable
+          >
+            {{ formatDate(props.row.started) }}
+          </b-table-column>
+          <b-table-column
+            width="150px"
+            field="completed"
+            label="Completed"
+            v-slot="props"
+            sortable
+          >
+            {{ formatDate(props.row.completed) }}
+          </b-table-column>
+        </b-table>
+      </div>
+    </nav>
   </div>
 </template>
 <script lang="ts">
 import Vue from "vue";
 import axios from "axios";
+import StatusTag from "@/components/StatusTag.vue";
+import { formatDate } from "../helpers/date_helper";
 
 export default Vue.extend({
   name: "EpicReport",
+  components: {
+    StatusTag
+  },
+
   data() {
     return {
       key: this.$route.params.key,
@@ -66,6 +138,13 @@ export default Vue.extend({
   },
 
   methods: {
+    parseDate(input?: string): Date {
+      if (!input) {
+        return null;
+      }
+      return new Date(input);
+    },
+    formatDate: formatDate,
     async fetchData() {
       const issueResponse = await axios.get(`/api/issues/${this.key}`);
       this.epic = issueResponse.data.issue;
@@ -73,7 +152,21 @@ export default Vue.extend({
       const childrenResponse = await axios.get(
         `/api/issues/${this.epic.key}/children`
       );
-      this.children = childrenResponse.data.issues;
+      this.children = this.issues = childrenResponse.data.issues.map(issue => {
+        return {
+          key: issue.key,
+          title: issue.title,
+          issueType: issue.issueType,
+          externalUrl: issue.externalUrl,
+          status: issue.status,
+          statusCategory: issue.statusCategory,
+          childCount: issue.childCount,
+          created: this.parseDate(issue.created),
+          started: this.parseDate(issue.started),
+          completed: this.parseDate(issue.completed),
+          cycleTime: issue.cycleTime
+        };
+      });
 
       this.stats["Total"] = this.children.length;
       this.stats["In Progress"] = this.children.filter(
