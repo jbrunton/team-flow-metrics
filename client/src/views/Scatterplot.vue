@@ -3,13 +3,36 @@
     <h1>Scatterplot</h1>
 
     <div class="columns">
-      <div class="column is-one-quarter">
+      <div class="column is-half">
         <b-field label="Date Range">
+          <p class="control">
+            <b-dropdown :triggers="['hover']" aria-role="list">
+              <button class="button is-info" slot="trigger">
+                <a
+                  ><b-icon icon="calendar-month-outline"></b-icon>
+                  <b-icon icon="menu-down"></b-icon
+                ></a>
+              </button>
+
+              <b-dropdown-item custom aria-role="menuitem">
+                <span class="menu-label">Jump To</span>
+              </b-dropdown-item>
+              <b-dropdown-item
+                v-for="range in dateRanges"
+                :key="range.description"
+                aria-role="listitem"
+                @click="selectRange(range)"
+              >
+                {{ range.description }}
+              </b-dropdown-item>
+            </b-dropdown>
+          </p>
           <b-datepicker
             placeholder="Click to select..."
             v-model="dates"
             :date-formatter="dateFormatter"
             range
+            style="width: 100%;"
           >
           </b-datepicker>
         </b-field>
@@ -39,7 +62,12 @@
 import Vue from "vue";
 import axios from "axios";
 import moment from "moment";
-import { getDefaultDateRange, formatDateRange } from "../helpers/date_helper";
+import {
+  getDefaultDateRange,
+  formatDateRange,
+  getDefaultDateRanges,
+  DateRange
+} from "../helpers/date_helper";
 
 export default Vue.extend({
   name: "Issues",
@@ -50,6 +78,7 @@ export default Vue.extend({
       chartData: [],
       hierarchyLevels: [],
       selectedLevel: null,
+      dateRanges: [],
       dates: []
     };
   },
@@ -77,9 +106,14 @@ export default Vue.extend({
     },
 
     async initForm() {
+      this.dateRanges = getDefaultDateRanges();
       const response = await axios.get("/api/meta/hierarchy-levels");
       this.hierarchyLevels = response.data.levels;
       this.selectedLevel = this.hierarchyLevels[0].name;
+    },
+
+    selectRange(range: DateRange) {
+      this.dates = [range.fromDate, range.toDate];
     },
 
     async fetchData() {

@@ -1,5 +1,11 @@
 import moment from "moment";
 
+export type DateRange = {
+  fromDate: Date;
+  toDate: Date;
+  description: string;
+};
+
 export function getDefaultDateRange(now = new Date()): Array<Date> {
   const today = moment(now).startOf("day");
   const toDate = today.add(1, "day").toDate();
@@ -7,6 +13,48 @@ export function getDefaultDateRange(now = new Date()): Array<Date> {
     .subtract(30, "days")
     .toDate();
   return [fromDate, toDate];
+}
+
+export function getDefaultDateRanges(now = new Date()): Array<DateRange> {
+  const today = moment(now).startOf("day");
+  const toDate = today.add(1, "day").toDate();
+  return [
+    {
+      fromDate: moment(now)
+        .subtract(7, "days")
+        .toDate(),
+      toDate: toDate,
+      description: "Last 7 days"
+    },
+    {
+      fromDate: moment(now)
+        .subtract(30, "days")
+        .toDate(),
+      toDate: toDate,
+      description: "Last 30 days"
+    },
+    {
+      fromDate: moment(now)
+        .subtract(90, "days")
+        .toDate(),
+      toDate: toDate,
+      description: "Last 90 days"
+    },
+    {
+      fromDate: moment(now)
+        .subtract(180, "days")
+        .toDate(),
+      toDate: toDate,
+      description: "Last 180 days"
+    },
+    {
+      fromDate: moment(now)
+        .subtract(365, "days")
+        .toDate(),
+      toDate: toDate,
+      description: "Last 1 year"
+    }
+  ];
 }
 
 export function formatDate(date?: Date): string {
