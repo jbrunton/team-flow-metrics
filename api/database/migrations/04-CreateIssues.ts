@@ -9,7 +9,7 @@ export class CreateIssues0000000000004 implements MigrationInterface {
             "key" character varying NOT NULL UNIQUE,
             "title" character varying NOT NULL,
             "issueType" character varying NOT NULL,
-            "status" character varying NOT NULL REFERENCES statuses(name),
+            "status" character varying NOT NULL,
             "statusCategory" status_category NOT NULL,
             "resolution" character varying,
             "created" timestamp NOT NULL,

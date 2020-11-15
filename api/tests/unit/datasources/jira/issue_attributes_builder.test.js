@@ -4,9 +4,9 @@ const { Field } = require('../../../../models/entities/field');
 
 describe('IssueAttributesBuilder', () => {
   const statuses = [
-    { name: "Backlog", category: "To Do" },
-    { name: "In Progress", category: "In Progress" },
-    { name: "Done", category: "Done" }
+    { name: "Backlog", category: "To Do", externalId: "1" },
+    { name: "In Progress", category: "In Progress", externalId: "2" },
+    { name: "Done", category: "Done", externalId: "3" }
   ]
   const hierarchyLevels = [
     { name: "Epic", issueType: "Epic" },
@@ -133,8 +133,8 @@ describe('IssueAttributesBuilder', () => {
               items: [
                 {
                   "field": "status",
-                  "fromString": "To Do",
-                  "toString": "In Progress"
+                  "from": "1",
+                  "to": "2"
                 }
               ]
             }
@@ -243,8 +243,8 @@ describe('IssueAttributesBuilder', () => {
               items: [
                 {
                   "field": "status",
-                  "fromString": "In Progress",
-                  "toString": "Done"
+                  "from": "2",
+                  "to": "3"
                 }
               ]
             },
@@ -253,8 +253,8 @@ describe('IssueAttributesBuilder', () => {
               items: [
                 {
                   "field": "status",
-                  "fromString": "In Progress",
-                  "toString": "Done"
+                  "from": "2",
+                  "to": "3"
                 }
               ]
             },
@@ -263,8 +263,8 @@ describe('IssueAttributesBuilder', () => {
               items: [
                 {
                   "field": "status",
-                  "fromString": "To Do",
-                  "toString": "In Progress"
+                  "from": "1",
+                  "to": "2"
                 }
               ]
             }

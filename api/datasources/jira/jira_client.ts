@@ -10,6 +10,7 @@ export class JiraClient {
   _client: Client
 
   constructor() {
+    console.log(`Creating client for host ${process.env.JIRA_HOST}, user ${process.env.JIRA_USER}`);
     this._client = new Client({
       host: process.env.JIRA_HOST,
       authentication: {
@@ -72,7 +73,8 @@ export class JiraClient {
     const statuses = await this._client.workflowStatuses.getAllStatuses();
     return statuses.map(status => repo.create({
       name: status["name"],
-      category: status["statusCategory"]["name"]
+      category: status["statusCategory"]["name"],
+      externalId: status["id"]
     }));
   }
 }

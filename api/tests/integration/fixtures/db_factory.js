@@ -17,9 +17,9 @@ module.exports = {
     await connection.getRepository(HierarchyLevel).save(levels);
 
     const statuses = await connection.getRepository(Status).create([
-      { name: "Backlog", category: "To Do" },
-      { name: "In Progress", category: "In Progress" },
-      { name: "Done", category: "Done" }
+      { name: "Backlog", category: "To Do", externalId: "1" },
+      { name: "In Progress", category: "In Progress", externalId: "2" },
+      { name: "Done", category: "Done", externalId: "3" }
     ]);
     await connection.getRepository(Status).save(statuses);
   },

@@ -33,7 +33,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
   const statuses = await client.getStatuses();
   await statusesRepo.save(statuses);
 
-  const issues = await client.search(fields, statuses, hierarchyLevels, 'project=LIST');
+  const issues = await client.search(fields, statuses, hierarchyLevels, process.env.JIRA_QUERY);
   await issuesRepo.save(issues);
 
   console.log("Building parent/child relationships...");
