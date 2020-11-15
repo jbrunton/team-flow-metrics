@@ -52,13 +52,7 @@
       </b-field>
     </section>
 
-    <b-table
-      class="is-compact-table"
-      :data="results"
-      :narrowed="true"
-      :striped="true"
-      :paginated="true"
-    >
+    <b-table :data="results" :narrowed="true" :striped="true" :paginated="true">
       <b-table-column
         width="120px"
         field="key"
