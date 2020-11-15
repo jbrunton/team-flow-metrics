@@ -221,7 +221,7 @@ describe('IssueAttributesBuilder', () => {
       expect(issue.completed).toBeNull();
     })
 
-    it('is the date of the last in progress status change', () => {
+    it('is the date of the first of the last contiguous set of transitions to done', () => {
       const json = {
         key: 'DEMO-101',
         fields: {
@@ -274,7 +274,7 @@ describe('IssueAttributesBuilder', () => {
   
       const issue = new IssueAttributesBuilder([], statuses, hierarchyLevels).build(json);
   
-      expect(issue.completed).toEqual(new Date("2020-01-03T09:00:00.000Z"))
+      expect(issue.completed).toEqual(new Date("2020-01-02T09:00:00.000Z"))
     })
 
     it('is null if the issue was reopened', () => {
