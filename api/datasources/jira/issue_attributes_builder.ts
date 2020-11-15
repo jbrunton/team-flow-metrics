@@ -86,6 +86,12 @@ export class IssueAttributesBuilder {
           name: statusChange.toString,
           category: this.statusCategories[statusChange.to]
         };
+        if (!fromStatus.category) {
+          console.warn(`Could not find status with id ${statusChange.from} (${statusChange.fromString})`);
+        }
+        if (!toStatus.category) {
+          console.warn(`Could not find status with id ${statusChange.to} (${statusChange.toString})`);
+        }
         return {
           date: event.created,
           fromStatus,
@@ -134,7 +140,7 @@ function getCompletedDate(transitions: Array<Transition>): Moment {
   if (!lastTransition) {
     return null;
   }
-  
+
   return moment(lastTransition.date);
 }
 
