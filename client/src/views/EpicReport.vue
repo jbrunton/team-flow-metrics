@@ -31,12 +31,34 @@
             </div>
           </div>
         </div>
+
         <b-progress
           type="is-done"
           :value="stats.percentDone"
           show-value
           format="percent"
         ></b-progress>
+
+        <div class="tile is-ancestor" v-if="epic">
+          <div class="tile is-parent">
+            <div class="tile is-child notification">
+              <p class="subtitle">Started</p>
+              <p>{{ formatDate(epic.started) }}</p>
+            </div>
+          </div>
+          <div class="tile is-parent">
+            <div class="tile is-child notification">
+              <p class="subtitle">Completed</p>
+              <p>{{ formatDate(epic.completed) }}</p>
+            </div>
+          </div>
+          <div class="tile is-parent">
+            <div class="tile is-child notification">
+              <p class="subtitle">Cycle Time</p>
+              <p>{{ formatNumber(epic.cycleTime) }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -112,6 +134,7 @@ import Vue from "vue";
 import axios from "axios";
 import StatusTag from "@/components/StatusTag.vue";
 import { formatDate } from "../helpers/date_helper";
+import { formatNumber } from "../helpers/format_helper";
 
 export default Vue.extend({
   name: "EpicReport",
@@ -144,7 +167,8 @@ export default Vue.extend({
       }
       return new Date(input);
     },
-    formatDate: formatDate,
+    formatDate,
+    formatNumber,
     async fetchData() {
       const issueResponse = await axios.get(`/api/issues/${this.key}`);
       this.epic = issueResponse.data.issue;
