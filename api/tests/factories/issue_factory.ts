@@ -15,6 +15,7 @@ export const IssueFactory = Factory.define("Issue", Issue)
     parentKey: null,
     parentId: null,
     childCount: null,
+    percentDone: null,
     started: null,
     completed: null,
     cycleTime: null,
