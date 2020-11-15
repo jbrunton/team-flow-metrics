@@ -10,7 +10,7 @@ export class CreateStatuses0000000000002 implements MigrationInterface {
         )`);
         await queryRunner.query(`CREATE TABLE "statuses" (
             "id" SERIAL NOT NULL,
-            "externalId" character varying NOT NULL,
+            "externalId" character varying NOT NULL UNIQUE,
             "name" character varying NOT NULL,
             "category" status_category NOT NULL,
             CONSTRAINT "PK_STATUSES_ID" PRIMARY KEY ("id")
