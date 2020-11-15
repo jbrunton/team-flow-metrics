@@ -7,6 +7,9 @@ export class Status {
     id: number;
 
     @Column()
+    externalId: string
+
+    @Column()
     name: string;
 
     @Column()

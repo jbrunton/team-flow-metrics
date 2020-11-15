@@ -19,6 +19,7 @@ services:
       - JIRA_USER
       - JIRA_TOKEN
       - JIRA_HOST
+      - JIRA_QUERY
       - EPIC_CYCLE_TIME_STRATEGY
       - STATUS_CATEGORY_OVERRIDES
 

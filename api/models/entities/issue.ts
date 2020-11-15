@@ -7,12 +7,6 @@ export type TransitionStatus = {
 }
 
 export type Transition = {
-    date: Moment,
-    fromStatus: TransitionStatus,
-    toStatus: TransitionStatus
-}
-
-export type TransitionJson = {
     date: string,
     fromStatus: TransitionStatus,
     toStatus: TransitionStatus
@@ -67,7 +61,7 @@ export class Issue {
         type: 'jsonb',
         array: false
     })
-    transitions: Array<TransitionJson>;
+    transitions: Array<Transition>;
 
     @Column("timestamp")
     started: Date;
