@@ -123,11 +123,18 @@ function getCompletedDate(transitions: Array<Transition>): Moment {
     return null;
   }
 
-  const lastTransition = transitions[transitions.length - 1];
-  if (lastTransition.toStatus.category != "Done") {
-    return null;
+  let lastTransition = null;
+  for (let i = transitions.length - 1; i >= 0; --i) {
+    if (transitions[i].toStatus.category !== "Done") {
+      break;
+    }
+    lastTransition = transitions[i];
   }
 
+  if (!lastTransition) {
+    return null;
+  }
+  
   return moment(lastTransition.date);
 }
 

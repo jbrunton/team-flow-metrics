@@ -111,7 +111,7 @@ router.get('/scatterplot', async (req, res) => {
   ])
   
   builder.addRows(issues.map(issue => [
-    formatDate(issue.started),
+    formatDate(issue.completed),
     issue.cycleTime,
     issue.key
   ]))
