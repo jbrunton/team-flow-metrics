@@ -34,7 +34,8 @@
 
         <b-progress
           type="is-done"
-          :value="stats.percentDone"
+          v-if="epic"
+          :value="epic.percentDone"
           show-value
           format="percent"
         ></b-progress>
@@ -150,8 +151,7 @@ export default Vue.extend({
       stats: {
         "To Do": null,
         "In Progress": null,
-        Done: null,
-        percentDone: null
+        Done: null
       }
     };
   },
@@ -199,9 +199,6 @@ export default Vue.extend({
       this.stats["Done"] = this.children.filter(
         issue => issue.statusCategory === "Done"
       ).length;
-      this.stats.percentDone = Math.round(
-        (this.stats["Done"] / this.children.length) * 100
-      );
     }
   }
 });

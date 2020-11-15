@@ -46,6 +46,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
       for (let child of children) {
         child.parentId = parent.id;
       }
+      parent.percentDone = Math.round(children.filter(child => child.completed).length / children.length * 100);
     } else {
       const childKeys = children.map(issue => issue.key)
       console.warn(`Could not find parent ${parentKey} for issues [${childKeys.join(", ")}]`);

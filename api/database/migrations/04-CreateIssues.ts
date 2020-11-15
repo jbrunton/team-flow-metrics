@@ -20,6 +20,7 @@ export class CreateIssues0000000000004 implements MigrationInterface {
             "parentKey" character varying,
             "parentId" integer REFERENCES issues(id),
             "childCount" integer,
+            "percentDone" integer,
 
             "transitions" jsonb NOT NULL,
 

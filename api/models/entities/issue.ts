@@ -60,6 +60,9 @@ export class Issue {
     @Column()
     childCount: number;
 
+    @Column()
+    percentDone: number;
+
     @Column({
         type: 'jsonb',
         array: false
