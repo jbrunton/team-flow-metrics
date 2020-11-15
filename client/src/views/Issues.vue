@@ -99,7 +99,7 @@
         cell-class="col-v-align"
       >
         <router-link
-          :to="{ name: 'IssueDetails', params: { key: props.row.key } }"
+          :to="{ name: 'EpicReport', params: { key: props.row.key } }"
         >
           <b-progress
             type="is-done"
