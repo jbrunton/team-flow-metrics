@@ -80,7 +80,7 @@ describe('charts_router', () => {
         rows: [
           {
             c: [
-              { v: "Date(2020, 1, 1, 0, 0)" },
+              { v: "Date(2020, 1, 2, 0, 0)" },
               { v: 1 },
               { v: issue1.key },
               { v: null },
@@ -91,7 +91,7 @@ describe('charts_router', () => {
           },
           {
             c: [
-              { v: "Date(2020, 1, 3, 0, 0)" },
+              { v: "Date(2020, 1, 5, 0, 0)" },
               { v: 2 },
               { v: issue2.key },
               { v: null },
@@ -170,7 +170,7 @@ describe('charts_router', () => {
         rows: [
           {
             c: [
-              { v: "Date(2020, 1, 1, 0, 0)" },
+              { v: "Date(2020, 1, 2, 0, 0)" },
               { v: 1 },
               { v: issue1.key }
             ]
