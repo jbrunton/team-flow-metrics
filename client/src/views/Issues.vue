@@ -75,22 +75,43 @@
       <b-table-column field="issueType" label="Type" v-slot="props" sortable>
         {{ props.row.issueType }}
       </b-table-column>
-      <b-table-column field="status" label="Status" v-slot="props" sortable>
+      <b-table-column
+        width="120px"
+        field="status"
+        label="Status"
+        v-slot="props"
+        sortable
+      >
         <StatusTag
           :status="props.row.status"
           :statusCategory="props.row.statusCategory"
         ></StatusTag>
       </b-table-column>
-      <b-table-column
-        field="childCount"
-        label="Children"
-        v-slot="props"
-        sortable
-      >
+      <b-table-column field="childCount" label="Issues" v-slot="props" sortable>
         {{ props.row.childCount }}
       </b-table-column>
       <b-table-column
-        width="150px"
+        field="percentDone"
+        label="Progress"
+        width="100px"
+        v-slot="props"
+        sortable
+        cell-class="col-v-align"
+      >
+        <router-link
+          :to="{ name: 'IssueDetails', params: { key: props.row.key } }"
+        >
+          <b-progress
+            type="is-done"
+            v-if="props.row.percentDone !== null"
+            :value="props.row.percentDone"
+            show-value
+            format="percent"
+          ></b-progress>
+        </router-link>
+      </b-table-column>
+      <b-table-column
+        width="120px"
         field="created"
         label="Created"
         v-slot="props"
@@ -99,7 +120,7 @@
         {{ formatDate(props.row.created) }}
       </b-table-column>
       <b-table-column
-        width="150px"
+        width="120px"
         field="started"
         label="Started"
         v-slot="props"
@@ -108,7 +129,7 @@
         {{ formatDate(props.row.started) }}
       </b-table-column>
       <b-table-column
-        width="150px"
+        width="120px"
         field="completed"
         label="Completed"
         v-slot="props"
@@ -151,6 +172,7 @@ type Issue = {
   status: string;
   statusCategory: string;
   childCount?: number;
+  percentDone?: number;
   created?: Date;
   started?: Date;
   completed?: Date;
@@ -167,16 +189,7 @@ export default Vue.extend({
       issues: [],
       searchQuery: "",
       selectedIssueTypes: [],
-      selectedStatuses: [],
-      columns: [
-        { field: "key", label: "Key" },
-        { field: "title", label: "Title" },
-        { field: "issueType", label: "Issue Type" },
-        { field: "created", label: "created" },
-        { field: "started", label: "Started" },
-        { field: "completed", label: "Completed" },
-        { field: "cycleTime", label: "Cycle Time" }
-      ]
+      selectedStatuses: []
     };
   },
   mounted() {
@@ -190,6 +203,7 @@ export default Vue.extend({
           status: issue.status,
           statusCategory: issue.statusCategory,
           childCount: issue.childCount,
+          percentDone: issue.percentDone,
           created: this.parseDate(issue.created),
           started: this.parseDate(issue.started),
           completed: this.parseDate(issue.completed),

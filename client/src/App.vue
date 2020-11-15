@@ -89,4 +89,8 @@ $link-focus-border: $primary;
     }
   }
 }
+
+.b-table td.col-v-align {
+  vertical-align: middle;
+}
 </style>
