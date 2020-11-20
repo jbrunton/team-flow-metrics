@@ -61,6 +61,9 @@
           </div>
         </div>
       </div>
+
+      <div id="chart_div">
+      </div>
     </div>
 
     <nav v-if="children" class="panel">
@@ -131,6 +134,8 @@
   </div>
 </template>
 <script lang="ts">
+/* global google */
+
 import Vue from "vue";
 import axios from "axios";
 import StatusTag from "@/components/StatusTag.vue";
@@ -158,9 +163,44 @@ export default Vue.extend({
 
   mounted() {
     this.fetchData();
+    this.initCharts();
   },
 
   methods: {
+    initCharts() {
+      google.charts.load("current", { packages: ["corechart"] });
+      google.charts.setOnLoadCallback(() => {
+        new ResizeObserver(this.drawChart).observe(
+          document.getElementById("chart_div")
+        );
+        this.fetchCfdData();
+      });
+    },
+    async fetchCfdData() {
+      const url = `/api/charts/cfd`;
+
+      const response = await axios.get(url);
+
+      this.chartData = response.data.chartData;
+      this.chartOpts = response.data.chartOpts;
+      this.drawChart();
+    },
+    drawChart() {
+      const container = document.getElementById("chart_div");
+      if (!container) {
+        // switched pages, ignore
+        return;
+      }
+
+      container.style.height = `${container.offsetWidth * 0.6}px`;
+      const data = new google.visualization.DataTable(this.chartData);
+      const chart = new google.visualization.AreaChart(container);
+      chart.draw(data, this.chartOpts);
+      this.chart = {
+        gchart: chart,
+        data: data
+      };
+    },
     parseDate(input?: string): Date {
       if (!input) {
         return null;

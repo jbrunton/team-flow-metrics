@@ -5,9 +5,9 @@ import { DataTableBuilder } from '../models/metrics/data_table_builder';
 const moment = require('moment');
 const { jStat } = require('jstat');
 const router = express.Router()
-const {getRepository} = require('typeorm')
-const {Issue} = require('../models/entities/issue')
-const {formatDate} = require('../helpers/charts_helper');
+const { getRepository } = require('typeorm')
+const { Issue } = require('../models/entities/issue')
+const { formatDate } = require('../helpers/charts_helper');
 
 router.get('/scatterplot', async (req, res) => {
   if (!req.query.fromDate) {
@@ -25,7 +25,7 @@ router.get('/scatterplot', async (req, res) => {
       error: "Required hierarchyLevel query param"
     })
   }
-  
+
   const fromDate = moment(req.query.fromDate).toDate();
   const toDate = moment(req.query.toDate).toDate();
   const hierarchyLevel = req.query.hierarchyLevel;
@@ -46,7 +46,7 @@ router.get('/scatterplot', async (req, res) => {
     }
     issues = issues.filter(outlierFilter);
   }
-  
+
   const chartOpts = {
     seriesType: "scatter",
     interpolateNulls: true,
@@ -109,13 +109,13 @@ router.get('/scatterplot', async (req, res) => {
       role: "annotationText"
     }
   ])
-  
+
   builder.addRows(issues.map(issue => [
     formatDate(issue.completed),
     issue.cycleTime,
     issue.key
   ]))
-  
+
   builder.addPercentiles(1, [50, 70, 85, 95], formatDate(fromDate), formatDate(toDate));
 
   res.json({
@@ -125,6 +125,172 @@ router.get('/scatterplot', async (req, res) => {
     chartOpts: chartOpts,
     chartData: builder.build()
   })
+})
+
+router.get("/cfd", async (req, res) => {
+  res.json( {
+    "chartOpts": {
+      "chartArea": {
+        "width": "90%",
+        "height": "80%",
+        "top": "5%"
+      },
+      "height": 500,
+      "hAxis": {
+        "titleTextStyle": {
+          "color": "#333"
+        }
+      },
+      "vAxis": {
+        "minValue": 0,
+        "textPosition": "none"
+      },
+      "isStacked": true,
+      "lineWidth": 1,
+      "areaOpacity": 0.4,
+      "legend": {
+        "position": "top"
+      },
+      "series": {
+        "0": {
+          "color": "grey"
+        },
+        "1": {
+          "color": "blue"
+        },
+        "2": {
+          "color": "green"
+        },
+        "3": {
+          "color": "red"
+        },
+        "4": {
+          "color": "orange"
+        }
+      },
+      "crosshair": {
+        "trigger": "focus",
+        "orientation": "vertical",
+        "color": "grey"
+      },
+      "focusTarget": "category",
+      "annotations": {
+        "textStyle": {
+          "color": "black"
+        },
+        "domain": {
+          "style": "line",
+          "stem": {
+            "color": "red"
+          }
+        },
+        "datum": {
+          "style": "point",
+          "stem": {
+            "color": "black",
+            "length": "12"
+          }
+        }
+      }
+    },
+    "chartData": {
+      "cols": [
+        {
+          "label": "Date",
+          "type": "date"
+        },
+        {
+          "label": "Total",
+          "type": "number"
+        },
+        {
+          "label": "Tooltip",
+          "type": "number",
+          "role": "tooltip"
+        },
+        {
+          "label": "Done",
+          "type": "number"
+        },
+        {
+          "label": "In Progress",
+          "type": "number"
+        },
+        {
+          "label": "To Do",
+          "type": "number"
+        }
+      ],
+      "rows": [
+        {
+          "c": [
+            {
+              "v": "Date(2020, 4, 1, 0, 0)"
+            },
+            {
+              "v": 0
+            },
+            {
+              "v": 462
+            },
+            {
+              "v": 299
+            },
+            {
+              "v": 14
+            },
+            {
+              "v": 149
+            }
+          ]
+        },
+        {
+          "c": [
+            {
+              "v": "Date(2020, 4, 2, 0, 0)"
+            },
+            {
+              "v": 0
+            },
+            {
+              "v": 477
+            },
+            {
+              "v": 299
+            },
+            {
+              "v": 18
+            },
+            {
+              "v": 160
+            }
+          ]
+        },
+        {
+          "c": [
+            {
+              "v": "Date(2020, 4, 3, 0, 0)"
+            },
+            {
+              "v": 0
+            },
+            {
+              "v": 477
+            },
+            {
+              "v": 299
+            },
+            {
+              "v": 18
+            },
+            {
+              "v": 160
+            }
+          ]
+        },
+      ]
+    }
+  });
 })
 
 module.exports = {
