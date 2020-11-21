@@ -8,7 +8,7 @@ type DataTableColumn = {
 }
 
 type DataTableValue = {
-  v: number
+  v: unknown
 }
 
 type DataTableRow = {
@@ -21,7 +21,7 @@ type DataTable = {
 }
 
 export class DataTableBuilder {
-  public rows: Array<Array<number>>
+  public rows: Array<Array<unknown>>
   public cols: Array<DataTableColumn>
 
   constructor() {
@@ -37,7 +37,7 @@ export class DataTableBuilder {
     this.rows.push(row);
   }
 
-  addRows(rows: Array<Array<number>>) {
+  addRows(rows: Array<Array<unknown>>) {
     for (let row of rows) {
       this.rows.push(row);
     }
@@ -47,7 +47,7 @@ export class DataTableBuilder {
     return this.rows.map(row => row[colIndex]);
   }
 
-  addPercentiles(colIndex: number, percentiles: Array<number>, fromValue: any, toValue: any) {
+  addPercentiles(colIndex: number, percentiles: Array<unknown>, fromValue: any, toValue: any) {
     if (this.rows.length <= 1) {
       return;
     }
@@ -56,7 +56,7 @@ export class DataTableBuilder {
 
     const columnValues = this.getColumnValues(colIndex);
     const percentileValues = percentiles.map(percentile => {
-      return jStat.percentile(columnValues, percentile / 100.0);
+      return jStat.percentile(columnValues, percentile as number / 100.0);
     }).reverse();
 
     percentiles.reverse().forEach(percentile => {

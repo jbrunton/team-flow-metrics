@@ -128,6 +128,103 @@ router.get('/scatterplot', async (req, res) => {
 })
 
 router.get("/cfd", async (req, res) => {
+  if (!req.query.epicKey) {
+    res.status(400).json({
+      error: "Required epicKey query param"
+    })
+  }
+  const epicKey = req.query.epicKey;
+  const epic = await getRepository(Issue).findOne({ key: epicKey });
+  if (!epic) {
+    res.status(401).json({
+      error: `Could not find epic with key ${epicKey}`
+    })
+  }
+  const issues = await getRepository(Issue).find({
+    parentId: epic.id
+  });
+  const total = issues.length;
+  const rows = issues
+    .map(issue => {
+      const transitions: { date: Date, fromCategory?: string, toCategory: string }[] = [{ date: issue.created, toCategory: "To Do"}];
+      if (issue.started) {
+        transitions.push({
+          date: issue.started,
+          fromCategory: "To Do",
+          toCategory: "In Progress"
+        })
+      }
+      if (issue.completed) {
+        transitions.push({
+          date: issue.completed,
+          fromCategory: issue.started ? "In Progress" : "To Do",
+          toCategory: "Done"
+        })
+      }
+      return transitions;
+    })
+    .flat()
+    .sort((t1, t2) => moment(t1.date).diff(moment(t2.date)))
+    .reduce((rows, transition) => {
+      const prev = rows.length ? rows[rows.length - 1] : [0, 0, 0, 0, 0, total];
+      const date = formatDate(transition.date);
+      const change = [date, 0, prev[2], prev[3], prev[4], prev[5]];
+      if (transition.fromCategory) {
+        switch (transition.fromCategory) {
+          case "To Do":
+            --change[5];
+            break;
+          case "In Progress":
+            --change[4];
+            break;
+          case "Done":
+            --change[3];
+            break;
+        }
+      }
+      switch (transition.toCategory) {
+        case "To Do":
+          ++change[5];
+          break;
+        case "In Progress":
+          ++change[4];
+          break;
+        case "Done":
+          ++change[3];
+          break;
+      }
+      return rows.concat([change]);
+    }, []);
+  console.log("transitions:", rows);
+  const builder = new DataTableBuilder();
+  builder.setColumns([
+    {
+      "label": "Date",
+      "type": "date"
+    },
+    {
+      "label": "Total",
+      "type": "number"
+    },
+    {
+      "label": "Tooltip",
+      "type": "number",
+      "role": "tooltip"
+    },
+    {
+      "label": "Done",
+      "type": "number"
+    },
+    {
+      "label": "In Progress",
+      "type": "number"
+    },
+    {
+      "label": "To Do",
+      "type": "number"
+    }
+  ]);
+  builder.addRows(rows);
   res.json( {
     "chartOpts": {
       "chartArea": {
@@ -193,103 +290,7 @@ router.get("/cfd", async (req, res) => {
         }
       }
     },
-    "chartData": {
-      "cols": [
-        {
-          "label": "Date",
-          "type": "date"
-        },
-        {
-          "label": "Total",
-          "type": "number"
-        },
-        {
-          "label": "Tooltip",
-          "type": "number",
-          "role": "tooltip"
-        },
-        {
-          "label": "Done",
-          "type": "number"
-        },
-        {
-          "label": "In Progress",
-          "type": "number"
-        },
-        {
-          "label": "To Do",
-          "type": "number"
-        }
-      ],
-      "rows": [
-        {
-          "c": [
-            {
-              "v": "Date(2020, 4, 1, 0, 0)"
-            },
-            {
-              "v": 0
-            },
-            {
-              "v": 462
-            },
-            {
-              "v": 299
-            },
-            {
-              "v": 14
-            },
-            {
-              "v": 149
-            }
-          ]
-        },
-        {
-          "c": [
-            {
-              "v": "Date(2020, 4, 2, 0, 0)"
-            },
-            {
-              "v": 0
-            },
-            {
-              "v": 477
-            },
-            {
-              "v": 299
-            },
-            {
-              "v": 18
-            },
-            {
-              "v": 160
-            }
-          ]
-        },
-        {
-          "c": [
-            {
-              "v": "Date(2020, 4, 3, 0, 0)"
-            },
-            {
-              "v": 0
-            },
-            {
-              "v": 477
-            },
-            {
-              "v": 299
-            },
-            {
-              "v": 18
-            },
-            {
-              "v": 160
-            }
-          ]
-        },
-      ]
-    }
+    "chartData": builder.build()
   });
 })
 

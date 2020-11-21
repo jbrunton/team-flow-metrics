@@ -176,7 +176,7 @@ export default Vue.extend({
       });
     },
     async fetchCfdData() {
-      const url = `/api/charts/cfd`;
+      const url = `/api/charts/cfd?epicKey=${this.epic.key}`;
 
       const response = await axios.get(url);
 
