@@ -171,7 +171,6 @@ export default Vue.extend({
 
   mounted() {
     this.fetchData();
-    this.initCharts();
   },
 
   methods: {
@@ -220,6 +219,8 @@ export default Vue.extend({
     async fetchData() {
       const issueResponse = await axios.get(`/api/issues/${this.key}`);
       this.epic = issueResponse.data.issue;
+
+      this.initCharts();
 
       const childrenResponse = await axios.get(
         `/api/issues/${this.epic.key}/children`
