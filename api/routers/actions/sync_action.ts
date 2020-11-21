@@ -103,6 +103,16 @@ export async function syncIssues(): Promise<Array<Issue>> {
         parent.lastTransition = null;
       }
 
+      if (parent.statusCategory !== "Done"
+        && process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT
+        && parent.lastTransition
+        && moment(parent.lastTransition).diff(moment(), 'days') <= -process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT
+      ) {
+        console.log(`Done timeout hit for ${parent.key}, overriding status to ${process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT_STATUS}`);
+        parent.status = process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT_STATUS;
+        parent.statusCategory = "Done";
+      }
+
       if (parent.statusCategory === "Done") {
         const completed = children
           .map(child => child.completed)
