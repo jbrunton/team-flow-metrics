@@ -12,7 +12,7 @@ describe("CfdBuilder", () => {
   const issue2 = IssueFactory.build({
     status: "Done",
     statusCategory: "Done",
-    created: new Date(2020, 1, 0, 9, 30),
+    created: new Date(2020, 1, 1, 9, 30),
     started: new Date(2020, 1, 1, 10, 0),
     completed: new Date(2020, 1, 4, 11, 30),
   });
@@ -86,7 +86,7 @@ describe("CfdBuilder", () => {
       builder.addIssues([issue1, issue2]);
       expect(builder.transitions()).toEqual([
         {
-          date: new Date(2020, 1, 0, 9, 30),
+          date: new Date(2020, 1, 1, 9, 30),
           toStatusCategory: "To Do"
         },
         {
@@ -123,54 +123,40 @@ describe("CfdBuilder", () => {
       expect(builder.build()).toEqual([]);
     })
 
-    xit("builds rows for the CFD when an issue is added", () => {
+    it("builds rows for the CFD when an issue is added", () => {
       const builder = new CfdBuilder();
       builder.addIssues([issue1]);
       expect(builder.build()).toEqual([
         {
-          date: new Date(2020, 1, 1),
+          date: new Date(2020, 0, 31),
           total: 0,
           toDo: 0,
           inProgress: 0,
           done: 0,
         },
         {
-          date: new Date(2020, 1, 1, 10, 30),
+          date: new Date(2020, 1, 1),
           total: 1,
           toDo: 1,
           inProgress: 0,
           done: 0,
         },
         {
-          date: new Date(2020, 1, 2, 0, 0),
-          total: 1,
-          toDo: 1,
-          inProgress: 0,
-          done: 0,
-        },
-        {
-          date: new Date(2020, 1, 2, 11, 0),
+          date: new Date(2020, 1, 2),
           total: 1,
           toDo: 0,
           inProgress: 1,
           done: 0,
         },
         {
-          date: new Date(2020, 1, 3, 0, 0),
-          total: 1,
-          toDo: 0,
-          inProgress: 1,
-          done: 0,
-        },
-        {
-          date: new Date(2020, 1, 3, 11, 30),
+          date: new Date(2020, 1, 3),
           total: 1,
           toDo: 0,
           inProgress: 0,
           done: 1,
         },
         {
-          date: new Date(2020, 1, 4, 0, 0),
+          date: new Date(2020, 1, 4),
           total: 1,
           toDo: 0,
           inProgress: 0,

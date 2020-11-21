@@ -23,7 +23,67 @@ export class CfdBuilder {
   }
 
   build(): CfdRow[] {
-    return [];
+    const transitions = this.transitions();
+    if (!transitions.length) {
+      return [];
+    }
+    const firstDate = transitions[0].date;
+    const lastDate = transitions[transitions.length - 1].date;
+    const fromDate = moment(firstDate).startOf('day').subtract(1, 'day').toDate();
+    const toDate = moment(lastDate).startOf('day').add(1, 'day').toDate();
+    const firstRow: CfdRow = {
+      date: fromDate,
+      total: 0,
+      toDo: 0,
+      inProgress: 0,
+      done: 0,
+    };
+    const rows = transitions.reduce<CfdRow[]>((rows, transition) => {
+      const prevRow = rows[rows.length - 1];
+      const sameDate = moment(prevRow.date).isSame(transition.date, 'day');
+      const currentRow = sameDate ? prevRow : {
+        date: moment(transition.date).startOf('day').toDate(),
+        total: prevRow.total,
+        toDo: prevRow.toDo,
+        inProgress: prevRow.inProgress,
+        done: prevRow.done,
+      }
+      if (transition.fromStatusCategory) {
+        switch (transition.fromStatusCategory) {
+          case "To Do":
+            --currentRow.toDo;
+            break;
+          case "In Progress":
+            --currentRow.inProgress;
+            break;
+          case "Done":
+            --currentRow.done;
+            break;
+        }
+      }
+      switch (transition.toStatusCategory) {
+        case "To Do":
+          ++currentRow.toDo;
+          ++currentRow.total;
+          break;
+        case "In Progress":
+          ++currentRow.inProgress;
+          break;
+        case "Done":
+          ++currentRow.done;
+          break;
+      }
+      return sameDate ? rows : rows.concat(currentRow);
+    }, [firstRow]);
+    const lastRow = rows[rows.length - 1];
+    rows.push({
+      date: toDate,
+      total: lastRow.total,
+      toDo: lastRow.toDo,
+      inProgress: lastRow.inProgress,
+      done: lastRow.done,
+    });
+    return rows;
   }
 
   transitions(): CfdTransition[] {
