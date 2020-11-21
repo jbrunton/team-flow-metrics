@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { Between, IsNull, Not } from 'typeorm';
 import { HierarchyLevel } from '../models/entities/hierarchy_level';
+import { CfdBuilder } from '../models/metrics/cfd_builder';
 import { DataTableBuilder } from '../models/metrics/data_table_builder';
 const moment = require('moment');
 const { jStat } = require('jstat');
@@ -143,59 +144,11 @@ router.get("/cfd", async (req, res) => {
   const issues = await getRepository(Issue).find({
     parentId: epic.id
   });
-  const total = issues.length;
-  const rows = issues
-    .map(issue => {
-      const transitions: { date: Date, fromCategory?: string, toCategory: string }[] = [{ date: issue.created, toCategory: "To Do"}];
-      if (issue.started) {
-        transitions.push({
-          date: issue.started,
-          fromCategory: "To Do",
-          toCategory: "In Progress"
-        })
-      }
-      if (issue.completed) {
-        transitions.push({
-          date: issue.completed,
-          fromCategory: issue.started ? "In Progress" : "To Do",
-          toCategory: "Done"
-        })
-      }
-      return transitions;
-    })
-    .flat()
-    .sort((t1, t2) => moment(t1.date).diff(moment(t2.date)))
-    .reduce((rows, transition) => {
-      const prev = rows.length ? rows[rows.length - 1] : [0, 0, 0, 0, 0, total];
-      const date = formatDate(transition.date);
-      const change = [date, 0, prev[2], prev[3], prev[4], prev[5]];
-      if (transition.fromCategory) {
-        switch (transition.fromCategory) {
-          case "To Do":
-            --change[5];
-            break;
-          case "In Progress":
-            --change[4];
-            break;
-          case "Done":
-            --change[3];
-            break;
-        }
-      }
-      switch (transition.toCategory) {
-        case "To Do":
-          ++change[5];
-          break;
-        case "In Progress":
-          ++change[4];
-          break;
-        case "Done":
-          ++change[3];
-          break;
-      }
-      return rows.concat([change]);
-    }, []);
-  console.log("transitions:", rows);
+  const cfdBuilder = new CfdBuilder();
+  cfdBuilder.addIssues(issues);
+  const rows = cfdBuilder.build().map(row => {
+    return [formatDate(row.date), 0, row.total, row.done, row.inProgress, row.toDo];
+  });
   const builder = new DataTableBuilder();
   builder.setColumns([
     {

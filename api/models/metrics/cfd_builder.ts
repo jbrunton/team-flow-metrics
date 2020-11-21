@@ -39,14 +39,16 @@ export class CfdBuilder {
       done: 0,
     };
     const rows = transitions.reduce<CfdRow[]>((rows, transition) => {
-      const prevRow = rows[rows.length - 1];
-      const sameDate = moment(prevRow.date).isSame(transition.date, 'day');
-      const currentRow = sameDate ? prevRow : {
-        date: moment(transition.date).startOf('day').toDate(),
-        total: prevRow.total,
-        toDo: prevRow.toDo,
-        inProgress: prevRow.inProgress,
-        done: prevRow.done,
+      let currentRow = rows[rows.length - 1];
+      while (!moment(currentRow.date).isSame(transition.date, 'day')) {
+        currentRow = {
+          date: moment(currentRow.date).add(1, 'day').toDate(),
+          total: currentRow.total,
+          toDo: currentRow.toDo,
+          inProgress: currentRow.inProgress,
+          done: currentRow.done,
+        };
+        rows.push(currentRow);
       }
       if (transition.fromStatusCategory) {
         switch (transition.fromStatusCategory) {
@@ -73,7 +75,7 @@ export class CfdBuilder {
           ++currentRow.done;
           break;
       }
-      return sameDate ? rows : rows.concat(currentRow);
+      return rows;
     }, [firstRow]);
     const lastRow = rows[rows.length - 1];
     rows.push({
