@@ -1,13 +1,14 @@
 import * as express from 'express';
 import { Between, IsNull, Not } from 'typeorm';
 import { HierarchyLevel } from '../models/entities/hierarchy_level';
+import { CfdBuilder } from '../models/metrics/cfd_builder';
 import { DataTableBuilder } from '../models/metrics/data_table_builder';
 const moment = require('moment');
 const { jStat } = require('jstat');
 const router = express.Router()
-const {getRepository} = require('typeorm')
-const {Issue} = require('../models/entities/issue')
-const {formatDate} = require('../helpers/charts_helper');
+const { getRepository } = require('typeorm')
+const { Issue } = require('../models/entities/issue')
+const { formatDate } = require('../helpers/charts_helper');
 
 router.get('/scatterplot', async (req, res) => {
   if (!req.query.fromDate) {
@@ -25,7 +26,7 @@ router.get('/scatterplot', async (req, res) => {
       error: "Required hierarchyLevel query param"
     })
   }
-  
+
   const fromDate = moment(req.query.fromDate).toDate();
   const toDate = moment(req.query.toDate).toDate();
   const hierarchyLevel = req.query.hierarchyLevel;
@@ -46,7 +47,7 @@ router.get('/scatterplot', async (req, res) => {
     }
     issues = issues.filter(outlierFilter);
   }
-  
+
   const chartOpts = {
     seriesType: "scatter",
     interpolateNulls: true,
@@ -109,13 +110,13 @@ router.get('/scatterplot', async (req, res) => {
       role: "annotationText"
     }
   ])
-  
+
   builder.addRows(issues.map(issue => [
     formatDate(issue.completed),
     issue.cycleTime,
     issue.key
   ]))
-  
+
   builder.addPercentiles(1, [50, 70, 85, 95], formatDate(fromDate), formatDate(toDate));
 
   res.json({
@@ -125,6 +126,125 @@ router.get('/scatterplot', async (req, res) => {
     chartOpts: chartOpts,
     chartData: builder.build()
   })
+})
+
+router.get("/cfd", async (req, res) => {
+  if (!req.query.epicKey) {
+    res.status(400).json({
+      error: "Required epicKey query param"
+    })
+  }
+  const epicKey = req.query.epicKey;
+  const epic = await getRepository(Issue).findOne({ key: epicKey });
+  if (!epic) {
+    res.status(401).json({
+      error: `Could not find epic with key ${epicKey}`
+    })
+  }
+  const issues = await getRepository(Issue).find({
+    parentId: epic.id
+  });
+  const cfdBuilder = new CfdBuilder();
+  cfdBuilder.addIssues(issues);
+  const rows = cfdBuilder.build().map(row => {
+    return [formatDate(row.date), 0, row.total, row.done, row.inProgress, row.toDo];
+  });
+  const builder = new DataTableBuilder();
+  builder.setColumns([
+    {
+      "label": "Date",
+      "type": "date"
+    },
+    {
+      "label": "Total",
+      "type": "number"
+    },
+    {
+      "label": "Tooltip",
+      "type": "number",
+      "role": "tooltip"
+    },
+    {
+      "label": "Done",
+      "type": "number"
+    },
+    {
+      "label": "In Progress",
+      "type": "number"
+    },
+    {
+      "label": "To Do",
+      "type": "number"
+    }
+  ]);
+  builder.addRows(rows);
+  res.json( {
+    "chartOpts": {
+      "chartArea": {
+        "width": "90%",
+        "height": "80%",
+        "top": "5%"
+      },
+      "height": 300,
+      "hAxis": {
+        "titleTextStyle": {
+          "color": "#333"
+        }
+      },
+      "vAxis": {
+        "minValue": 0,
+        "textPosition": "none"
+      },
+      "isStacked": true,
+      "lineWidth": 1,
+      "areaOpacity": 0.4,
+      "legend": {
+        "position": "top"
+      },
+      "series": {
+        "0": {
+          "color": "grey"
+        },
+        "1": {
+          "color": "blue"
+        },
+        "2": {
+          "color": "green"
+        },
+        "3": {
+          "color": "red"
+        },
+        "4": {
+          "color": "orange"
+        }
+      },
+      "crosshair": {
+        "trigger": "focus",
+        "orientation": "vertical",
+        "color": "grey"
+      },
+      "focusTarget": "category",
+      "annotations": {
+        "textStyle": {
+          "color": "black"
+        },
+        "domain": {
+          "style": "line",
+          "stem": {
+            "color": "red"
+          }
+        },
+        "datum": {
+          "style": "point",
+          "stem": {
+            "color": "black",
+            "length": "12"
+          }
+        }
+      }
+    },
+    "chartData": builder.build()
+  });
 })
 
 module.exports = {

@@ -65,7 +65,7 @@ describe("DataTableBuilder", () => {
     describe("if no or little data", () => {
       it("adds no percentile rows", () => {
         builder.addRow([1, 2, 3]);
-        builder.addPercentiles(1, [50, 80]);
+        builder.addPercentiles(1, [50, 80], 1, 5);
         expect(builder.rows).toEqual([[1, 2, 3]]);
       })
     })

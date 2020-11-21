@@ -93,4 +93,9 @@ $link-focus-border: $primary;
 .b-table td.col-v-align {
   vertical-align: middle;
 }
+
+// fixes flickering behavior in tooltips
+svg > g > g:last-child {
+  pointer-events: none;
+}
 </style>
