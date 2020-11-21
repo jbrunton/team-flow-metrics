@@ -110,6 +110,15 @@
             ></StatusTag>
           </b-table-column>
           <b-table-column
+            width="120px"
+            field="resolution"
+            label="Resolution"
+            v-slot="props"
+            sortable
+          >
+            {{ props.row.resolution }}
+          </b-table-column>
+          <b-table-column
             width="150px"
             field="created"
             label="Created"
@@ -135,6 +144,15 @@
             sortable
           >
             {{ formatDate(props.row.completed) }}
+          </b-table-column>
+          <b-table-column
+            width="150px"
+            field="lastTransition"
+            label="Last Transition"
+            v-slot="props"
+            sortable
+          >
+            {{ formatDate(props.row.lastTransition) }}
           </b-table-column>
         </b-table>
       </div>
@@ -233,10 +251,12 @@ export default Vue.extend({
           externalUrl: issue.externalUrl,
           status: issue.status,
           statusCategory: issue.statusCategory,
+          resolution: issue.resolution,
           childCount: issue.childCount,
           created: this.parseDate(issue.created),
           started: this.parseDate(issue.started),
           completed: this.parseDate(issue.completed),
+          lastTransition: this.parseDate(issue.lastTransition),
           cycleTime: issue.cycleTime
         };
       });

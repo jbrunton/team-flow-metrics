@@ -21,6 +21,7 @@ services:
       - JIRA_HOST
       - JIRA_QUERY
       - EPIC_CYCLE_TIME_STRATEGY
+      - EPIC_CYCLE_TIME_EXCL_RESOLUTIONS
       - STATUS_CATEGORY_OVERRIDES
 
     command: npm run debug

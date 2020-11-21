@@ -323,4 +323,62 @@ describe('IssueAttributesBuilder', () => {
       expect(issue.completed).toBeNull()
     })
   })
+
+  describe("#lastTransition", () => {
+    it("is the date of the last transition", () => {
+      const json = {
+        key: 'DEMO-101',
+        fields: {
+          summary: "Demo Issue 101",
+          issuetype: {
+            name: 'Story'
+          },
+          status: {
+            name: "Backlog",
+            statusCategory: {
+              name: "To Do"
+            }
+          }
+        },
+        changelog: {
+          histories: [
+            {
+              created: "2020-01-02T10:00:00.000+0100",
+              items: [
+                {
+                  "field": "status",
+                  "from": "2",
+                  "to": "3"
+                }
+              ]
+            },
+            {
+              created: "2020-01-03T10:00:00.000+0100",
+              items: [
+                {
+                  "field": "status",
+                  "from": "2",
+                  "to": "3"
+                }
+              ]
+            },
+            {
+              created: "2020-01-01T10:00:00.000+0100",
+              items: [
+                {
+                  "field": "status",
+                  "from": "1",
+                  "to": "2"
+                }
+              ]
+            }
+          ]
+        }
+      };
+
+      const issue = new IssueAttributesBuilder([], statuses, hierarchyLevels).build(json);
+  
+      expect(issue.lastTransition).toEqual(new Date("2020-01-03T09:00:00.000Z"))
+    });
+  });
 });

@@ -70,8 +70,19 @@ export async function syncIssues(): Promise<Array<Issue>> {
 
   if (process.env.EPIC_CYCLE_TIME_STRATEGY === "STORIES") {
     console.log("EPIC_CYCLE_TIME_STRATEGY = STORIES, computing epic cycle times...");
+    const resolutionExclusions = process.env.EPIC_CYCLE_TIME_EXCL_RESOLUTIONS
+      ? process.env.EPIC_CYCLE_TIME_EXCL_RESOLUTIONS.split(",")
+      : [];
     for (let parent of issueCollection.getParents()) {
-      const children = issueCollection.getChildrenFor(parent.key);
+      const children = issueCollection
+        .getChildrenFor(parent.key)
+        .filter(child => {
+          const include = !resolutionExclusions.includes(child.resolution);
+          if (!include) {
+            console.log(`Excluding ${child.key} from cycle time calculations for ${parent.key} (resolution = ${child.resolution})`);
+          }
+          return include;
+        });
       const started = children
         .map(child => child.started)
         .filter(date => date)
@@ -80,6 +91,16 @@ export async function syncIssues(): Promise<Array<Issue>> {
         parent.started = started;
       } else {
         parent.started = null;
+      }
+
+      const lastTransition = children
+        .map(child => child.lastTransition)
+        .filter(date => date)
+        .sort((d1, d2) => moment(d2).diff(moment(d1)))[0];
+      if (lastTransition) {
+        parent.lastTransition = lastTransition;
+      } else {
+        parent.lastTransition = null;
       }
 
       if (parent.statusCategory === "Done") {

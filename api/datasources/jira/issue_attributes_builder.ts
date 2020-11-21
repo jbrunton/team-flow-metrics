@@ -40,9 +40,14 @@ export class IssueAttributesBuilder {
     transitions: Array<Transition>,
     started: Date,
     completed: Date,
+    lastTransition: Date,
     cycleTime: number
   } {
     const transitions = this.getTransitions(json);
+    const lastTransition = transitions
+      .map(transition => transition.date)
+      .sort((d1, d2) => moment(d2).diff(moment(d1)))
+      .map(d => moment(d).toDate())[0];
     const startedDate = getStartedDate(transitions);
     const completedDate = getCompletedDate(transitions);
     const cycleTime = startedDate && completedDate ? completedDate.diff(startedDate, 'hours') / 24 : null;
@@ -66,6 +71,7 @@ export class IssueAttributesBuilder {
       transitions: serializeTransitions(transitions),
       started: startedDate ? startedDate.toDate() : null,
       completed: completedDate ? completedDate.toDate() : null,
+      lastTransition: lastTransition,
       cycleTime: cycleTime
     };
   }
