@@ -62,8 +62,7 @@
         </div>
       </div>
 
-      <div id="chart_div">
-      </div>
+      <div id="chart_div" class="column is-half"></div>
     </div>
 
     <nav v-if="children" class="panel">
@@ -170,9 +169,9 @@ export default Vue.extend({
     initCharts() {
       google.charts.load("current", { packages: ["corechart"] });
       google.charts.setOnLoadCallback(() => {
-        new ResizeObserver(this.drawChart).observe(
-          document.getElementById("chart_div")
-        );
+        // new ResizeObserver(this.drawChart).observe(
+        //   document.getElementById("chart_div")
+        // );
         this.fetchCfdData();
       });
     },
@@ -192,7 +191,7 @@ export default Vue.extend({
         return;
       }
 
-      container.style.height = `${container.offsetWidth * 0.6}px`;
+      //container.style.height = `${container.offsetWidth * 0.6}px`;
       const data = new google.visualization.DataTable(this.chartData);
       const chart = new google.visualization.AreaChart(container);
       chart.draw(data, this.chartOpts);

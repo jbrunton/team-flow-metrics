@@ -135,7 +135,7 @@ router.get("/cfd", async (req, res) => {
         "height": "80%",
         "top": "5%"
       },
-      "height": 500,
+      "height": 300,
       "hAxis": {
         "titleTextStyle": {
           "color": "#333"
