@@ -111,6 +111,15 @@
           </b-table-column>
           <b-table-column
             width="150px"
+            field="created"
+            label="Created"
+            v-slot="props"
+            sortable
+          >
+            {{ formatDate(props.row.created) }}
+          </b-table-column>
+          <b-table-column
+            width="150px"
             field="started"
             label="Started"
             v-slot="props"
