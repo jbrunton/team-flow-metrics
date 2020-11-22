@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { Between, IsNull, Not } from 'typeorm';
+import { Between, IsNull, LessThan, MoreThan, MoreThanOrEqual, Not } from 'typeorm';
 import { HierarchyLevel } from '../models/entities/hierarchy_level';
 import { CfdBuilder } from '../models/metrics/cfd_builder';
 import { DataTableBuilder } from '../models/metrics/data_table_builder';
@@ -7,7 +7,7 @@ const moment = require('moment');
 const { jStat } = require('jstat');
 const router = express.Router()
 const { getRepository } = require('typeorm')
-const { Issue } = require('../models/entities/issue')
+import { Issue } from '../models/entities/issue';
 const { formatDate } = require('../helpers/charts_helper');
 
 router.get('/scatterplot', async (req, res) => {
@@ -129,28 +129,58 @@ router.get('/scatterplot', async (req, res) => {
 })
 
 router.get("/cfd", async (req, res) => {
-  if (!req.query.epicKey) {
-    res.status(400).json({
-      error: "Required epicKey query param"
-    })
+  let issues: Issue[];
+  let fromDate: Date
+  let toDate: Date
+  if (req.query.epicKey) {
+    const epicKey = req.query.epicKey;
+    const epic = await getRepository(Issue).findOne({ key: epicKey });
+    if (!epic) {
+      res.status(401).json({
+        error: `Could not find epic with key ${epicKey}`
+      })
+    }
+    issues = await getRepository(Issue).find({
+      parentId: epic.id
+    });  
+  } else if (req.query.fromDate && req.query.toDate) {
+    fromDate = moment(req.query.fromDate).toDate();
+    toDate = moment(req.query.toDate).toDate();
+    const hierarchyLevel = req.query.hierarchyLevel;
+    const completedIssues = await getRepository(Issue)
+      .find({
+        completed: MoreThan(fromDate),
+        issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
+        started: LessThan(toDate)
+      });
+    const inProgressIssues = await getRepository(Issue)
+      .find({
+        completed: IsNull(),
+        issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
+        started: LessThan(toDate)
+      });
+    issues = completedIssues.concat(inProgressIssues);
+  } else {
+    if (!req.query.epicKey && !req.query.fromDate && !req.query.toDate) {
+      return res.status(400).json({
+        error: "Required epicKey or fromDate and toDate query params"
+      })
+    }  
   }
-  const epicKey = req.query.epicKey;
-  const epic = await getRepository(Issue).findOne({ key: epicKey });
-  if (!epic) {
-    res.status(401).json({
-      error: `Could not find epic with key ${epicKey}`
-    })
-  }
-  const issues = await getRepository(Issue).find({
-    parentId: epic.id
-  });
+
   const cfdBuilder = new CfdBuilder();
   cfdBuilder.addIssues(issues);
-  const rows = cfdBuilder.build().map(row => {
-    return [formatDate(row.date), 0, row.total, row.done, row.inProgress, row.toDo];
+  const rows = cfdBuilder.build(
+    fromDate, toDate
+  ).map(cfdRow => {
+    const row = [formatDate(cfdRow.date), 0, cfdRow.total, cfdRow.done, cfdRow.inProgress];
+    if (req.query.epicKey) {
+      row.push(cfdRow.toDo);
+    }
+    return row;
   });
   const builder = new DataTableBuilder();
-  builder.setColumns([
+  const columns = [
     {
       "label": "Date",
       "type": "date"
@@ -172,11 +202,14 @@ router.get("/cfd", async (req, res) => {
       "label": "In Progress",
       "type": "number"
     },
-    {
+  ];
+  if (req.query.epicKey) {
+    columns.push({
       "label": "To Do",
       "type": "number"
-    }
-  ]);
+    });
+  }
+  builder.setColumns(columns);
   builder.addRows(rows);
   res.json( {
     "chartOpts": {

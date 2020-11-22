@@ -11,6 +11,7 @@ export type CfdRow = {
 
 type CfdTransition = {
   date: Date;
+  key: string;
   fromStatusCategory?: string;
   toStatusCategory: string;
 }
@@ -22,7 +23,7 @@ export class CfdBuilder {
     this.issues = this.issues.concat(issues);
   }
 
-  build(): CfdRow[] {
+  build(chartFromDate?: Date, chartToDate?: Date): CfdRow[] {
     const transitions = this.transitions();
     if (!transitions.length) {
       return [];
@@ -38,6 +39,7 @@ export class CfdBuilder {
       inProgress: 0,
       done: 0,
     };
+    const inProgressKeys = new Set<String>();
     const rows = transitions.reduce<CfdRow[]>((rows, transition) => {
       let currentRow = rows[rows.length - 1];
       while (!moment(currentRow.date).isSame(transition.date, 'day')) {
@@ -57,6 +59,7 @@ export class CfdBuilder {
             break;
           case "In Progress":
             --currentRow.inProgress;
+            inProgressKeys.delete(transition.key);
             break;
           case "Done":
             --currentRow.done;
@@ -70,6 +73,7 @@ export class CfdBuilder {
           break;
         case "In Progress":
           ++currentRow.inProgress;
+          inProgressKeys.add(transition.key);
           break;
         case "Done":
           ++currentRow.done;
@@ -85,16 +89,23 @@ export class CfdBuilder {
       inProgress: lastRow.inProgress,
       done: lastRow.done,
     });
+    console.log("inProgressKeys:", inProgressKeys);
+    if (chartFromDate && chartToDate) {
+      return rows.filter(row => {
+        return moment(chartFromDate).isBefore(row.date) && moment(row.date).isBefore(chartToDate);
+      });  
+    }
     return rows;
   }
 
   transitions(): CfdTransition[] {
     return this.issues
       .map(issue => {
-        const transitions: CfdTransition[] = [{ date: issue.created, toStatusCategory: "To Do"}];
+        const transitions: CfdTransition[] = [{ date: issue.created, key: issue.key, toStatusCategory: "To Do"}];
         if (issue.started) {
           transitions.push({
             date: issue.started,
+            key: issue.key,
             fromStatusCategory: "To Do",
             toStatusCategory: "In Progress"
           })
@@ -102,6 +113,7 @@ export class CfdBuilder {
         if (issue.completed) {
           transitions.push({
             date: issue.completed,
+            key: issue.key,
             fromStatusCategory: issue.started ? "In Progress" : "To Do",
             toStatusCategory: "Done"
           })
