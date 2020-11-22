@@ -138,6 +138,15 @@
         {{ formatDate(props.row.completed) }}
       </b-table-column>
       <b-table-column
+        width="150px"
+        field="lastTransition"
+        label="Last Transition"
+        v-slot="props"
+        sortable
+      >
+        {{ formatDate(props.row.lastTransition) }}
+      </b-table-column>
+      <b-table-column
         width="120px"
         field="cycleTime"
         label="Cycle Time"
@@ -207,6 +216,7 @@ export default Vue.extend({
           created: this.parseDate(issue.created),
           started: this.parseDate(issue.started),
           completed: this.parseDate(issue.completed),
+          lastTransition: this.parseDate(issue.lastTransition),
           cycleTime: issue.cycleTime
         };
       });

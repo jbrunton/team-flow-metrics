@@ -42,6 +42,11 @@ describe("getRelativeDateRanges", () => {
         fromDate: new Date(2019, 6, 11),
         toDate: new Date(2020, 6, 11),
         description: "Last 1 year"
+      },
+      {
+        fromDate: new Date(2018, 6, 11),
+        toDate: new Date(2020, 6, 11),
+        description: "Last 2 years"
       }
     ]);
   });

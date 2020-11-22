@@ -69,6 +69,9 @@ export class Issue {
     @Column("timestamp")
     completed: Date;
 
+    @Column("timestamp")
+    lastTransition: Date;
+
     @Column()
     cycleTime: number;
 

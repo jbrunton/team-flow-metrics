@@ -26,6 +26,7 @@ export class CreateIssues0000000000004 implements MigrationInterface {
 
             "started" timestamp,
             "completed" timestamp,
+            "lastTransition" timestamp,
             "cycleTime" real,
             CONSTRAINT "PK_ISSUES_ID" PRIMARY KEY ("id")
         )`);

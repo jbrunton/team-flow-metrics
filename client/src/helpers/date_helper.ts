@@ -53,6 +53,13 @@ export function getRelativeDateRanges(now = new Date()): Array<DateRange> {
         .toDate(),
       toDate: toDate,
       description: "Last 1 year"
+    },
+    {
+      fromDate: moment(now)
+        .subtract(365 * 2, "days")
+        .toDate(),
+      toDate: toDate,
+      description: "Last 2 years"
     }
   ];
 }
