@@ -42,6 +42,10 @@ $primary-invert: findColorInvert($primary);
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')
 $colors: mergeColorMaps(
   (
+    "none": (
+      rgb(199, 199, 199),
+      $black
+    ),
     "to-do": (
       #db2828,
       $white

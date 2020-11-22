@@ -116,10 +116,10 @@
             v-slot="props"
             sortable
           >
-            {{ props.row.resolution }}
+            <b-tag style="font-weight: bold;">{{ props.row.resolution }}</b-tag>
           </b-table-column>
           <b-table-column
-            width="150px"
+            width="120px"
             field="created"
             label="Created"
             v-slot="props"
@@ -128,7 +128,7 @@
             {{ formatDate(props.row.created) }}
           </b-table-column>
           <b-table-column
-            width="150px"
+            width="120px"
             field="started"
             label="Started"
             v-slot="props"
@@ -137,7 +137,7 @@
             {{ formatDate(props.row.started) }}
           </b-table-column>
           <b-table-column
-            width="150px"
+            width="120px"
             field="completed"
             label="Completed"
             v-slot="props"
@@ -146,13 +146,42 @@
             {{ formatDate(props.row.completed) }}
           </b-table-column>
           <b-table-column
-            width="150px"
+            width="120px"
             field="lastTransition"
             label="Last Transition"
             v-slot="props"
             sortable
           >
             {{ formatDate(props.row.lastTransition) }}
+          </b-table-column>
+
+          <b-table-column width="150px" label="Progress" v-slot="props">
+            <b-progress
+              v-if="props.row.progress"
+              size="is-small"
+              :max="props.row.progress.totalTime"
+            >
+              <b-progress-bar
+                slot="bar"
+                :value="props.row.progress.timeToCreated"
+                type="is-none"
+              ></b-progress-bar>
+              <b-progress-bar
+                slot="bar"
+                :value="props.row.progress.toDoTime"
+                type="is-to-do"
+              ></b-progress-bar>
+              <b-progress-bar
+                slot="bar"
+                :value="props.row.progress.inProgressTime"
+                type="is-in-progress"
+              ></b-progress-bar>
+              <b-progress-bar
+                slot="bar"
+                :value="props.row.progress.doneTime"
+                type="is-done"
+              ></b-progress-bar>
+            </b-progress>
           </b-table-column>
         </b-table>
       </div>
@@ -167,6 +196,7 @@ import axios from "axios";
 import StatusTag from "@/components/StatusTag.vue";
 import { formatDate } from "../helpers/date_helper";
 import { formatNumber } from "../helpers/format_helper";
+import moment from "moment";
 
 export default Vue.extend({
   name: "EpicReport",
@@ -232,6 +262,15 @@ export default Vue.extend({
       }
       return new Date(input);
     },
+    truncateDate(date: Date): Date {
+      if (date && moment(date).isBefore(moment(this.epic.started))) {
+        return moment(this.epic.started).toDate();
+      }
+      if (date && moment(date).isAfter(moment(this.epic.completed))) {
+        return moment(this.epic.completed).toDate();
+      }
+      return date;
+    },
     formatDate,
     formatNumber,
     async fetchData() {
@@ -260,6 +299,55 @@ export default Vue.extend({
           cycleTime: issue.cycleTime
         };
       });
+
+      if (this.epic.started && this.epic.completed) {
+        const totalTime =
+          moment(this.epic.completed).diff(this.epic.started, "hours") / 24;
+        console.log({ totalTime });
+        this.children.forEach(issue => {
+          const created = this.truncateDate(issue.created);
+          const started = this.truncateDate(issue.started);
+          const completed = this.truncateDate(issue.completed);
+          console.log({ key: issue.key, created, started, completed });
+          const timeToCreated =
+            moment(created).diff(this.epic.started, "hours") / 24;
+          issue.progress = {
+            totalTime,
+            timeToCreated
+          };
+          if (started) {
+            const toDoTime = moment(started).diff(created, "hours") / 24;
+            issue.progress.toDoTime = toDoTime;
+          } else if (completed) {
+            const toDoTime = moment(completed).diff(created, "hours") / 24;
+            issue.progress.toDoTime = toDoTime;
+          } else {
+            const toDoTime =
+              moment(created).diff(this.epic.completed, "hours") / 24;
+            issue.progress.toDoTime = toDoTime;
+          }
+          if (completed) {
+            if (started) {
+              const inProgressTime =
+                moment(completed).diff(started, "hours") / 24;
+              issue.progress.inProgressTime = inProgressTime;
+            } else {
+              issue.progress.inProgressTime = 0;
+            }
+            const doneTime =
+              totalTime -
+              (issue.progress.timeToCreated +
+                issue.progress.toDoTime +
+                issue.progress.inProgressTime);
+            //const donePercent = 100 - (issue.progress[0] + issue.progress[1] + issue.progress[2]);
+            issue.progress.doneTime = doneTime;
+          }
+          console.log({
+            key: issue.key,
+            progress: issue.progress
+          });
+        });
+      }
 
       this.stats["Total"] = this.children.length;
       this.stats["In Progress"] = this.children.filter(
