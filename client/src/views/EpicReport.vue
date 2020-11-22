@@ -339,7 +339,6 @@ export default Vue.extend({
               (issue.progress.timeToCreated +
                 issue.progress.toDoTime +
                 issue.progress.inProgressTime);
-            //const donePercent = 100 - (issue.progress[0] + issue.progress[1] + issue.progress[2]);
             issue.progress.doneTime = doneTime;
           }
           console.log({
