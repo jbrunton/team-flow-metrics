@@ -3,6 +3,8 @@
     "db:create": "docker-compose run -e NODE_ENV api npm run db:create",
     "db:setup": "docker-compose run -e NODE_ENV api npm run db:setup",
     "db:reset": "docker-compose run -e NODE_ENV api npm run db:reset",
+    "db:migrate": "docker-compose run -e NODE_ENV api npm run db:migrate",
+    "db:revert": "docker-compose run -e NODE_ENV api npm run db:revert",
     "client:lint": "cd client && npm run lint",
     "client:lint:check": "cd client && npm run lint:check",
     "lint": "npm run client:lint",
