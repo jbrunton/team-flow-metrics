@@ -18,6 +18,7 @@ export const IssueFactory = Factory.define("Issue", Issue)
     percentDone: null,
     started: null,
     completed: null,
+    lastTransition: null,
     cycleTime: null,
     transitions: []
   });
