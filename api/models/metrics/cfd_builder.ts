@@ -39,7 +39,6 @@ export class CfdBuilder {
       inProgress: 0,
       done: 0,
     };
-    const inProgressKeys = new Set<String>();
     const rows = transitions.reduce<CfdRow[]>((rows, transition) => {
       let currentRow = rows[rows.length - 1];
       while (!moment(currentRow.date).isSame(transition.date, 'day')) {
@@ -59,7 +58,6 @@ export class CfdBuilder {
             break;
           case "In Progress":
             --currentRow.inProgress;
-            inProgressKeys.delete(transition.key);
             break;
           case "Done":
             --currentRow.done;
@@ -73,7 +71,6 @@ export class CfdBuilder {
           break;
         case "In Progress":
           ++currentRow.inProgress;
-          inProgressKeys.add(transition.key);
           break;
         case "Done":
           ++currentRow.done;
@@ -89,7 +86,6 @@ export class CfdBuilder {
       inProgress: lastRow.inProgress,
       done: lastRow.done,
     });
-    console.log("inProgressKeys:", inProgressKeys);
     if (chartFromDate && chartToDate) {
       return rows.filter(row => {
         return moment(chartFromDate).isBefore(row.date) && moment(row.date).isBefore(chartToDate);

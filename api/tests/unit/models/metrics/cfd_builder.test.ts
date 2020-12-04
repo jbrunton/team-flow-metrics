@@ -28,15 +28,18 @@ describe("CfdBuilder", () => {
       builder.addIssues([issue1]);
       expect(builder.transitions()).toEqual([
         {
+          key: issue1.key,
           date: new Date(2020, 1, 1, 10, 30),
           toStatusCategory: "To Do"
         },
         {
+          key: issue1.key,
           date: new Date(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
           toStatusCategory: "In Progress"
         },
         {
+          key: issue1.key,
           date: new Date(2020, 1, 3, 11, 30),
           fromStatusCategory: "In Progress",
           toStatusCategory: "Done"
@@ -45,19 +48,22 @@ describe("CfdBuilder", () => {
     });
 
     it("returns transitions for started issues", () => {
-      const builder = new CfdBuilder();
-      builder.addIssues([IssueFactory.build({
+      const issue = IssueFactory.build({
         status: "In Progress",
         statusCategory: "In Progress",
         created: new Date(2020, 1, 1, 10, 30),
         started: new Date(2020, 1, 2, 11, 0),
-      })]);
+      });
+      const builder = new CfdBuilder();
+      builder.addIssues([issue]);
       expect(builder.transitions()).toEqual([
         {
+          key: issue.key,
           date: new Date(2020, 1, 1, 10, 30),
           toStatusCategory: "To Do"
         },
         {
+          key: issue.key,
           date: new Date(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
           toStatusCategory: "In Progress"
@@ -66,19 +72,22 @@ describe("CfdBuilder", () => {
     });
 
     it("returns transitions for issues moved straight to done", () => {
-      const builder = new CfdBuilder();
-      builder.addIssues([IssueFactory.build({
+      const issue = IssueFactory.build({
         status: "Done",
         statusCategory: "Done",
         created: new Date(2020, 1, 1, 10, 30),
         completed: new Date(2020, 1, 2, 11, 0),
-      })]);
+      });
+      const builder = new CfdBuilder();
+      builder.addIssues([issue]);
       expect(builder.transitions()).toEqual([
         {
+          key: issue.key,
           date: new Date(2020, 1, 1, 10, 30),
           toStatusCategory: "To Do"
         },
         {
+          key: issue.key,
           date: new Date(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
           toStatusCategory: "Done"
@@ -91,29 +100,35 @@ describe("CfdBuilder", () => {
       builder.addIssues([issue1, issue2]);
       expect(builder.transitions()).toEqual([
         {
+          key: issue2.key,
           date: new Date(2020, 1, 1, 9, 30),
           toStatusCategory: "To Do"
         },
         {
+          key: issue2.key,
           date: new Date(2020, 1, 1, 10, 0),
           fromStatusCategory: "To Do",
           toStatusCategory: "In Progress"
         },
         {
+          key: issue1.key,
           date: new Date(2020, 1, 1, 10, 30),
           toStatusCategory: "To Do"
         },
         {
+          key: issue1.key,
           date: new Date(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
           toStatusCategory: "In Progress"
         },
         {
+          key: issue1.key,
           date: new Date(2020, 1, 3, 11, 30),
           fromStatusCategory: "In Progress",
           toStatusCategory: "Done"
         },
         {
+          key: issue2.key,
           date: new Date(2020, 1, 4, 11, 30),
           fromStatusCategory: "In Progress",
           toStatusCategory: "Done"
