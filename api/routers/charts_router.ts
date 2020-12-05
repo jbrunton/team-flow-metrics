@@ -10,6 +10,7 @@ const router = express.Router()
 const { getRepository } = require('typeorm')
 import { Issue } from '../models/entities/issue';
 import { groupBy } from "lodash";
+import { dateRange, StepInterval } from '../helpers/date_helper';
 const { formatDate } = require('../helpers/charts_helper');
 
 router.get('/scatterplot', async (req, res) => {
@@ -146,8 +147,8 @@ router.get("/cfd", async (req, res) => {
       parentId: epic.id
     });  
   } else if (req.query.fromDate && req.query.toDate) {
-    fromDate = moment(req.query.fromDate).toDate();
-    toDate = moment(req.query.toDate).toDate();
+    fromDate = moment.utc(req.query.fromDate).toDate();
+    toDate = moment.utc(req.query.toDate).toDate();
     const hierarchyLevel = req.query.hierarchyLevel;
     const completedIssues = await getRepository(Issue)
       .find({
@@ -299,8 +300,8 @@ router.get("/throughput", async (req, res) => {
     })
   }
 
-  const fromDate = moment(req.query.fromDate).toDate();
-  const toDate = moment(req.query.toDate).toDate();
+  const fromDate = moment.utc(req.query.fromDate).toDate();
+  const toDate = moment.utc(req.query.toDate).toDate();
   const hierarchyLevel = req.query.hierarchyLevel;
   const completedIssues = await getRepository(Issue)
     .find({
@@ -314,9 +315,16 @@ router.get("/throughput", async (req, res) => {
       }
     });
 
-  const groupedIssues = groupBy(completedIssues, (issue) => moment(issue.completed).startOf('day'));
-  const rows = Object.entries(groupedIssues)
-    .map((entry: [string, Issue[]]) => [formatDate(moment(entry[0]).toDate()), entry[1].length]);
+  const dates = dateRange(fromDate, toDate, StepInterval.Daily);
+
+  const groupedIssues = groupBy(completedIssues, (issue) => formatDate(moment.utc(issue.completed).startOf('day').toDate()));
+
+  const rows = dates.map(date => {
+    const dateString = formatDate(date);
+    const issues = groupedIssues[dateString] || [];
+    return [dateString, issues.length];
+  });
+  
   const builder = new DataTableBuilder();
   builder.setColumns([
     {
