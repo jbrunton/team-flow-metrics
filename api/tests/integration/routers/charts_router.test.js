@@ -198,7 +198,7 @@ describe('charts_router', () => {
       }));
 
       const res = await request(app)
-        .get('/charts/throughput?fromDate=2020-01-01&toDate=2020-03-01&hierarchyLevel=Story')
+        .get('/charts/throughput?fromDate=2020-02-01&toDate=2020-02-05&hierarchyLevel=Story')
       
       expect(res.statusCode).toEqual(200)
       expect(res.body.chartData).toEqual({
@@ -215,8 +215,26 @@ describe('charts_router', () => {
         rows: [
           {
             c: [
+              { v: "Date(2020, 1, 1, 0, 0)" },
+              { v: 0 },
+            ]
+          },
+          {
+            c: [
               { v: "Date(2020, 1, 2, 0, 0)" },
               { v: 1 },
+            ]
+          },
+          {
+            c: [
+              { v: "Date(2020, 1, 3, 0, 0)" },
+              { v: 0 },
+            ]
+          },
+          {
+            c: [
+              { v: "Date(2020, 1, 4, 0, 0)" },
+              { v: 0 },
             ]
           },
           {
