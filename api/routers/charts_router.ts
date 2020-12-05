@@ -294,8 +294,6 @@ router.get("/throughput", async (req, res) => {
       }
     });
 
-  console.log(completedIssues);
-
   const groupedIssues = groupBy(completedIssues, (issue) => moment(issue.completed).startOf('day'));
   const rows = Object.entries(groupedIssues)
     .map((entry: [string, Issue[]]) => [formatDate(moment(entry[0]).toDate()), entry[1].length]);
