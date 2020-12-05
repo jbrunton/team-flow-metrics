@@ -24,7 +24,7 @@ describe('charts_router', () => {
     await DbFactory.resetDatabase();
   })
 
-  describe('/scatterplot', () => {
+  describe('GET /scatterplot', () => {
     it('should return cycle time data', async () => {
       const issue1 = await getRepository(Issue).save(IssueFactory.build({
         status: "Done",
@@ -175,6 +175,56 @@ describe('charts_router', () => {
               { v: issue1.key }
             ]
           }
+        ]
+      })
+    })
+  })
+
+  describe('GET /throughput', () => {
+    it('returns throughput data', async () => {
+      const issue1 = await getRepository(Issue).save(IssueFactory.build({
+        status: "Done",
+        statusCategory: "Done",
+        started: new Date(2020, 1, 1, 0, 0),
+        completed: new Date(2020, 1, 2, 0, 0),
+        cycleTime: 1
+      }));
+      const issue2 = await getRepository(Issue).save(IssueFactory.build({
+        status: "Done",
+        statusCategory: "Done",
+        started: new Date(2020, 1, 3, 0, 0),
+        completed: new Date(2020, 1, 5, 0, 0),
+        cycleTime: 2
+      }));
+
+      const res = await request(app)
+        .get('/charts/throughput?fromDate=2020-01-01&toDate=2020-03-01&hierarchyLevel=Story')
+      
+      expect(res.statusCode).toEqual(200)
+      expect(res.body.chartData).toEqual({
+        cols: [
+          {
+            label: "completed_time",
+            type: "date"
+          },
+          {
+            label: "Count",
+            type: "number"
+          },
+        ],
+        rows: [
+          {
+            c: [
+              { v: "Date(2020, 1, 2, 0, 0)" },
+              { v: 1 },
+            ]
+          },
+          {
+            c: [
+              { v: "Date(2020, 1, 5, 0, 0)" },
+              { v: 1 },
+            ],
+          },
         ]
       })
     })

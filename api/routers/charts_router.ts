@@ -4,10 +4,12 @@ import { HierarchyLevel } from '../models/entities/hierarchy_level';
 import { CfdBuilder } from '../models/metrics/cfd_builder';
 import { DataTableBuilder } from '../models/metrics/data_table_builder';
 const moment = require('moment');
+import { Moment } from "moment";
 const { jStat } = require('jstat');
 const router = express.Router()
 const { getRepository } = require('typeorm')
 import { Issue } from '../models/entities/issue';
+import { groupBy } from "lodash";
 const { formatDate } = require('../helpers/charts_helper');
 
 router.get('/scatterplot', async (req, res) => {
@@ -279,6 +281,88 @@ router.get("/cfd", async (req, res) => {
     "chartData": builder.build()
   });
 })
+
+router.get("/throughput", async (req, res) => {
+  const completedIssues = await getRepository(Issue)
+    .find({
+      where: {
+        completed: Not(IsNull()),
+        issueType: Not("Epic"), // TODO: this is a hack
+      },
+      order: {
+        completed: "ASC"
+      }
+    });
+
+  const groupedIssues = groupBy(completedIssues, (issue) => moment(issue.completed).startOf('day'));
+  const rows = Object.entries(groupedIssues)
+    .map((entry: [string, Issue[]]) => [formatDate(moment(entry[0]).toDate()), entry[1].length]);
+  const builder = new DataTableBuilder();
+  builder.setColumns([
+    {
+      "label": "completed_time",
+      "type": "date"
+    },
+    {
+      "label": "Count",
+      "type": "number"
+    },
+  ]);
+  builder.addRows(rows);
+  
+  res.json({
+    "chartOpts": {
+      "seriesType": "scatter",
+      "chartArea": {
+        "width": "90%",
+        "height": "80%",
+        "top": "5%"
+      },
+      "legend": {
+        "position": "top"
+      },
+      "height": 500,
+      "series": {
+        "0": {
+          "lineWidth": 1,
+          "pointSize": 4,
+          "color": "indianred"
+        },
+        "1": {
+          "type": "steppedArea",
+          "color": "#f44336",
+          "areaOpacity": 0,
+          "lineDashStyle": [
+            4,
+            4
+          ]
+        },
+        "2": {
+          "type": "steppedArea",
+          "color": "#ff9800",
+          "areaOpacity": 0,
+          "lineDashStyle": [
+            4,
+            4
+          ]
+        },
+        "3": {
+          "type": "steppedArea",
+          "color": "#03a9f4",
+          "areaOpacity": 0,
+          "lineDashStyle": [
+            4,
+            4
+          ]
+        }
+      },
+      "vAxis": {
+        "minValue": 0
+      }
+    },
+    "chartData": builder.build(),
+  })
+});
 
 module.exports = {
   routerPath: '/charts',
