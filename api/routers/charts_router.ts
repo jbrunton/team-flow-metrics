@@ -9,7 +9,7 @@ const { jStat } = require('jstat');
 const router = express.Router()
 const { getRepository } = require('typeorm')
 import { Issue } from '../models/entities/issue';
-import { groupBy } from "lodash";
+import { takeWhile } from "lodash";
 import { dateRange, StepInterval } from '../helpers/date_helper';
 const { formatDate } = require('../helpers/charts_helper');
 
@@ -303,6 +303,8 @@ router.get("/throughput", async (req, res) => {
   const fromDate = moment.utc(req.query.fromDate).toDate();
   const toDate = moment.utc(req.query.toDate).toDate();
   const hierarchyLevel = req.query.hierarchyLevel;
+  const stepInterval = StepInterval[req.query.stepInterval as string];
+  const dates = dateRange(fromDate, toDate, stepInterval);
   const completedIssues = await getRepository(Issue)
     .find({
       where: {
@@ -315,16 +317,26 @@ router.get("/throughput", async (req, res) => {
       }
     });
 
-  const dates = dateRange(fromDate, toDate, StepInterval.Daily);
-
-  const groupedIssues = groupBy(completedIssues, (issue) => formatDate(moment.utc(issue.completed).startOf('day').toDate()));
-
-  const rows = dates.map(date => {
-    const dateString = formatDate(date);
-    const issues = groupedIssues[dateString] || [];
-    return [dateString, issues.length];
-  });
+  type GroupResult = {
+    issues: Issue[];
+    dates: Date[];
+    currentDate: Date;
+    rows: [string, number][];
+  };
+  const { rows } = dates.reduce(({ issues, dates, currentDate, rows }, nextDate) => {
+    const group = takeWhile(issues, issue => moment(issue.completed).isBefore(nextDate));
+    const count = group.length;
+    const row = [formatDate(currentDate), count];
+    return {
+      issues: issues.slice(count),
+      dates: dates.slice(1),
+      currentDate: nextDate,
+      rows: rows.concat([row]),
+    };
+  }, { issues: completedIssues, dates, currentDate: fromDate, rows: [] });
   
+console.log(StepInterval);
+
   const builder = new DataTableBuilder();
   builder.setColumns([
     {
