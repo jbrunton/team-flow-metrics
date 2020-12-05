@@ -317,12 +317,6 @@ router.get("/throughput", async (req, res) => {
       }
     });
 
-  type GroupResult = {
-    issues: Issue[];
-    dates: Date[];
-    currentDate: Date;
-    rows: [string, number][];
-  };
   const { rows } = dates.reduce(({ issues, dates, currentDate, rows }, nextDate) => {
     const group = takeWhile(issues, issue => moment(issue.completed).isBefore(nextDate));
     const count = group.length;
@@ -334,8 +328,6 @@ router.get("/throughput", async (req, res) => {
       rows: rows.concat([row]),
     };
   }, { issues: completedIssues, dates, currentDate: fromDate, rows: [] });
-  
-console.log(StepInterval);
 
   const builder = new DataTableBuilder();
   builder.setColumns([
