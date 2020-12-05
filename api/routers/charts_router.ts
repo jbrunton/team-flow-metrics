@@ -305,6 +305,7 @@ router.get("/throughput", async (req, res) => {
   const hierarchyLevel = req.query.hierarchyLevel;
   const stepInterval = StepInterval[req.query.stepInterval as string];
   const dates = dateRange(fromDate, toDate, stepInterval);
+  console.log({ dates });
   const completedIssues = await getRepository(Issue)
     .find({
       where: {
@@ -317,17 +318,16 @@ router.get("/throughput", async (req, res) => {
       }
     });
 
-  const { rows } = dates.reduce(({ issues, dates, currentDate, rows }, nextDate) => {
+  const { rows } = dates.slice(1).reduce(({ issues, currentDate, rows }, nextDate) => {
     const group = takeWhile(issues, issue => moment(issue.completed).isBefore(nextDate));
     const count = group.length;
     const row = [formatDate(currentDate), count];
     return {
       issues: issues.slice(count),
-      dates: dates.slice(1),
       currentDate: nextDate,
       rows: rows.concat([row]),
     };
-  }, { issues: completedIssues, dates, currentDate: fromDate, rows: [] });
+  }, { issues: completedIssues, currentDate: fromDate, rows: [] });
 
   const builder = new DataTableBuilder();
   builder.setColumns([

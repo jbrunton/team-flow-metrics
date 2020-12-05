@@ -198,7 +198,7 @@ describe('charts_router', () => {
       }));
 
       const res = await request(app)
-        .get('/charts/throughput?fromDate=2020-02-01&toDate=2020-02-05&hierarchyLevel=Story')
+        .get('/charts/throughput?fromDate=2020-02-01&toDate=2020-02-06&hierarchyLevel=Story&stepInterval=Daily')
       
       expect(res.statusCode).toEqual(200)
       expect(res.body.chartData).toEqual({
