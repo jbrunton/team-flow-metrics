@@ -280,6 +280,134 @@ router.get("/cfd", async (req, res) => {
   });
 })
 
+router.get("/throughput", async (req, res) => {
+  res.json({
+    "chartOpts": {
+      "seriesType": "scatter",
+      "chartArea": {
+        "width": "90%",
+        "height": "80%",
+        "top": "5%"
+      },
+      "legend": {
+        "position": "top"
+      },
+      "height": 500,
+      "series": {
+        "0": {
+          "lineWidth": 1,
+          "pointSize": 4,
+          "color": "indianred"
+        },
+        "1": {
+          "type": "steppedArea",
+          "color": "#f44336",
+          "areaOpacity": 0,
+          "lineDashStyle": [
+            4,
+            4
+          ]
+        },
+        "2": {
+          "type": "steppedArea",
+          "color": "#ff9800",
+          "areaOpacity": 0,
+          "lineDashStyle": [
+            4,
+            4
+          ]
+        },
+        "3": {
+          "type": "steppedArea",
+          "color": "#03a9f4",
+          "areaOpacity": 0,
+          "lineDashStyle": [
+            4,
+            4
+          ]
+        }
+      },
+      "vAxis": {
+        "minValue": 0
+      }
+    },
+    "chartData": {
+      "cols": [
+        {
+          "label": "completed_time",
+          "type": "date"
+        },
+        {
+          "label": "Count",
+          "type": "number"
+        },
+      ],
+      "rows": [
+        {
+          "c": [
+            {
+              "v": "Date(2020, 5, 1)"
+            },
+            {
+              "v": 12
+            },
+          ]
+        },
+        {
+          "c": [
+            {
+              "v": "Date(2020, 6, 1)"
+            },
+            {
+              "v": 20
+            },
+          ]
+        },
+        {
+          "c": [
+            {
+              "v": "Date(2020, 7, 1)"
+            },
+            {
+              "v": 29
+            },
+          ]
+        },
+        {
+          "c": [
+            {
+              "v": "Date(2020, 8, 1)"
+            },
+            {
+              "v": 15
+            },
+          ]
+        },
+        {
+          "c": [
+            {
+              "v": "Date(2020, 9, 1)"
+            },
+            {
+              "v": 9
+            },
+          ]
+        },
+        {
+          "c": [
+            {
+              "v": "Date(2020, 10, 1, 0, 0)"
+            },
+            {
+              "v": 0
+            },
+          ]
+        },
+      ]
+    }
+  })
+});
+
 module.exports = {
   routerPath: '/charts',
   router: router

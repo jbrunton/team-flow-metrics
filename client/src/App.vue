@@ -23,6 +23,9 @@
           <b-navbar-item tag="router-link" :to="{ path: '/cfd' }">
             CFD
           </b-navbar-item>
+          <b-navbar-item tag="router-link" :to="{ path: '/throughput' }">
+            Throughput
+          </b-navbar-item>
         </template>
       </b-navbar>
     </div>

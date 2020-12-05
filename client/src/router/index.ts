@@ -49,6 +49,12 @@ const routes: Array<RouteConfig> = [
     path: "/cfd",
     name: "CFD",
     component: () => import(/* webpackChunkName: "cfd" */ "../views/CFD.vue")
+  },
+  {
+    path: "/throughput",
+    name: "Throughput",
+    component: () =>
+      import(/* webpackChunkName: "throughput" */ "../views/Throughput.vue")
   }
 ];
 
