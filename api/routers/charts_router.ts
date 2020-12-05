@@ -283,11 +283,31 @@ router.get("/cfd", async (req, res) => {
 })
 
 router.get("/throughput", async (req, res) => {
+  if (!req.query.fromDate) {
+    res.status(400).json({
+      error: "Required fromDate query param"
+    })
+  }
+  if (!req.query.toDate) {
+    res.status(400).json({
+      error: "Required toDate query param"
+    })
+  }
+  if (!req.query.hierarchyLevel) {
+    res.status(400).json({
+      error: "Required hierarchyLevel query param"
+    })
+  }
+
+  const fromDate = moment(req.query.fromDate).toDate();
+  const toDate = moment(req.query.toDate).toDate();
+  const hierarchyLevel = req.query.hierarchyLevel;
   const completedIssues = await getRepository(Issue)
     .find({
       where: {
-        completed: Not(IsNull()),
-        issueType: Not("Epic"), // TODO: this is a hack
+        completed: Between(fromDate, toDate),
+        issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
+        started: Not(IsNull())
       },
       order: {
         completed: "ASC"
