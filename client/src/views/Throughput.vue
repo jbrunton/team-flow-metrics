@@ -67,6 +67,19 @@
           </b-select>
         </b-field>
       </div>
+      <div class="column is-one-quarter">
+        <b-field label="Step Interval">
+          <b-select aria-role="list" v-model="selectedInterval">
+            <option
+              v-for="interval in stepIntervals"
+              :value="interval.key"
+              :key="interval.key"
+            >
+              {{ interval.name }}
+            </option>
+          </b-select>
+        </b-field>
+      </div>
     </div>
 
     <div class="field">
@@ -124,6 +137,13 @@ export default Vue.extend({
       relativeDateRanges: [],
       calendarMonthRange: [],
       excludeOutliers: false,
+      stepIntervals: [
+        { name: "Daily", key: "Daily" },
+        { name: "Weekly", key: "Weekly" },
+        { name: "Bi-Weekly", key: "BiWeekly" },
+        { name: "Monthly", key: "Monthly" }
+      ],
+      selectedInterval: "Daily",
       dates: [],
       selectedIssueKey: null
     };
@@ -171,9 +191,10 @@ export default Vue.extend({
         fromDate: fromDate.toString(),
         toDate: toDate.toString(),
         hierarchyLevel: this.selectedLevel,
-        excludeOutliers: this.excludeOutliers
+        excludeOutliers: this.excludeOutliers,
+        stepInterval: this.selectedInterval
       };
-      const url = `/api/charts/throughput?fromDate=${new URLSearchParams(
+      const url = `/api/charts/throughput?${new URLSearchParams(
         params
       ).toString()}`;
 
@@ -239,6 +260,9 @@ export default Vue.extend({
       this.fetchData();
     },
     excludeOutliers() {
+      this.fetchData();
+    },
+    selectedInterval() {
       this.fetchData();
     }
   }

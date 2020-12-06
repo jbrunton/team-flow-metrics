@@ -173,7 +173,7 @@ export default Vue.extend({
         hierarchyLevel: this.selectedLevel,
         excludeOutliers: this.excludeOutliers
       };
-      const url = `/api/charts/scatterplot?fromDate=${new URLSearchParams(
+      const url = `/api/charts/scatterplot?${new URLSearchParams(
         params
       ).toString()}`;
 
