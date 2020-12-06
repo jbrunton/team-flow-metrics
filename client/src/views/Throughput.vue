@@ -90,11 +90,10 @@
 
     <div id="chart_div"></div>
 
-    <!-- <IssueDetails
-      v-if="selectedIssueKey"
-      :issueKey="selectedIssueKey"
-      :key="selectedIssueKey"
-    ></IssueDetails> -->
+    <IssuesList
+      v-if="selectedIssues.length"
+      :issues="selectedIssues"
+    ></IssuesList>
   </div>
 </template>
 
@@ -118,9 +117,14 @@ import {
   getCalendarMonthRanges,
   DateRange
 } from "../helpers/date_helper";
+import IssuesList from "@/components/IssuesList";
 
 export default Vue.extend({
   name: "Issues",
+
+  components: {
+    IssuesList
+  },
 
   data() {
     return {
@@ -140,7 +144,8 @@ export default Vue.extend({
       ],
       selectedInterval: "Daily",
       dates: [],
-      selectedDate: null
+      selectedDate: null,
+      selectedIssues: []
     };
   },
 
@@ -227,6 +232,7 @@ export default Vue.extend({
     },
 
     dateSelected() {
+      this.selectedIssues = [];
       const selection = this.chart.gchart.getSelection()[0];
       // completed issues column
       if (selection.column == 1) {
@@ -236,6 +242,12 @@ export default Vue.extend({
         //alert(date);
         //this.selectedIssueKey = key;
       }
+    },
+    parseDate(input?: string): Date {
+      if (!input) {
+        return null;
+      }
+      return new Date(input);
     }
   },
 
@@ -262,6 +274,7 @@ export default Vue.extend({
     selectedInterval() {
       this.fetchData();
     },
+
     async selectedDate() {
       //alert(this.selectedDate);
 
@@ -274,7 +287,23 @@ export default Vue.extend({
         params
       ).toString()}`;
       const response = await axios.get(url);
-      console.log(response.data.issues);
+      this.selectedIssues = response.data.issues.map(issue => {
+        return {
+          key: issue.key,
+          title: issue.title,
+          issueType: issue.issueType,
+          externalUrl: issue.externalUrl,
+          status: issue.status,
+          statusCategory: issue.statusCategory,
+          childCount: issue.childCount,
+          percentDone: issue.percentDone,
+          created: this.parseDate(issue.created),
+          started: this.parseDate(issue.started),
+          completed: this.parseDate(issue.completed),
+          lastTransition: this.parseDate(issue.lastTransition),
+          cycleTime: issue.cycleTime
+        };
+      });
     }
   }
 });

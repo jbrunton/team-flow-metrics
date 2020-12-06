@@ -358,7 +358,6 @@ router.get("/throughput", async (req, res) => {
       "legend": {
         "position": "top"
       },
-      "height": 500,
       "series": {
         "0": {
           "lineWidth": 1,
