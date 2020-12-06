@@ -117,7 +117,7 @@ import {
   getCalendarMonthRanges,
   DateRange
 } from "../helpers/date_helper";
-import IssuesList from "@/components/IssuesList";
+import IssuesList from "@/components/IssuesList.vue";
 
 export default Vue.extend({
   name: "Issues",
