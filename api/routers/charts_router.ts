@@ -305,6 +305,9 @@ router.get("/throughput", async (req, res) => {
   const hierarchyLevel = req.query.hierarchyLevel;
   const stepInterval = StepInterval[req.query.stepInterval as string];
   const dates = dateRange(fromDate, toDate, stepInterval);
+  if (moment(dates[dates.length - 1]).isBefore(toDate)) {
+    dates.push(nextIntervalDate(dates[dates.length - 1], stepInterval));
+  }
 
   const completedIssues = await getRepository(Issue)
     .find({
