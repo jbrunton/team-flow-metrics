@@ -90,11 +90,10 @@
 
     <div id="chart_div"></div>
 
-    <IssueDetails
-      v-if="selectedIssueKey"
-      :issueKey="selectedIssueKey"
-      :key="selectedIssueKey"
-    ></IssueDetails>
+    <IssuesList
+      v-if="selectedIssues.length"
+      :issues="selectedIssues"
+    ></IssuesList>
   </div>
 </template>
 
@@ -118,13 +117,13 @@ import {
   getCalendarMonthRanges,
   DateRange
 } from "../helpers/date_helper";
-import IssueDetails from "@/components/IssueDetails.vue";
+import IssuesList from "@/components/IssuesList.vue";
 
 export default Vue.extend({
   name: "Issues",
 
   components: {
-    IssueDetails
+    IssuesList
   },
 
   data() {
@@ -145,7 +144,8 @@ export default Vue.extend({
       ],
       selectedInterval: "Daily",
       dates: [],
-      selectedIssueKey: null
+      selectedDate: null,
+      selectedIssues: []
     };
   },
 
@@ -219,7 +219,7 @@ export default Vue.extend({
       google.visualization.events.addListener(
         chart,
         "select",
-        this.issueSelected
+        this.dateSelected
       );
       this.chart = {
         gchart: chart,
@@ -231,14 +231,23 @@ export default Vue.extend({
       return formatDateRange(dates);
     },
 
-    issueSelected() {
+    dateSelected() {
+      this.selectedIssues = [];
       const selection = this.chart.gchart.getSelection()[0];
       // completed issues column
       if (selection.column == 1) {
         //$('#spinner').show().html(render('spinner', { margin: 20 }));
-        const key = this.chart.data.getValue(selection.row, 2);
-        this.selectedIssueKey = key;
+        const date = this.chart.data.getValue(selection.row, 2);
+        this.selectedDate = date;
+        //alert(date);
+        //this.selectedIssueKey = key;
       }
+    },
+    parseDate(input?: string): Date {
+      if (!input) {
+        return null;
+      }
+      return new Date(input);
     }
   },
 
@@ -264,6 +273,37 @@ export default Vue.extend({
     },
     selectedInterval() {
       this.fetchData();
+    },
+
+    async selectedDate() {
+      //alert(this.selectedDate);
+
+      const params = {
+        fromDate: this.selectedDate,
+        stepInterval: this.selectedInterval,
+        hierarchyLevel: this.selectedLevel
+      };
+      const url = `/api/charts/throughput/closedBetween?${new URLSearchParams(
+        params
+      ).toString()}`;
+      const response = await axios.get(url);
+      this.selectedIssues = response.data.issues.map(issue => {
+        return {
+          key: issue.key,
+          title: issue.title,
+          issueType: issue.issueType,
+          externalUrl: issue.externalUrl,
+          status: issue.status,
+          statusCategory: issue.statusCategory,
+          childCount: issue.childCount,
+          percentDone: issue.percentDone,
+          created: this.parseDate(issue.created),
+          started: this.parseDate(issue.started),
+          completed: this.parseDate(issue.completed),
+          lastTransition: this.parseDate(issue.lastTransition),
+          cycleTime: issue.cycleTime
+        };
+      });
     }
   }
 });

@@ -10,7 +10,7 @@ const router = express.Router()
 const { getRepository } = require('typeorm')
 import { Issue } from '../models/entities/issue';
 import { takeWhile } from "lodash";
-import { dateRange, StepInterval } from '../helpers/date_helper';
+import { dateRange, nextIntervalDate, StepInterval } from '../helpers/date_helper';
 const { formatDate } = require('../helpers/charts_helper');
 
 router.get('/scatterplot', async (req, res) => {
@@ -321,7 +321,7 @@ router.get("/throughput", async (req, res) => {
   const { rows } = dates.slice(1).reduce(({ issues, currentDate, rows }, nextDate) => {
     const group = takeWhile(issues, issue => moment(issue.completed).isBefore(nextDate));
     const count = group.length;
-    const row = [formatDate(currentDate), count];
+    const row = [formatDate(currentDate), count, moment(currentDate).format("YYYY-MM-DD")];
     return {
       issues: issues.slice(count),
       currentDate: nextDate,
@@ -339,6 +339,11 @@ router.get("/throughput", async (req, res) => {
       "label": "Count",
       "type": "number"
     },
+    {
+      label: "date",
+      type: "string",
+      role: "annotationText"
+    }
   ]);
   builder.addRows(rows);
   
@@ -353,7 +358,6 @@ router.get("/throughput", async (req, res) => {
       "legend": {
         "position": "top"
       },
-      "height": 500,
       "series": {
         "0": {
           "lineWidth": 1,
@@ -394,6 +398,42 @@ router.get("/throughput", async (req, res) => {
     },
     "chartData": builder.build(),
   })
+});
+
+router.get("/throughput/closedBetween", async (req, res) => {
+  if (!req.query.fromDate) {
+    res.status(400).json({
+      error: "Required fromDate query param"
+    })
+  }
+
+  if (!req.query.hierarchyLevel) {
+    res.status(400).json({
+      error: "Required hierarchyLevel query param"
+    })
+  }
+
+  const fromDate = moment.utc(req.query.fromDate).toDate();
+  const stepInterval = StepInterval[req.query.stepInterval as string];
+  const toDate = nextIntervalDate(fromDate, stepInterval);
+  const hierarchyLevel = req.query.hierarchyLevel;
+  
+  const completedIssues = await getRepository(Issue)
+    .find({
+      where: {
+        completed: Between(fromDate, toDate),
+        issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
+        started: Not(IsNull())
+      },
+      order: {
+        completed: "ASC"
+      }
+    });
+
+  res.json({
+    count: completedIssues.length,
+    issues: completedIssues
+  });
 });
 
 module.exports = {
