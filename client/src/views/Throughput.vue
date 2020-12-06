@@ -90,11 +90,11 @@
 
     <div id="chart_div"></div>
 
-    <IssueDetails
+    <!-- <IssueDetails
       v-if="selectedIssueKey"
       :issueKey="selectedIssueKey"
       :key="selectedIssueKey"
-    ></IssueDetails>
+    ></IssueDetails> -->
   </div>
 </template>
 
@@ -118,14 +118,9 @@ import {
   getCalendarMonthRanges,
   DateRange
 } from "../helpers/date_helper";
-import IssueDetails from "@/components/IssueDetails.vue";
 
 export default Vue.extend({
   name: "Issues",
-
-  components: {
-    IssueDetails
-  },
 
   data() {
     return {
@@ -145,7 +140,7 @@ export default Vue.extend({
       ],
       selectedInterval: "Daily",
       dates: [],
-      selectedIssueKey: null
+      selectedDate: null
     };
   },
 
@@ -219,7 +214,7 @@ export default Vue.extend({
       google.visualization.events.addListener(
         chart,
         "select",
-        this.issueSelected
+        this.dateSelected
       );
       this.chart = {
         gchart: chart,
@@ -231,13 +226,15 @@ export default Vue.extend({
       return formatDateRange(dates);
     },
 
-    issueSelected() {
+    dateSelected() {
       const selection = this.chart.gchart.getSelection()[0];
       // completed issues column
       if (selection.column == 1) {
         //$('#spinner').show().html(render('spinner', { margin: 20 }));
-        const key = this.chart.data.getValue(selection.row, 2);
-        this.selectedIssueKey = key;
+        const date = this.chart.data.getValue(selection.row, 2);
+        this.selectedDate = date;
+        //alert(date);
+        //this.selectedIssueKey = key;
       }
     }
   },
@@ -264,6 +261,20 @@ export default Vue.extend({
     },
     selectedInterval() {
       this.fetchData();
+    },
+    async selectedDate() {
+      //alert(this.selectedDate);
+
+      const params = {
+        fromDate: this.selectedDate,
+        stepInterval: this.selectedInterval,
+        hierarchyLevel: this.selectedLevel
+      };
+      const url = `/api/charts/throughput/closedBetween?${new URLSearchParams(
+        params
+      ).toString()}`;
+      const response = await axios.get(url);
+      console.log(response.data.issues);
     }
   }
 });
