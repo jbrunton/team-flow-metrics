@@ -2,7 +2,7 @@
   <div class="issues">
     <h1>Scatterplot</h1>
 
-    <DatePicker />
+    <DatePicker v-model="dates" />
 
     <div class="columns">
       <div class="column is-half">

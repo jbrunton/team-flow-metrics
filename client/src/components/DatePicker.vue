@@ -41,7 +41,7 @@
     </p>
     <b-datepicker
       placeholder="Click to select..."
-      v-model="dates"
+      v-model="input"
       :date-formatter="formatDateRange"
       range
       style="width: 100%;"
@@ -50,23 +50,45 @@
   </b-field>
 </template>
 
+<style lang="scss" scoped>
+.menu-label,
+.menu-list {
+  white-space: nowrap;
+}
+</style>
+
 <script lang="ts">
 import Vue from "vue";
 import {
   getDefaultDateRange,
   formatDateRange,
   getRelativeDateRanges,
-  getCalendarMonthRanges
+  getCalendarMonthRanges,
+  DateRange
 } from "../helpers/date_helper";
 
 export default Vue.extend({
+  props: ["value"],
   data() {
     return {
       relativeDateRanges: getRelativeDateRanges(),
       calendarMonthRanges: getCalendarMonthRanges(),
       formatDateRange,
-      dates: getDefaultDateRange()
+      input: getDefaultDateRange()
     };
+  },
+  methods: {
+    selectRange(range: DateRange) {
+      this.input = [range.fromDate, range.toDate];
+    }
+  },
+  watch: {
+    value() {
+      this.input = this.value;
+    },
+    input() {
+      this.$emit("input", this.input);
+    }
   }
 });
 </script>
