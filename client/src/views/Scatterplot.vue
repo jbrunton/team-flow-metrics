@@ -2,6 +2,8 @@
   <div class="issues">
     <h1>Scatterplot</h1>
 
+    <DatePicker />
+
     <div class="columns">
       <div class="column is-half">
         <b-field label="Date Range">
@@ -106,12 +108,14 @@ import {
   DateRange
 } from "../helpers/date_helper";
 import IssueDetails from "@/components/IssueDetails.vue";
+import DatePicker from "@/components/DatePicker.vue";
 
 export default Vue.extend({
   name: "Issues",
 
   components: {
-    IssueDetails
+    IssueDetails,
+    DatePicker
   },
 
   data() {
@@ -122,7 +126,7 @@ export default Vue.extend({
       hierarchyLevels: [],
       selectedLevel: null,
       relativeDateRanges: [],
-      calendarMonthRange: [],
+      calendarMonthRanges: [],
       excludeOutliers: false,
       dates: [],
       selectedIssueKey: null
