@@ -3,7 +3,7 @@ import {
   getCalendarMonthRanges,
   getDefaultDateRange,
   getRelativeDateRanges
-} from "../../../src/helpers/date_helper";
+} from "@/helpers/date_helper";
 
 describe("getDefaultDateRange", () => {
   it("returns dates spanning the last 30 days", () => {
