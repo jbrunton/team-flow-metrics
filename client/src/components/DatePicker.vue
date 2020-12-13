@@ -41,10 +41,19 @@
     </p>
     <b-datepicker
       placeholder="Click to select..."
-      v-model="input"
-      :date-formatter="formatDateRange"
-      range
-      style="width: 100%;"
+      v-model="fromDate"
+      :date-formatter="formatDate"
+    >
+    </b-datepicker>
+    <p class="control">
+      <span class="button is-static">
+        <b-icon icon="arrow-right"></b-icon>
+      </span>
+    </p>
+    <b-datepicker
+      placeholder="Click to select..."
+      v-model="toDate"
+      :date-formatter="formatDate"
     >
     </b-datepicker>
   </b-field>
@@ -55,13 +64,16 @@
 .menu-list {
   white-space: nowrap;
 }
+.datepicker {
+  width: 100%;
+}
 </style>
 
 <script lang="ts">
 import Vue from "vue";
 import {
   getDefaultDateRange,
-  formatDateRange,
+  formatDate,
   getRelativeDateRanges,
   getCalendarMonthRanges,
   DateRange
@@ -70,21 +82,30 @@ import {
 export default Vue.extend({
   props: ["value"],
   data() {
+    const [fromDate, toDate] = getDefaultDateRange();
     return {
       relativeDateRanges: getRelativeDateRanges(),
       calendarMonthRanges: getCalendarMonthRanges(),
-      formatDateRange,
-      input: getDefaultDateRange()
+      fromDate,
+      toDate
     };
   },
   methods: {
     selectRange(range: DateRange) {
-      this.input = [range.fromDate, range.toDate];
+      this.fromDate = range.fromDate;
+      this.toDate = range.toDate;
+    },
+    formatDate
+  },
+  computed: {
+    input() {
+      return [this.fromDate, this.toDate];
     }
   },
   watch: {
     value() {
-      this.input = this.value;
+      this.fromDate = this.value[0];
+      this.toDate = this.value[1];
     },
     input() {
       this.$emit("input", this.input);
