@@ -7,17 +7,7 @@
         <DatePicker v-model="dates" />
       </div>
       <div class="column is-one-quarter">
-        <b-field label="Hierarchy Level">
-          <b-select aria-role="list" v-model="selectedLevel">
-            <option
-              v-for="level in hierarchyLevels"
-              :value="level.name"
-              :key="level.name"
-            >
-              {{ level.name }}
-            </option>
-          </b-select>
-        </b-field>
+        <HierarchyLevelPicker v-model="selectedLevel" />
       </div>
       <div class="column is-one-quarter">
         <b-field label="Step Interval">
@@ -65,13 +55,15 @@ import moment from "moment";
 import { getDefaultDateRange, formatDateRange } from "../helpers/date_helper";
 import IssuesList from "@/components/IssuesList.vue";
 import DatePicker from "@/components/DatePicker.vue";
+import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
 
 export default Vue.extend({
   name: "Issues",
 
   components: {
     IssuesList,
-    DatePicker
+    DatePicker,
+    HierarchyLevelPicker
   },
 
   data() {
@@ -79,8 +71,7 @@ export default Vue.extend({
       chartOps: {},
       chartData: [],
       chart: null,
-      hierarchyLevels: [],
-      selectedLevel: null,
+      selectedLevel: "Story",
       excludeOutliers: false,
       stepIntervals: [
         { name: "Daily", key: "Daily" },
@@ -89,14 +80,14 @@ export default Vue.extend({
         { name: "Monthly", key: "Monthly" }
       ],
       selectedInterval: "Daily",
-      dates: [],
+      dates: getDefaultDateRange(),
       selectedDate: null,
       selectedIssues: []
     };
   },
 
   mounted() {
-    this.initForm().then(this.initCharts);
+    this.initCharts();
   },
 
   methods: {
@@ -115,12 +106,6 @@ export default Vue.extend({
           document.getElementById("chart_div")
         );
       });
-    },
-
-    async initForm() {
-      const response = await axios.get("/api/meta/hierarchy-levels");
-      this.hierarchyLevels = response.data.levels;
-      this.selectedLevel = this.hierarchyLevels[0].name;
     },
 
     async fetchData() {
