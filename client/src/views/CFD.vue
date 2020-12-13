@@ -11,6 +11,12 @@
       </div>
     </div>
 
+    <div class="field">
+      <b-checkbox v-model="excludeStoppedIssues">
+        Exclude stopped issues
+      </b-checkbox>
+    </div>
+
     <div id="chart_div"></div>
   </div>
 </template>
@@ -47,6 +53,7 @@ export default Vue.extend({
       chart: null,
       selectedLevel: "Story",
       dates: getDefaultDateRange(),
+      excludeStoppedIssues: true,
       selectedIssueKey: null
     };
   },
@@ -126,7 +133,8 @@ export default Vue.extend({
       return {
         fromDate: formatDateParam(this.dates[0]),
         toDate: formatDateParam(this.dates[1]),
-        hierarchyLevel: String(this.selectedLevel)
+        hierarchyLevel: String(this.selectedLevel),
+        excludeStoppedIssues: String(this.excludeStoppedIssues)
       };
     },
 
