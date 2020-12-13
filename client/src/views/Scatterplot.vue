@@ -39,7 +39,6 @@
 
 import Vue from "vue";
 import axios from "axios";
-import moment from "moment";
 import { getDefaultDateRange } from "@/helpers/date_helper";
 import { buildUrl, formatDateParam } from "@/helpers/url_helper";
 import IssueDetails from "@/components/IssueDetails.vue";
@@ -59,6 +58,7 @@ export default Vue.extend({
     return {
       chartOps: {},
       chartData: [],
+      initialized: false,
       chart: null,
       selectedLevel: "Story",
       excludeOutliers: false,
@@ -68,41 +68,25 @@ export default Vue.extend({
   },
 
   mounted() {
-    this.initCharts();
+    this.initialize();
   },
 
   methods: {
-    initCharts() {
+    initialize() {
       google.charts.load("current", { packages: ["corechart"] });
-      google.charts.setOnLoadCallback(() => {
-        if (this.$route.query.fromDate && this.$route.query.toDate) {
-          this.dates = [
-            moment(this.$route.query.fromDate as string).toDate(),
-            moment(this.$route.query.toDate as string).toDate()
-          ];
-        } else {
-          this.dates = getDefaultDateRange();
-        }
-        new ResizeObserver(this.drawChart).observe(
-          document.getElementById("chart_div")
-        );
-      });
+      google.charts.setOnLoadCallback(this.afterInitialize);
+    },
+
+    afterInitialize() {
+      this.initialized = true;
+      this.fetchData();
+      new ResizeObserver(this.drawChart).observe(
+        document.getElementById("chart_div")
+      );
     },
 
     async fetchData() {
-      const fromDate = this.dates[0];
-      const toDate = this.dates[1];
-
-      const params = {
-        fromDate: fromDate.toString(),
-        toDate: toDate.toString(),
-        hierarchyLevel: this.selectedLevel,
-        excludeOutliers: this.excludeOutliers
-      };
-      const url = buildUrl("/api/charts/scatterplot", params);
-
-      const response = await axios.get(url);
-
+      const response = await axios.get(this.url);
       this.chartData = response.data.chartData;
       this.chartOpts = response.data.chartOpts;
       this.drawChart();
@@ -134,7 +118,6 @@ export default Vue.extend({
       const selection = this.chart.gchart.getSelection()[0];
       // completed issues column
       if (selection.column == 1) {
-        //$('#spinner').show().html(render('spinner', { margin: 20 }));
         const key = this.chart.data.getValue(selection.row, 2);
         this.selectedIssueKey = key;
       }
@@ -142,24 +125,35 @@ export default Vue.extend({
   },
 
   watch: {
-    dates() {
-      this.fetchData();
-      const query = {
-        fromDate: formatDateParam(this.dates[0]),
-        toDate: formatDateParam(this.dates[1])
-      };
-      if (JSON.stringify(this.$route.query) !== JSON.stringify(query)) {
-        this.$router.replace({
-          path: this.$route.path,
-          query: query
-        });
+    params: {
+      immediate: true,
+      handler(params) {
+        history.pushState({}, null, buildUrl(this.$route.path, params));
       }
     },
-    selectedLevel() {
-      this.fetchData();
+
+    url: {
+      immediate: true,
+      handler() {
+        if (this.initialized) {
+          this.fetchData();
+        }
+      }
+    }
+  },
+
+  computed: {
+    params() {
+      return {
+        fromDate: formatDateParam(this.dates[0]),
+        toDate: formatDateParam(this.dates[1]),
+        hierarchyLevel: String(this.selectedLevel),
+        excludeOutliers: String(this.excludeOutliers)
+      };
     },
-    excludeOutliers() {
-      this.fetchData();
+
+    url() {
+      return buildUrl("/api/charts/scatterplot", this.params);
     }
   }
 });

@@ -13,26 +13,26 @@
           <div class="columns">
             <b-menu class="column">
               <b-menu-list label="Absolute" style="whitespace: no-wrap;">
-                <b-menu-item
+                <b-dropdown-item
                   v-for="range in calendarMonthRanges"
                   :key="range.description"
-                  aria-role="listitem"
-                  :label="range.description"
+                  aria-role="menuitem"
                   @click="selectRange(range)"
                 >
-                </b-menu-item>
+                  {{ range.description }}
+                </b-dropdown-item>
               </b-menu-list>
             </b-menu>
             <b-menu class="column">
               <b-menu-list label="Relative" style="white-space: no-wrap;">
-                <b-menu-item
+                <b-dropdown-item
                   v-for="range in relativeDateRanges"
                   :key="range.description"
-                  aria-role="listitem"
-                  :label="range.description"
+                  aria-role="menuitem"
                   @click="selectRange(range)"
                 >
-                </b-menu-item>
+                  {{ range.description }}
+                </b-dropdown-item>
               </b-menu-list>
             </b-menu>
           </div>
