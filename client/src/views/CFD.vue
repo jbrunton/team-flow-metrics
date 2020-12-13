@@ -6,6 +6,9 @@
       <div class="column is-half">
         <DatePicker v-model="dates" />
       </div>
+      <div class="column is-one-quarter">
+        <HierarchyLevelPicker v-model="selectedLevel" />
+      </div>
     </div>
 
     <div id="chart_div"></div>
@@ -27,12 +30,14 @@ import axios from "axios";
 import moment from "moment";
 import { getDefaultDateRange, formatDateRange } from "../helpers/date_helper";
 import DatePicker from "@/components/DatePicker.vue";
+import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
 
 export default Vue.extend({
   name: "CFD",
 
   components: {
-    DatePicker
+    DatePicker,
+    HierarchyLevelPicker
   },
 
   data() {
@@ -40,16 +45,15 @@ export default Vue.extend({
       chartOps: {},
       chartData: [],
       chart: null,
-      hierarchyLevels: [],
-      selectedLevel: null,
+      selectedLevel: "Story",
       excludeOutliers: false,
-      dates: [],
+      dates: getDefaultDateRange(),
       selectedIssueKey: null
     };
   },
 
   mounted() {
-    this.initForm().then(this.initCharts);
+    this.initCharts();
   },
 
   methods: {
@@ -68,12 +72,6 @@ export default Vue.extend({
           document.getElementById("chart_div")
         );
       });
-    },
-
-    async initForm() {
-      const response = await axios.get("/api/meta/hierarchy-levels");
-      this.hierarchyLevels = response.data.levels;
-      this.selectedLevel = this.hierarchyLevels[0].name;
     },
 
     async fetchData() {
