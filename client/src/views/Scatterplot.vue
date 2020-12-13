@@ -40,7 +40,8 @@
 import Vue from "vue";
 import axios from "axios";
 import moment from "moment";
-import { getDefaultDateRange } from "../helpers/date_helper";
+import { getDefaultDateRange } from "@/helpers/date_helper";
+import { buildUrl, formatDateParam } from "@/helpers/url_helper";
 import IssueDetails from "@/components/IssueDetails.vue";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
@@ -98,9 +99,7 @@ export default Vue.extend({
         hierarchyLevel: this.selectedLevel,
         excludeOutliers: this.excludeOutliers
       };
-      const url = `/api/charts/scatterplot?${new URLSearchParams(
-        params
-      ).toString()}`;
+      const url = buildUrl("/api/charts/scatterplot", params);
 
       const response = await axios.get(url);
 
@@ -146,8 +145,8 @@ export default Vue.extend({
     dates() {
       this.fetchData();
       const query = {
-        fromDate: moment(this.dates[0]).format("YYYY-MM-DD"),
-        toDate: moment(this.dates[1]).format("YYYY-MM-DD")
+        fromDate: formatDateParam(this.dates[0]),
+        toDate: formatDateParam(this.dates[1])
       };
       if (JSON.stringify(this.$route.query) !== JSON.stringify(query)) {
         this.$router.replace({
