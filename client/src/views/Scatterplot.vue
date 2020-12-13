@@ -7,17 +7,7 @@
         <DatePicker v-model="dates" />
       </div>
       <div class="column is-one-quarter">
-        <b-field label="Hierarchy Level">
-          <b-select aria-role="list" v-model="selectedLevel">
-            <option
-              v-for="level in hierarchyLevels"
-              :value="level.name"
-              :key="level.name"
-            >
-              {{ level.name }}
-            </option>
-          </b-select>
-        </b-field>
+        <HierarchyLevelPicker v-model="selectedLevel" />
       </div>
     </div>
 
@@ -53,13 +43,15 @@ import moment from "moment";
 import { getDefaultDateRange } from "../helpers/date_helper";
 import IssueDetails from "@/components/IssueDetails.vue";
 import DatePicker from "@/components/DatePicker.vue";
+import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
 
 export default Vue.extend({
   name: "Issues",
 
   components: {
     IssueDetails,
-    DatePicker
+    DatePicker,
+    HierarchyLevelPicker
   },
 
   data() {
@@ -67,16 +59,15 @@ export default Vue.extend({
       chartOps: {},
       chartData: [],
       chart: null,
-      hierarchyLevels: [],
-      selectedLevel: null,
+      selectedLevel: "Story",
       excludeOutliers: false,
-      dates: [],
+      dates: getDefaultDateRange(),
       selectedIssueKey: null
     };
   },
 
   mounted() {
-    this.initForm().then(this.initCharts);
+    this.initCharts();
   },
 
   methods: {
@@ -95,12 +86,6 @@ export default Vue.extend({
           document.getElementById("chart_div")
         );
       });
-    },
-
-    async initForm() {
-      const response = await axios.get("/api/meta/hierarchy-levels");
-      this.hierarchyLevels = response.data.levels;
-      this.selectedLevel = this.hierarchyLevels[0].name;
     },
 
     async fetchData() {
