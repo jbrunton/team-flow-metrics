@@ -27,10 +27,10 @@
 
 import Vue from "vue";
 import axios from "axios";
-import moment from "moment";
 import { getDefaultDateRange, formatDateRange } from "../helpers/date_helper";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
+import { buildUrl, formatDateParam } from "@/helpers/url_helper";
 
 export default Vue.extend({
   name: "CFD",
@@ -46,7 +46,6 @@ export default Vue.extend({
       chartData: [],
       chart: null,
       selectedLevel: "Story",
-      excludeOutliers: false,
       dates: getDefaultDateRange(),
       selectedIssueKey: null
     };
@@ -57,38 +56,21 @@ export default Vue.extend({
   },
 
   methods: {
-    initCharts() {
+    initialize() {
       google.charts.load("current", { packages: ["corechart"] });
-      google.charts.setOnLoadCallback(() => {
-        if (this.$route.query.fromDate && this.$route.query.toDate) {
-          this.dates = [
-            moment(this.$route.query.fromDate as string).toDate(),
-            moment(this.$route.query.toDate as string).toDate()
-          ];
-        } else {
-          this.dates = getDefaultDateRange();
-        }
-        new ResizeObserver(this.drawChart).observe(
-          document.getElementById("chart_div")
-        );
-      });
+      google.charts.setOnLoadCallback(this.afterInitialize);
+    },
+
+    afterInitialize() {
+      this.initialized = true;
+      this.fetchData();
+      new ResizeObserver(this.drawChart).observe(
+        document.getElementById("chart_div")
+      );
     },
 
     async fetchData() {
-      const fromDate = this.dates[0];
-      const toDate = this.dates[1];
-
-      const params = {
-        fromDate: fromDate.toString(),
-        toDate: toDate.toString(),
-        hierarchyLevel: this.selectedLevel
-      };
-      const url = `/api/charts/cfd?fromDate=${new URLSearchParams(
-        params
-      ).toString()}`;
-
-      const response = await axios.get(url);
-
+      const response = await axios.get(this.url);
       this.chartData = response.data.chartData;
       this.chartOpts = response.data.chartOpts;
       this.drawChart();
@@ -122,21 +104,34 @@ export default Vue.extend({
   },
 
   watch: {
-    dates() {
-      this.fetchData();
-      const query = {
-        fromDate: moment(this.dates[0]).format("YYYY-MM-DD"),
-        toDate: moment(this.dates[1]).format("YYYY-MM-DD")
-      };
-      if (JSON.stringify(this.$route.query) !== JSON.stringify(query)) {
-        this.$router.replace({
-          path: this.$route.path,
-          query: query
-        });
+    params: {
+      immediate: true,
+      handler(params) {
+        history.pushState({}, null, buildUrl(this.$route.path, params));
       }
     },
-    selectedLevel() {
-      this.fetchData();
+
+    url: {
+      immediate: true,
+      handler() {
+        if (this.initialized) {
+          this.fetchData();
+        }
+      }
+    }
+  },
+
+  computed: {
+    params() {
+      return {
+        fromDate: formatDateParam(this.dates[0]),
+        toDate: formatDateParam(this.dates[1]),
+        hierarchyLevel: String(this.selectedLevel)
+      };
+    },
+
+    url() {
+      return buildUrl("/api/charts/cfd", this.params);
     }
   }
 });

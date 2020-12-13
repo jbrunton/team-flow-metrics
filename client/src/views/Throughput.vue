@@ -139,6 +139,7 @@ export default Vue.extend({
         this.selectedDate = date;
       }
     },
+
     parseDate(input?: string): Date {
       if (!input) {
         return null;
