@@ -52,7 +52,7 @@ export default Vue.extend({
   },
 
   mounted() {
-    this.initCharts();
+    this.initialize();
   },
 
   methods: {
