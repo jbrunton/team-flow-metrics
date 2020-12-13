@@ -150,6 +150,8 @@ router.get("/cfd", async (req, res) => {
     fromDate = moment.utc(req.query.fromDate).toDate();
     toDate = moment.utc(req.query.toDate).toDate();
     const hierarchyLevel = req.query.hierarchyLevel;
+    const excludeStoppedIssues = req.query.excludeStoppedIssues === "true";
+
     const completedIssues = await getRepository(Issue)
       .find({
         completed: MoreThan(fromDate),
@@ -162,7 +164,9 @@ router.get("/cfd", async (req, res) => {
         issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
         started: LessThan(toDate)
       });
-    issues = completedIssues.concat(inProgressIssues);
+    issues = completedIssues
+      .concat(inProgressIssues)
+      .filter(issue => !excludeStoppedIssues || issue.statusCategory !== "To Do");
   } else {
     if (!req.query.epicKey && !req.query.fromDate && !req.query.toDate) {
       return res.status(400).json({
@@ -227,10 +231,10 @@ router.get("/cfd", async (req, res) => {
           "color": "#333"
         }
       },
-      "vAxis": {
+      "vAxis": req.query.epicKey ? {
         "minValue": 0,
         "textPosition": "none"
-      },
+      } : { "minValue": 0 },
       "isStacked": true,
       "lineWidth": 1,
       "areaOpacity": 0.4,
