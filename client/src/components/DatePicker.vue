@@ -72,7 +72,6 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  getDefaultDateRange,
   formatDate,
   getRelativeDateRanges,
   getCalendarMonthRanges,
@@ -82,7 +81,8 @@ import {
 export default Vue.extend({
   props: ["value"],
   data() {
-    const [fromDate, toDate] = getDefaultDateRange();
+    const [fromDate, toDate] = this.value;
+    console.log("DatePicker - data()", { fromDate, toDate });
     return {
       relativeDateRanges: getRelativeDateRanges(),
       calendarMonthRanges: getCalendarMonthRanges(),
@@ -104,10 +104,12 @@ export default Vue.extend({
   },
   watch: {
     value() {
+      console.log("DatePicker - watch(value)", { value: this.value });
       this.fromDate = this.value[0];
       this.toDate = this.value[1];
     },
     input() {
+      console.log("DatePicker - watch(input)", { value: this.value });
       this.$emit("input", this.input);
     }
   }

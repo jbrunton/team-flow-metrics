@@ -73,7 +73,7 @@ export default Vue.extend({
         { name: "Monthly", key: "Monthly" }
       ],
       selectedInterval: "Daily",
-      dates: getDefaultDateRange(),
+      dates: getDefaultDateRange(this.$route.query),
       selectedDate: null,
       selectedIssues: []
     };

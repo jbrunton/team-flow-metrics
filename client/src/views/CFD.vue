@@ -52,7 +52,7 @@ export default Vue.extend({
       chartData: [],
       chart: null,
       selectedLevel: "Story",
-      dates: getDefaultDateRange(),
+      dates: getDefaultDateRange(this.$route.query),
       excludeStoppedIssues: true,
       selectedIssueKey: null
     };

@@ -55,6 +55,7 @@ export default Vue.extend({
   },
 
   data() {
+    console.log("Scatterplot - data()", { route: this.$route });
     return {
       chartOps: {},
       chartData: [],
@@ -62,7 +63,7 @@ export default Vue.extend({
       chart: null,
       selectedLevel: "Story",
       excludeOutliers: false,
-      dates: getDefaultDateRange(),
+      dates: getDefaultDateRange(this.$route.query),
       selectedIssueKey: null
     };
   },
