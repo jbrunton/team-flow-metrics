@@ -10,6 +10,7 @@
     "test": "npx lerna run test:unit && npm run test:integration"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.19",
     "husky": "^4.3.0",
     "lerna": "^3.22.1"
   },
