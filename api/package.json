@@ -1,4 +1,5 @@
 {
+  "name": "api",
   "scripts": {
     "debug": "NODE_ENV=development nodemon --ext 'ts,js,json' --inspect --exec 'ts-node main.ts'",
     "test:unit": "NODE_ENV=test jest -c jest.config.unit.js",
