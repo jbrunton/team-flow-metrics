@@ -6,10 +6,19 @@ import {
 } from "@/helpers/date_helper";
 
 describe("getDefaultDateRange", () => {
-  it("returns dates spanning the last 30 days", () => {
+  it("returns dates spanning the last 30 days by default", () => {
     const now = new Date(2020, 1, 10);
-    const dates = getDefaultDateRange(now);
+    const dates = getDefaultDateRange({}, now);
     expect(dates).toEqual([new Date(2020, 0, 11), new Date(2020, 1, 11)]);
+  });
+
+  it("returns dates given by query params if defined", () => {
+    const now = new Date(2020, 1, 10);
+    const dates = getDefaultDateRange(
+      { fromDate: "2020-02-01", toDate: "2020-02-07" },
+      now
+    );
+    expect(dates).toEqual([new Date(2020, 1, 1), new Date(2020, 1, 7)]);
   });
 });
 

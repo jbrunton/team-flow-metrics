@@ -33,10 +33,11 @@
 
 import Vue from "vue";
 import axios from "axios";
-import { getDefaultDateRange, formatDateRange } from "../helpers/date_helper";
+import { formatDateRange } from "../helpers/date_helper";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
 import { buildUrl, formatDateParam } from "@/helpers/url_helper";
+import { getDefaultChartParams } from "@/helpers/chart_helper";
 
 export default Vue.extend({
   name: "CFD",
@@ -47,12 +48,12 @@ export default Vue.extend({
   },
 
   data() {
+    const chartParams = getDefaultChartParams(this.$route.query);
     return {
+      ...chartParams,
       chartOps: {},
       chartData: [],
       chart: null,
-      selectedLevel: "Story",
-      dates: getDefaultDateRange(),
       excludeStoppedIssues: true,
       selectedIssueKey: null
     };

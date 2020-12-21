@@ -1,4 +1,5 @@
 import moment from "moment";
+import { Route } from "vue-router";
 
 export type DateRange = {
   fromDate: Date;
@@ -6,7 +7,16 @@ export type DateRange = {
   description: string;
 };
 
-export function getDefaultDateRange(now = new Date()): Array<Date> {
+export function getDefaultDateRange(
+  query: Route["query"],
+  now = new Date()
+): [Date, Date] {
+  if (query.fromDate && query.toDate) {
+    const fromDate = moment(query.fromDate as string).toDate();
+    const toDate = moment(query.toDate as string).toDate();
+    return [fromDate, toDate];
+  }
+
   const today = moment(now).startOf("day");
   const toDate = today.add(1, "day").toDate();
   const fromDate = moment(now)

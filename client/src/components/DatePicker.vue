@@ -72,7 +72,6 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  getDefaultDateRange,
   formatDate,
   getRelativeDateRanges,
   getCalendarMonthRanges,
@@ -82,7 +81,7 @@ import {
 export default Vue.extend({
   props: ["value"],
   data() {
-    const [fromDate, toDate] = getDefaultDateRange();
+    const [fromDate, toDate] = this.value;
     return {
       relativeDateRanges: getRelativeDateRanges(),
       calendarMonthRanges: getCalendarMonthRanges(),
