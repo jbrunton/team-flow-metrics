@@ -41,7 +41,7 @@ router.get('/scatterplot', async (req, res) => {
         started: Not(IsNull())
       },
       order: {
-        completed: "ASC"
+        completed: "ASC",
       }
     });
 

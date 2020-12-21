@@ -69,8 +69,8 @@ export class DataTableBuilder {
       });
     });
     
-    this.rows.push([fromValue].concat(padding).concat(percentileValues));
-    this.rows.push([toValue].concat(padding).concat(percentileValues));
+    this.rows.unshift([toValue].concat(padding).concat(percentileValues));
+    this.rows.unshift([fromValue].concat(padding).concat(percentileValues));
   }
 
   build(): DataTable {
