@@ -55,7 +55,6 @@ export default Vue.extend({
   },
 
   data() {
-    console.log("Scatterplot - data()", { route: this.$route });
     const chartParams = getDefaultChartParams(this.$route.query);
     return {
       ...chartParams,

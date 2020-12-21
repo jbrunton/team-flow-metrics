@@ -63,7 +63,6 @@ export default Vue.extend({
 
   data() {
     const chartParams = getDefaultChartParams(this.$route.query);
-    console.log({ chartParams });
     return {
       ...chartParams,
       chartOps: {},
