@@ -39,8 +39,8 @@
 
 import Vue from "vue";
 import axios from "axios";
-import { getDefaultDateRange } from "@/helpers/date_helper";
 import { buildUrl, formatDateParam } from "@/helpers/url_helper";
+import { getDefaultChartParams } from "@/helpers/chart_helper";
 import IssueDetails from "@/components/IssueDetails.vue";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
@@ -56,14 +56,14 @@ export default Vue.extend({
 
   data() {
     console.log("Scatterplot - data()", { route: this.$route });
+    const chartParams = getDefaultChartParams(this.$route.query);
     return {
+      ...chartParams,
       chartOps: {},
       chartData: [],
       initialized: false,
       chart: null,
-      selectedLevel: "Story",
       excludeOutliers: false,
-      dates: getDefaultDateRange(this.$route.query),
       selectedIssueKey: null
     };
   },

@@ -45,11 +45,12 @@
 
 import Vue from "vue";
 import axios from "axios";
-import { getDefaultDateRange, formatDateRange } from "@/helpers/date_helper";
+import { formatDateRange } from "@/helpers/date_helper";
 import { buildUrl, formatDateParam } from "@/helpers/url_helper";
 import IssuesList from "@/components/IssuesList.vue";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
+import { getDefaultChartParams } from "@/helpers/chart_helper";
 
 export default Vue.extend({
   name: "Issues",
@@ -61,19 +62,20 @@ export default Vue.extend({
   },
 
   data() {
+    const chartParams = getDefaultChartParams(this.$route.query);
+    console.log({ chartParams });
     return {
+      ...chartParams,
       chartOps: {},
       chartData: [],
       chart: null,
-      selectedLevel: "Story",
       stepIntervals: [
         { name: "Daily", key: "Daily" },
         { name: "Weekly", key: "Weekly" },
         { name: "Bi-Weekly", key: "BiWeekly" },
         { name: "Monthly", key: "Monthly" }
       ],
-      selectedInterval: "Daily",
-      dates: getDefaultDateRange(this.$route.query),
+      selectedInterval: this.$route.query.stepInterval || "Daily",
       selectedDate: null,
       selectedIssues: []
     };

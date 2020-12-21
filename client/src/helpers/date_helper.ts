@@ -10,7 +10,7 @@ export type DateRange = {
 export function getDefaultDateRange(
   query: Route["query"],
   now = new Date()
-): Array<Date> {
+): [Date, Date] {
   if (query.fromDate && query.toDate) {
     const fromDate = moment(query.fromDate as string).toDate();
     const toDate = moment(query.toDate as string).toDate();
