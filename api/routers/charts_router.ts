@@ -35,9 +35,14 @@ router.get('/scatterplot', async (req, res) => {
   const hierarchyLevel = req.query.hierarchyLevel;
   let issues = await getRepository(Issue)
     .find({
-      completed: Between(fromDate, toDate),
-      issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
-      started: Not(IsNull())
+      where: {
+        completed: Between(fromDate, toDate),
+        issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
+        started: Not(IsNull())
+      },
+      order: {
+        completed: "ASC"
+      }
     });
 
   if (req.query.excludeOutliers === "true") {
