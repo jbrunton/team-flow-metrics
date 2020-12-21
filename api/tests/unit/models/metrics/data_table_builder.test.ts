@@ -88,26 +88,26 @@ describe("DataTableBuilder", () => {
       it("adds percentile rows", () => {
         builder.addPercentiles(1, [50, 80], 1, 5);
         expect(builder.rows).toEqual([
+          [1, null, 15, 10],
+          [5, null, 15, 10],
           [1, 10, null, null],
           [2, 10, null, null],
           [3, 10, null, null],
           [4, 15, null, null],
           [5, 20, null, null],
-          [1, null, 15, 10],
-          [5, null, 15, 10]
         ])
       })
   
       it("adds null rows if there are no data", () => {
         builder.addPercentiles(1, [50, 80], 1, 5);
         expect(builder.rows).toEqual([
+          [1, null, 15, 10],
+          [5, null, 15, 10],
           [1, 10, null, null],
           [2, 10, null, null],
           [3, 10, null, null],
           [4, 15, null, null],
           [5, 20, null, null],
-          [1, null, 15, 10],
-          [5, null, 15, 10]
         ])
       })
     })
