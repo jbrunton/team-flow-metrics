@@ -4,6 +4,7 @@ import { Field } from "../../models/entities/field";
 import { Transition } from "../../models/entities/issue";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
+import { compareDates } from "../../helpers/date_helper";
 
 export class IssueAttributesBuilder {
   private epicLinkFieldId: string;
@@ -43,12 +44,11 @@ export class IssueAttributesBuilder {
   } {
     const transitions = this.getTransitions(json);
     const lastTransition = transitions
-      .map(transition => transition.date)
-      .sort((d1, d2) => DateTime.fromISO(d2).diff(DateTime.fromISO(d1)))
-      .map(d => DateTime.fromISO(d).toJSDate())[0];
+      .map(transition => DateTime.fromISO(transition.date).toJSDate())
+      .sort(compareDates)[0];
     const startedDate = getStartedDate(transitions);
     const completedDate = getCompletedDate(transitions);
-    const cycleTime = startedDate && completedDate ? completedDate.diff(startedDate, 'hours') / 24 : null;
+    const cycleTime = startedDate && completedDate ? completedDate.diff(startedDate, 'hours').hours / 24 : null;
     const issueType = json["fields"]["issuetype"]["name"];
     const hierarchyLevel = this.hierarchyLevels[issueType] || this.hierarchyLevels["*"];
     if (!hierarchyLevel) {

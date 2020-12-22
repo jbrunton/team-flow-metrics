@@ -1,4 +1,4 @@
-import { nextIntervalDate, dateRange, StepInterval } from "../../../helpers/date_helper";
+import { nextIntervalDate, dateRange, StepInterval, compareDates } from "../../../helpers/date_helper";
 
 describe("nextIntervalDate", () => {
   it("returns the next day when the interval is Daily", () => {
@@ -42,5 +42,15 @@ describe("dateRange", () => {
       new Date(2020, 1, 22),
       new Date(2020, 1, 29),
     ]);
+  });
+});
+
+describe("#compareDates", () => {
+  it("can be used to sort dates", () => {
+    const sortedDates = [new Date(2020, 2, 1), new Date(2020, 3, 1), new Date(2020, 1, 1)]
+      .sort(compareDates);
+    expect(sortedDates).toEqual([
+      new Date(2020, 1, 1), new Date(2020, 2, 1), new Date(2020, 3, 1)
+    ])
   });
 });
