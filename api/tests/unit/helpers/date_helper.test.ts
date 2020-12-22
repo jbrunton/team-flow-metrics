@@ -1,4 +1,5 @@
-import { nextIntervalDate, dateRange, StepInterval, compareDates } from "../../../helpers/date_helper";
+import { DateTime } from "luxon";
+import { nextIntervalDate, dateRange, StepInterval, compareDates, compareDateTimes } from "../../../helpers/date_helper";
 
 describe("nextIntervalDate", () => {
   it("returns the next day when the interval is Daily", () => {
@@ -47,10 +48,32 @@ describe("dateRange", () => {
 
 describe("#compareDates", () => {
   it("can be used to sort dates", () => {
-    const sortedDates = [new Date(2020, 2, 1), new Date(2020, 3, 1), new Date(2020, 1, 1)]
-      .sort(compareDates);
+    const dates = [
+      new Date(2020, 2, 1),
+      new Date(2020, 3, 1),
+      new Date(2020, 1, 1)
+    ];
+    const sortedDates = dates.sort(compareDates);
     expect(sortedDates).toEqual([
-      new Date(2020, 1, 1), new Date(2020, 2, 1), new Date(2020, 3, 1)
+      new Date(2020, 1, 1),
+      new Date(2020, 2, 1),
+      new Date(2020, 3, 1)
+    ])
+  });
+});
+
+describe("#compareDateTimes", () => {
+  it("can be used to sort dates", () => {
+    const dates = [
+      DateTime.local(2020, 2, 1),
+      DateTime.local(2020, 3, 1),
+      DateTime.local(2020, 1, 1)
+    ];
+    const sortedDates = dates.sort(compareDateTimes);
+    expect(sortedDates).toEqual([
+      DateTime.local(2020, 1, 1),
+      DateTime.local(2020, 2, 1),
+      DateTime.local(2020, 3, 1)
     ])
   });
 });
