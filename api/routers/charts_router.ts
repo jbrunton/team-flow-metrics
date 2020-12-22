@@ -147,7 +147,7 @@ router.get("/cfd", async (req, res) => {
       })
     }
     issues = await getRepository(Issue).find({
-      parentId: epic.id
+      epicId: epic.id
     });  
   } else if (req.query.fromDate && req.query.toDate) {
     fromDate = DateTime.fromISO(req.query.fromDate as string).toUTC().toJSDate();

@@ -45,7 +45,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
     if (parent) {
       parent.childCount = children.length;
       for (let child of children) {
-        child.parentId = parent.id;
+        child.epicId = parent.id;
       }
       parent.percentDone = Math.round(children.filter(child => child.completed).length / children.length * 100);
     } else {

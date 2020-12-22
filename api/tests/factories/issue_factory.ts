@@ -13,7 +13,7 @@ export const IssueFactory = Factory.define("Issue", Issue)
   .attrs({
     resolution: null,
     parentKey: null,
-    parentId: null,
+    epicId: null,
     childCount: null,
     percentDone: null,
     started: null,

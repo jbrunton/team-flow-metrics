@@ -22,7 +22,7 @@ router.get('/:key', async (req, res) => {
 router.get('/:key/children', async (req, res) => {
   const parent = await getRepository(Issue).findOne({ key: req.params.key });
   const children = await getRepository(Issue).find({
-    parentId: parent.id
+    epicId: parent.id
   });
   res.json({
     count: children.length,
