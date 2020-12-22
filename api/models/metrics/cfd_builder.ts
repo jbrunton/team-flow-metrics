@@ -1,5 +1,5 @@
 import { Issue } from "../entities/issue";
-const moment = require("moment");
+import { DateTime } from "luxon";
 
 export type CfdRow = {
   date: Date;
@@ -30,8 +30,8 @@ export class CfdBuilder {
     }
     const firstDate = transitions[0].date;
     const lastDate = transitions[transitions.length - 1].date;
-    const fromDate = moment(firstDate).startOf('day').subtract(1, 'day').toDate();
-    const toDate = moment(lastDate).startOf('day').add(1, 'day').toDate();
+    const fromDate = DateTime.fromJSDate(firstDate).startOf('day').minus({ days: 1 }).toJSDate();
+    const toDate = DateTime.fromJSDate(lastDate).startOf('day').plus({ days: 1 }).toJSDate();
     const firstRow: CfdRow = {
       date: fromDate,
       total: 0,
@@ -41,9 +41,9 @@ export class CfdBuilder {
     };
     const rows = transitions.reduce<CfdRow[]>((rows, transition) => {
       let currentRow = rows[rows.length - 1];
-      while (!moment(currentRow.date).isSame(transition.date, 'day')) {
+      while (!DateTime.fromJSDate(currentRow.date).hasSame(transition.date, 'day')) {
         currentRow = {
-          date: moment(currentRow.date).add(1, 'day').toDate(),
+          date: DateTime.fromJSDate(currentRow.date).plus({ days: 1 }).toJSDate(),
           total: currentRow.total,
           toDo: currentRow.toDo,
           inProgress: currentRow.inProgress,
@@ -88,8 +88,9 @@ export class CfdBuilder {
     });
     if (chartFromDate && chartToDate) {
       return rows.filter(row => {
-        return moment(chartFromDate).isBefore(row.date) && moment(row.date).isBefore(chartToDate);
-      });  
+        return DateTime.fromJSDate(chartFromDate) < DateTime.fromJSDate(row.date) &&
+          DateTime.fromJSDate(row.date) < DateTime.fromJSDate(chartToDate);
+      });
     }
     return rows;
   }
@@ -117,6 +118,6 @@ export class CfdBuilder {
         return transitions;
       })
       .flat()
-      .sort((t1, t2) => moment(t1.date).diff(moment(t2.date)));
+      .sort((t1, t2) => DateTime.fromJSDate(t1.date).diff(DateTime.fromJSDate(t2.date)));
   }
 }

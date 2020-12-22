@@ -1,10 +1,8 @@
 import * as express from 'express';
 import { Between, IsNull, LessThan, MoreThan, MoreThanOrEqual, Not } from 'typeorm';
-import { HierarchyLevel } from '../models/entities/hierarchy_level';
 import { CfdBuilder } from '../models/metrics/cfd_builder';
 import { DataTableBuilder } from '../models/metrics/data_table_builder';
-const moment = require('moment');
-import { Moment } from "moment";
+import { DateTime } from "luxon";
 const { jStat } = require('jstat');
 const router = express.Router()
 const { getRepository } = require('typeorm')
@@ -30,8 +28,8 @@ router.get('/scatterplot', async (req, res) => {
     })
   }
 
-  const fromDate = moment(req.query.fromDate).toDate();
-  const toDate = moment(req.query.toDate).toDate();
+  const fromDate = DateTime.fromISO(req.query.fromDate as string).toJSDate();
+  const toDate = DateTime.fromISO(req.query.toDate as string).toJSDate();
   const hierarchyLevel = req.query.hierarchyLevel;
   let issues = await getRepository(Issue)
     .find({
@@ -152,8 +150,8 @@ router.get("/cfd", async (req, res) => {
       parentId: epic.id
     });  
   } else if (req.query.fromDate && req.query.toDate) {
-    fromDate = moment.utc(req.query.fromDate).toDate();
-    toDate = moment.utc(req.query.toDate).toDate();
+    fromDate = DateTime.fromISO(req.query.fromDate as string).toUTC().toJSDate();
+    toDate = DateTime.fromISO(req.query.toDate as string).toUTC().toJSDate();
     const hierarchyLevel = req.query.hierarchyLevel;
     const excludeStoppedIssues = req.query.excludeStoppedIssues === "true";
 
@@ -309,12 +307,12 @@ router.get("/throughput", async (req, res) => {
     })
   }
 
-  const fromDate = moment.utc(req.query.fromDate).toDate();
-  const toDate = moment.utc(req.query.toDate).toDate();
+  const fromDate = DateTime.fromISO(req.query.fromDate as string).toUTC().toJSDate();
+  const toDate = DateTime.fromISO(req.query.toDate  as string).toUTC().toJSDate();
   const hierarchyLevel = req.query.hierarchyLevel;
   const stepInterval = StepInterval[req.query.stepInterval as string];
   const dates = dateRange(fromDate, toDate, stepInterval);
-  if (moment(dates[dates.length - 1]).isBefore(toDate)) {
+  if (DateTime.fromJSDate(dates[dates.length - 1]) < DateTime.fromJSDate(toDate)) {
     dates.push(nextIntervalDate(dates[dates.length - 1], stepInterval));
   }
 
@@ -331,9 +329,9 @@ router.get("/throughput", async (req, res) => {
     });
 
   const { rows } = dates.slice(1).reduce(({ issues, currentDate, rows }, nextDate) => {
-    const group = takeWhile(issues, issue => moment(issue.completed).isBefore(nextDate));
+    const group = takeWhile(issues, issue => DateTime.fromJSDate(issue.completed) < DateTime.fromJSDate(nextDate));
     const count = group.length;
-    const row = [formatDate(currentDate), count, moment(currentDate).format("YYYY-MM-DD")];
+    const row = [formatDate(currentDate), count, DateTime.fromJSDate(currentDate).toFormat("yyyy-MM-dd")];
     return {
       issues: issues.slice(count),
       currentDate: nextDate,
@@ -425,7 +423,7 @@ router.get("/throughput/closedBetween", async (req, res) => {
     })
   }
 
-  const fromDate = moment.utc(req.query.fromDate).toDate();
+  const fromDate = DateTime.fromISO(req.query.fromDate as string).toUTC().toJSDate();
   const stepInterval = StepInterval[req.query.stepInterval as string];
   const toDate = nextIntervalDate(fromDate, stepInterval);
   const hierarchyLevel = req.query.hierarchyLevel;

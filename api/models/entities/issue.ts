@@ -1,5 +1,4 @@
 import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
-import { Moment } from "moment";
 
 export type TransitionStatus = {
     name: string,
