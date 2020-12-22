@@ -4,6 +4,7 @@ import { Field } from "../../models/entities/field";
 import { Transition } from "../../models/entities/issue";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
+import { compareDates, compareDateTimes } from "../../helpers/date_helper";
 
 export class IssueAttributesBuilder {
   private epicLinkFieldId: string;
@@ -43,12 +44,11 @@ export class IssueAttributesBuilder {
   } {
     const transitions = this.getTransitions(json);
     const lastTransition = transitions
-      .map(transition => transition.date)
-      .sort((d1, d2) => DateTime.fromISO(d2).diff(DateTime.fromISO(d1)))
-      .map(d => DateTime.fromISO(d).toJSDate())[0];
+      .map(transition => DateTime.fromISO(transition.date).toJSDate())
+      .slice(-1)[0];
     const startedDate = getStartedDate(transitions);
     const completedDate = getCompletedDate(transitions);
-    const cycleTime = startedDate && completedDate ? completedDate.diff(startedDate, 'hours') / 24 : null;
+    const cycleTime = startedDate && completedDate ? completedDate.diff(startedDate, 'hours').hours / 24 : null;
     const issueType = json["fields"]["issuetype"]["name"];
     const hierarchyLevel = this.hierarchyLevels[issueType] || this.hierarchyLevels["*"];
     if (!hierarchyLevel) {
@@ -103,7 +103,7 @@ export class IssueAttributesBuilder {
         };
       })
       .filter(transition => transition)
-      .sort((t1, t2) => DateTime.fromISO(t1.date).diff(DateTime.fromISO(t2.date)));
+      .sort((t1, t2) => compareDateTimes(DateTime.fromISO(t1.date), DateTime.fromISO(t2.date)));
   }
 }
 

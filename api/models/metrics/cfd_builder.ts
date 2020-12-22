@@ -1,5 +1,6 @@
 import { Issue } from "../entities/issue";
 import { DateTime } from "luxon";
+import { compareDates } from "../../helpers/date_helper";
 
 export type CfdRow = {
   date: Date;
@@ -41,7 +42,7 @@ export class CfdBuilder {
     };
     const rows = transitions.reduce<CfdRow[]>((rows, transition) => {
       let currentRow = rows[rows.length - 1];
-      while (!DateTime.fromJSDate(currentRow.date).hasSame(transition.date, 'day')) {
+      while (!DateTime.fromJSDate(currentRow.date).hasSame(DateTime.fromJSDate(transition.date), 'day')) {
         currentRow = {
           date: DateTime.fromJSDate(currentRow.date).plus({ days: 1 }).toJSDate(),
           total: currentRow.total,
@@ -118,6 +119,6 @@ export class CfdBuilder {
         return transitions;
       })
       .flat()
-      .sort((t1, t2) => DateTime.fromJSDate(t1.date).diff(DateTime.fromJSDate(t2.date)));
+      .sort((t1, t2) => compareDates(t1.date, t2.date));
   }
 }
