@@ -28,3 +28,7 @@ export const dateRange = (startDate: Date, endDate: Date, interval: StepInterval
 export const compareDates = (d1: Date, d2: Date): number => {
   return d1.getTime() - d2.getTime();
 };
+
+export const compareDateTimes = (d1: DateTime, d2: DateTime): number => {
+  return compareDates(d1.toJSDate(), d2.toJSDate());
+};

@@ -4,7 +4,7 @@ import { Field } from "../../models/entities/field";
 import { Transition } from "../../models/entities/issue";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
-import { compareDates } from "../../helpers/date_helper";
+import { compareDates, compareDateTimes } from "../../helpers/date_helper";
 
 export class IssueAttributesBuilder {
   private epicLinkFieldId: string;
@@ -45,7 +45,7 @@ export class IssueAttributesBuilder {
     const transitions = this.getTransitions(json);
     const lastTransition = transitions
       .map(transition => DateTime.fromISO(transition.date).toJSDate())
-      .sort(compareDates)[0];
+      .slice(-1)[0];
     const startedDate = getStartedDate(transitions);
     const completedDate = getCompletedDate(transitions);
     const cycleTime = startedDate && completedDate ? completedDate.diff(startedDate, 'hours').hours / 24 : null;
@@ -103,7 +103,7 @@ export class IssueAttributesBuilder {
         };
       })
       .filter(transition => transition)
-      .sort((t1, t2) => DateTime.fromISO(t1.date).diff(DateTime.fromISO(t2.date)));
+      .sort((t1, t2) => compareDateTimes(DateTime.fromISO(t1.date), DateTime.fromISO(t2.date)));
   }
 }
 
