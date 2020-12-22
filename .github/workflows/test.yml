@@ -34,5 +34,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup database
-      run: NODE_ENV=test npm run db:setup
+      run: |
+        cp default.env .env
+        NODE_ENV=test npm run db:setup
     - run: npx lerna run test:integration
