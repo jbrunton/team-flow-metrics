@@ -11,7 +11,7 @@ Very much under development.
 Make a copy of the example .env file:
 
 ```
-cp example.env .env
+cp default.env .env
 ```
 
 Then complete the relevant configuration details for your Jira domain and user in the `.env` file.
@@ -22,7 +22,7 @@ First time setup:
 
 ```
 npm install
-NODE_ENV=development npm run db:setup
+NODE_ENV=development npm run db:migrate
 ```
 
 Then, to run the app:
