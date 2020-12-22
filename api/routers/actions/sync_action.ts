@@ -1,12 +1,13 @@
 import { getRepository } from "typeorm";
+import { DateTime } from "luxon";
+import { identity } from "lodash";
 import { JiraClient } from "../../datasources/jira/jira_client";
 import { Field } from "../../models/entities/field";
 import { Issue } from "../../models/entities/issue";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { IssueCollection } from "../../models/scope/issue_collection";
 import { Status } from "../../models/entities/status";
-
-const moment = require('moment');
+import { compareDates } from "../../helpers/date_helper";
 
 export async function syncIssues(): Promise<Array<Issue>> {
   const client = new JiraClient();
@@ -85,8 +86,8 @@ export async function syncIssues(): Promise<Array<Issue>> {
         });
       const started = children
         .map(child => child.started)
-        .filter(date => date)
-        .sort((d1, d2) => moment(d1).diff(moment(d2)))[0];
+        .filter(identity)
+        .sort(compareDates)[0];
       if (started) {
         parent.started = started;
       } else {
@@ -95,8 +96,8 @@ export async function syncIssues(): Promise<Array<Issue>> {
 
       const lastTransition = children
         .map(child => child.lastTransition)
-        .filter(date => date)
-        .sort((d1, d2) => moment(d2).diff(moment(d1)))[0];
+        .filter(identity)
+        .sort(compareDates)[0];
       if (lastTransition) {
         parent.lastTransition = lastTransition;
       } else {
@@ -106,7 +107,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
       if (parent.statusCategory !== "Done"
         && process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT
         && parent.lastTransition
-        && moment(parent.lastTransition).diff(moment(), 'days') <= -process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT
+        && DateTime.fromJSDate(parent.lastTransition).diff(DateTime.local()).days <= -process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT
       ) {
         console.log(`Done timeout hit for ${parent.key}, overriding status to ${process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT_STATUS}`);
         parent.status = process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT_STATUS;
@@ -116,8 +117,8 @@ export async function syncIssues(): Promise<Array<Issue>> {
       if (parent.statusCategory === "Done") {
         const completed = children
           .map(child => child.completed)
-          .filter(date => date)
-          .sort((d1, d2) => moment(d2).diff(moment(d1)))[0];
+          .filter(identity)
+          .sort(compareDates)[0];
         if (completed) {
           parent.completed = completed;
         } else {
@@ -125,7 +126,9 @@ export async function syncIssues(): Promise<Array<Issue>> {
         }
       }
 
-      const cycleTime = parent.started && parent.completed ? moment(parent.completed).diff(moment(parent.started), 'hours') / 24 : null;
+      const cycleTime = parent.started && parent.completed
+        ? DateTime.fromJSDate(parent.completed).diff(DateTime.fromJSDate(parent.started)).hours / 24
+        : null;
       parent.cycleTime = cycleTime;
     }
     await issuesRepo.save(issues);

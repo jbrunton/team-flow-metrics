@@ -1,11 +1,9 @@
-import { Moment } from "moment";
+import { DateTime } from "luxon";
 import { URL } from "url";
 import { Field } from "../../models/entities/field";
 import { Transition } from "../../models/entities/issue";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
-
-const moment = require('moment');
 
 export class IssueAttributesBuilder {
   private epicLinkFieldId: string;
@@ -46,8 +44,8 @@ export class IssueAttributesBuilder {
     const transitions = this.getTransitions(json);
     const lastTransition = transitions
       .map(transition => transition.date)
-      .sort((d1, d2) => moment(d2).diff(moment(d1)))
-      .map(d => moment(d).toDate())[0];
+      .sort((d1, d2) => DateTime.fromISO(d2).diff(DateTime.fromISO(d1)))
+      .map(d => DateTime.fromISO(d).toJSDate())[0];
     const startedDate = getStartedDate(transitions);
     const completedDate = getCompletedDate(transitions);
     const cycleTime = startedDate && completedDate ? completedDate.diff(startedDate, 'hours') / 24 : null;
@@ -64,13 +62,13 @@ export class IssueAttributesBuilder {
       status: json["fields"]["status"]["name"],
       statusCategory: json["fields"]["status"]["statusCategory"]["name"],
       resolution: resolution,
-      created: moment(json["fields"]["created"]).toDate(),
+      created: DateTime.fromISO(json["fields"]["created"]).toJSDate(),
       hierarchyLevel: hierarchyLevel.name,
       parentKey: json["fields"][this.epicLinkFieldId],
       externalUrl: new URL(`browse/${json["key"]}`, process.env.JIRA_HOST).href,
       transitions: serializeTransitions(transitions),
-      started: startedDate ? startedDate.toDate() : null,
-      completed: completedDate ? completedDate.toDate() : null,
+      started: startedDate ? startedDate.toJSDate() : null,
+      completed: completedDate ? completedDate.toJSDate() : null,
       lastTransition: lastTransition,
       cycleTime: cycleTime
     };
@@ -105,14 +103,14 @@ export class IssueAttributesBuilder {
         };
       })
       .filter(transition => transition)
-      .sort((t1, t2) => moment(t1.date).diff(moment(t2.date)));
+      .sort((t1, t2) => DateTime.fromISO(t1.date).diff(DateTime.fromISO(t2.date)));
   }
 }
 
 function serializeTransitions(transitions: Array<Transition>): Array<Transition> {
   return transitions.map(transition => {
     const json = {
-      date: moment(transition.date).toISOString(),
+      date: DateTime.fromISO(transition.date).toISO(),
       fromStatus: transition.fromStatus,
       toStatus: transition.toStatus
     };
@@ -120,17 +118,17 @@ function serializeTransitions(transitions: Array<Transition>): Array<Transition>
   })
 }
 
-function getStartedDate(transitions: Array<Transition>): Moment {
+function getStartedDate(transitions: Array<Transition>): DateTime {
   const startedTransition = transitions.find(transition => transition.toStatus.category === "In Progress");
   
   if (!startedTransition) {
     return null;
   }
 
-  return moment(startedTransition.date);
+  return DateTime.fromISO(startedTransition.date);
 }
 
-function getCompletedDate(transitions: Array<Transition>): Moment {
+function getCompletedDate(transitions: Array<Transition>): DateTime {
   if (!transitions.length) {
     return null;
   }
@@ -147,7 +145,7 @@ function getCompletedDate(transitions: Array<Transition>): Moment {
     return null;
   }
 
-  return moment(lastTransition.date);
+  return DateTime.fromISO(lastTransition.date);
 }
 
 function getResolution(json: JSON): string {

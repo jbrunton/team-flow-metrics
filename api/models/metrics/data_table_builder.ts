@@ -1,5 +1,4 @@
 import { jStat } from "jstat";
-const moment = require('moment')
 
 type DataTableColumn = {
   label: string,
