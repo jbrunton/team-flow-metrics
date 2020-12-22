@@ -1,5 +1,7 @@
 import {
   formatDateRange,
+  formatDate,
+  formatTime,
   getCalendarMonthRanges,
   getDefaultDateRange,
   getRelativeDateRanges
@@ -48,12 +50,12 @@ describe("getRelativeDateRanges", () => {
         description: "Last 180 days"
       },
       {
-        fromDate: new Date(2019, 6, 11),
+        fromDate: new Date(2019, 6, 10),
         toDate: new Date(2020, 6, 11),
         description: "Last 1 year"
       },
       {
-        fromDate: new Date(2018, 6, 11),
+        fromDate: new Date(2018, 6, 10),
         toDate: new Date(2020, 6, 11),
         description: "Last 2 years"
       }
@@ -63,12 +65,12 @@ describe("getRelativeDateRanges", () => {
 
 describe("getCalendarMonthRanges", () => {
   it("returns a list of calendar month ranges", () => {
-    const now = new Date(2020, 6, 10);
+    const now = new Date(2020, 6, 10, 10, 30);
     const ranges = getCalendarMonthRanges(now);
     expect(ranges).toEqual([
       {
         fromDate: new Date(2020, 6, 1),
-        toDate: new Date(2020, 6, 32),
+        toDate: new Date(2020, 7, 1),
         description: "This month"
       },
       {
@@ -97,6 +99,20 @@ describe("getCalendarMonthRanges", () => {
         description: "February"
       }
     ]);
+  });
+});
+
+describe("formatDate", () => {
+  it("formats the given date", () => {
+    const date = new Date(2020, 0, 1);
+    expect(formatDate(date)).toEqual("1 Jan 2020");
+  });
+});
+
+describe("formatTime", () => {
+  it("formats the given time", () => {
+    const date = new Date(2020, 0, 1, 10, 30);
+    expect(formatTime(date)).toEqual("1 Jan 2020 10:30");
   });
 });
 

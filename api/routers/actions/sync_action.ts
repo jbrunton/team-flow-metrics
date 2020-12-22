@@ -118,7 +118,8 @@ export async function syncIssues(): Promise<Array<Issue>> {
         const completed = children
           .map(child => child.completed)
           .filter(identity)
-          .sort(compareDates)[0];
+          .sort(compareDates)
+          .slice(-1)[0];
         if (completed) {
           parent.completed = completed;
         } else {

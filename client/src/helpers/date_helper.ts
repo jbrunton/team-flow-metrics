@@ -1,4 +1,4 @@
-import moment from "moment";
+import { DateTime } from "luxon";
 import { Route } from "vue-router";
 
 export type DateRange = {
@@ -12,62 +12,62 @@ export function getDefaultDateRange(
   now = new Date()
 ): [Date, Date] {
   if (query.fromDate && query.toDate) {
-    const fromDate = moment(query.fromDate as string).toDate();
-    const toDate = moment(query.toDate as string).toDate();
+    const fromDate = DateTime.fromISO(query.fromDate as string).toJSDate();
+    const toDate = DateTime.fromISO(query.toDate as string).toJSDate();
     return [fromDate, toDate];
   }
 
-  const today = moment(now).startOf("day");
-  const toDate = today.add(1, "day").toDate();
-  const fromDate = moment(now)
-    .subtract(30, "days")
-    .toDate();
+  const today = DateTime.fromJSDate(now).startOf("day");
+  const toDate = today.plus({ days: 1 }).toJSDate();
+  const fromDate = DateTime.fromJSDate(now)
+    .minus({ days: 30 })
+    .toJSDate();
   return [fromDate, toDate];
 }
 
 export function getRelativeDateRanges(now = new Date()): Array<DateRange> {
-  const today = moment(now).startOf("day");
-  const toDate = today.add(1, "day").toDate();
+  const today = DateTime.fromJSDate(now).startOf("day");
+  const toDate = today.plus({ days: 1 }).toJSDate();
   return [
     {
-      fromDate: moment(now)
-        .subtract(7, "days")
-        .toDate(),
+      fromDate: DateTime.fromJSDate(now)
+        .minus({ days: 7 })
+        .toJSDate(),
       toDate: toDate,
       description: "Last 7 days"
     },
     {
-      fromDate: moment(now)
-        .subtract(30, "days")
-        .toDate(),
+      fromDate: DateTime.fromJSDate(now)
+        .minus({ days: 30 })
+        .toJSDate(),
       toDate: toDate,
       description: "Last 30 days"
     },
     {
-      fromDate: moment(now)
-        .subtract(90, "days")
-        .toDate(),
+      fromDate: DateTime.fromJSDate(now)
+        .minus({ days: 90 })
+        .toJSDate(),
       toDate: toDate,
       description: "Last 90 days"
     },
     {
-      fromDate: moment(now)
-        .subtract(180, "days")
-        .toDate(),
+      fromDate: DateTime.fromJSDate(now)
+        .minus({ days: 180 })
+        .toJSDate(),
       toDate: toDate,
       description: "Last 180 days"
     },
     {
-      fromDate: moment(now)
-        .subtract(365, "days")
-        .toDate(),
+      fromDate: DateTime.fromJSDate(now)
+        .minus({ years: 1 })
+        .toJSDate(),
       toDate: toDate,
       description: "Last 1 year"
     },
     {
-      fromDate: moment(now)
-        .subtract(365 * 2, "days")
-        .toDate(),
+      fromDate: DateTime.fromJSDate(now)
+        .minus({ years: 2 })
+        .toJSDate(),
       toDate: toDate,
       description: "Last 2 years"
     }
@@ -75,26 +75,22 @@ export function getRelativeDateRanges(now = new Date()): Array<DateRange> {
 }
 
 export function getCalendarMonthRanges(now = new Date()): Array<DateRange> {
-  const thisMonth = moment(now).startOf("month");
-  const fromDate = thisMonth;
+  const thisMonth = DateTime.fromJSDate(now).startOf("month");
+  let fromDate = thisMonth;
   const ranges = [
     {
-      fromDate: thisMonth.toDate(),
-      toDate: moment(fromDate)
-        .add(1, "month")
-        .toDate(),
+      fromDate: thisMonth.toJSDate(),
+      toDate: thisMonth.plus({ months: 1 }).toJSDate(),
       description: "This month"
     }
   ];
 
   for (let i = 0; i < 5; ++i) {
-    fromDate.subtract(1, "month");
+    fromDate = fromDate.minus({ months: 1 });
     ranges.push({
-      fromDate: fromDate.toDate(),
-      toDate: moment(fromDate)
-        .add(1, "month")
-        .toDate(),
-      description: fromDate.format("MMMM")
+      fromDate: fromDate.toJSDate(),
+      toDate: fromDate.plus({ months: 1 }).toJSDate(),
+      description: fromDate.toFormat("MMMM")
     });
   }
 
@@ -105,16 +101,24 @@ export function formatDate(date?: Date): string {
   if (!date) {
     return "-";
   }
-  return moment(date).format("D MMM YYYY");
+  return DateTime.fromJSDate(date).toFormat("d MMM yyyy");
 }
 
 export function formatTime(time?: Date): string {
   if (!time) {
     return "-";
   }
-  return moment(time).format("D MMM YYYY hh:mm");
+  return DateTime.fromJSDate(time).toFormat("d MMM yyyy hh:mm");
 }
 
 export function formatDateRange(dates: Array<Date>): string {
   return dates.map(date => formatDate(date)).join(" - ");
+}
+
+export function timeBetween(d1: Date, d2: Date): number {
+  const dateTime1 = DateTime.fromJSDate(d1);
+  const dateTime2 = DateTime.fromJSDate(d2);
+  const diff = dateTime2.diff(dateTime1, "hours");
+  console.log({ dateTime1, dateTime2, hours: diff.hours });
+  return diff.hours / 24;
 }
