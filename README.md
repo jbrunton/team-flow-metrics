@@ -41,9 +41,9 @@ Currently you need to navigate to http://localhost:3001/api/sync. You can watch 
 
 ## Running tests
 
-You can run unit tests locally with `npm run test:unit` from either the `client/` or `server/` directories, or simply with `jest`.
+You can run unit tests locally with `npx lerna run test:unit`, or simply with `jest` from the relevant package directory.
 
-API integration tests require a database and docker. Run `npm run api:test:integration` from the root directory. (You'll need to run `NODE_ENV=test npm run db:setup` the first time.)
+API integration tests require a database and docker. Run `npx lerna run test:integration` from the root directory. (You'll need to run `NODE_ENV=test npm run db:setup` the first time.)
 
 ## Database migrations
 

@@ -35,4 +35,4 @@ jobs:
     - uses: actions/checkout@v2
     - name: setup database
       run: NODE_ENV=test npm run db:setup
-    - run: docker-compose run api npm run test:integration
+    - run: npx lerna run test:integration

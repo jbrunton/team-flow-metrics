@@ -4,10 +4,7 @@
     "db:setup": "docker-compose run -e NODE_ENV api npm run db:setup",
     "db:reset": "docker-compose run -e NODE_ENV api npm run db:reset",
     "db:migrate": "docker-compose run -e NODE_ENV api npm run db:migrate",
-    "db:revert": "docker-compose run -e NODE_ENV api npm run db:revert",
-    "api:test:integration": "docker-compose run api npm run test:integration",
-    "test:integration": "npm run api:test:integration",
-    "test": "npx lerna run test:unit && npm run test:integration"
+    "db:revert": "docker-compose run -e NODE_ENV api npm run db:revert"
   },
   "devDependencies": {
     "@types/jest": "^26.0.19",
