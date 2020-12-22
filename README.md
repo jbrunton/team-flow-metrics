@@ -11,7 +11,7 @@ Very much under development.
 Make a copy of the example .env file:
 
 ```
-cp .env.example .env
+cp example.env .env
 ```
 
 Then complete the relevant configuration details for your Jira domain and user in the `.env` file.
