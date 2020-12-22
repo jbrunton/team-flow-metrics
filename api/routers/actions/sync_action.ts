@@ -118,12 +118,14 @@ export async function syncIssues(): Promise<Array<Issue>> {
         const completed = children
           .map(child => child.completed)
           .filter(identity)
-          .sort(compareDates)[0];
+          .sort(compareDates)
+          .slice(-1)[0];
         if (completed) {
           parent.completed = completed;
         } else {
           parent.completed = null;
         }
+        console.log("epic completed:", { key: parent.key, completed, completionDates: children.map(child => child.completed) })
       }
 
       const cycleTime = parent.started && parent.completed

@@ -1,7 +1,7 @@
-import moment from "moment";
+import { DateTime } from "luxon";
 
 export const formatDateParam = (date: Date) =>
-  moment(date).format("YYYY-MM-DD");
+  DateTime.fromJSDate(date).toFormat("yyyy-MM-dd");
 
 export const buildQueryParams = (
   queryParams: Record<string, unknown>
@@ -10,9 +10,8 @@ export const buildQueryParams = (
     queryParams
   ).reduce((obj, key) => {
     const value = queryParams[key];
-    const serializedValue = moment.isDate(value)
-      ? formatDateParam(value)
-      : value;
+    const serializedValue =
+      value instanceof Date ? formatDateParam(value) : value;
     return { ...obj, [key]: serializedValue };
   }, {});
   return new URLSearchParams(serializedParams).toString();

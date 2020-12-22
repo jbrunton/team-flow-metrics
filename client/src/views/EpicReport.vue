@@ -194,9 +194,9 @@
 import Vue from "vue";
 import axios from "axios";
 import StatusTag from "@/components/StatusTag.vue";
-import { formatDate } from "../helpers/date_helper";
+import { formatDate, timeBetween } from "../helpers/date_helper";
 import { formatNumber } from "../helpers/format_helper";
-import moment from "moment";
+import { DateTime } from "luxon";
 
 export default Vue.extend({
   name: "EpicReport",
@@ -263,11 +263,17 @@ export default Vue.extend({
       return new Date(input);
     },
     truncateDate(date: Date): Date {
-      if (date && moment(date).isBefore(moment(this.epic.started))) {
-        return moment(this.epic.started).toDate();
+      if (
+        date &&
+        DateTime.fromJSDate(date) < DateTime.fromJSDate(this.epic.started)
+      ) {
+        return this.epic.started;
       }
-      if (date && moment(date).isAfter(moment(this.epic.completed))) {
-        return moment(this.epic.completed).toDate();
+      if (
+        date &&
+        DateTime.fromJSDate(date) > DateTime.fromJSDate(this.epic.completed)
+      ) {
+        return this.epic.completed;
       }
       return date;
     },
@@ -276,6 +282,10 @@ export default Vue.extend({
     async fetchData() {
       const issueResponse = await axios.get(`/api/issues/${this.key}`);
       this.epic = issueResponse.data.issue;
+      this.epic.created = this.parseDate(this.epic.created);
+      this.epic.started = this.parseDate(this.epic.started);
+      this.epic.completed = this.parseDate(this.epic.completed);
+      this.epic.lastTransition = this.parseDate(this.epic.lastTransition);
 
       this.initCharts();
 
@@ -301,35 +311,29 @@ export default Vue.extend({
       });
 
       if (this.epic.started && this.epic.completed) {
-        const totalTime =
-          moment(this.epic.completed).diff(this.epic.started, "hours") / 24;
-        console.log({ totalTime });
+        const totalTime = timeBetween(this.epic.started, this.epic.completed);
         this.children.forEach(issue => {
           const created = this.truncateDate(issue.created);
           const started = this.truncateDate(issue.started);
           const completed = this.truncateDate(issue.completed);
-          console.log({ key: issue.key, created, started, completed });
-          const timeToCreated =
-            moment(created).diff(this.epic.started, "hours") / 24;
+          const timeToCreated = timeBetween(this.epic.started, created);
           issue.progress = {
             totalTime,
             timeToCreated
           };
           if (started) {
-            const toDoTime = moment(started).diff(created, "hours") / 24;
+            const toDoTime = timeBetween(created, started);
             issue.progress.toDoTime = toDoTime;
           } else if (completed) {
-            const toDoTime = moment(completed).diff(created, "hours") / 24;
+            const toDoTime = timeBetween(created, completed);
             issue.progress.toDoTime = toDoTime;
           } else {
-            const toDoTime =
-              moment(created).diff(this.epic.completed, "hours") / 24;
+            const toDoTime = timeBetween(created, completed);
             issue.progress.toDoTime = toDoTime;
           }
           if (completed) {
             if (started) {
-              const inProgressTime =
-                moment(completed).diff(started, "hours") / 24;
+              const inProgressTime = timeBetween(started, completed);
               issue.progress.inProgressTime = inProgressTime;
             } else {
               issue.progress.inProgressTime = 0;

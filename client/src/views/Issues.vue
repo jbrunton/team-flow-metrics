@@ -66,7 +66,6 @@
 import Vue from "vue";
 import IssuesList from "@/components/IssuesList.vue";
 import axios from "axios";
-import moment from "moment";
 import { formatDate } from "../helpers/date_helper";
 import { formatNumber } from "../helpers/format_helper";
 
@@ -137,7 +136,6 @@ export default Vue.extend({
     }
   },
   methods: {
-    moment: moment,
     formatDate,
     formatNumber,
     parseDate(input?: string): Date {
