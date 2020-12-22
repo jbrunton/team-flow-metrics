@@ -125,7 +125,6 @@ export async function syncIssues(): Promise<Array<Issue>> {
         } else {
           parent.completed = null;
         }
-        console.log("epic completed:", { key: parent.key, completed, completionDates: children.map(child => child.completed) })
       }
 
       const cycleTime = parent.started && parent.completed
