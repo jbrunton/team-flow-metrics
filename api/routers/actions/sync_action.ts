@@ -7,7 +7,7 @@ import { Issue } from "../../models/entities/issue";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { IssueCollection } from "../../models/scope/issue_collection";
 import { Status } from "../../models/entities/status";
-import { compareDates } from "../../helpers/date_helper";
+import { compareDateTimes, getCycleTime } from "../../helpers/date_helper";
 
 export async function syncIssues(): Promise<Array<Issue>> {
   const client = new JiraClient();
@@ -101,7 +101,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
       const started = children
         .map((child) => child.started)
         .filter(identity)
-        .sort(compareDates)[0];
+        .sort(compareDateTimes)[0];
       if (started) {
         parent.started = started;
       } else {
@@ -111,7 +111,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
       const lastTransition = children
         .map((child) => child.lastTransition)
         .filter(identity)
-        .sort(compareDates)[0];
+        .sort(compareDateTimes)[0];
       if (lastTransition) {
         parent.lastTransition = lastTransition;
       } else {
@@ -122,8 +122,8 @@ export async function syncIssues(): Promise<Array<Issue>> {
         parent.statusCategory !== "Done" &&
         process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT &&
         parent.lastTransition &&
-        DateTime.fromJSDate(parent.lastTransition).diff(DateTime.local())
-          .days <= -process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT
+        parent.lastTransition.diff(DateTime.local()).days <=
+          -process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT
       ) {
         console.log(
           `Done timeout hit for ${parent.key}, overriding status to ${process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT_STATUS}`
@@ -136,7 +136,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
         const completed = children
           .map((child) => child.completed)
           .filter(identity)
-          .sort(compareDates)
+          .sort(compareDateTimes)
           .slice(-1)[0];
         if (completed) {
           parent.completed = completed;
@@ -145,13 +145,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
         }
       }
 
-      const cycleTime =
-        parent.started && parent.completed
-          ? DateTime.fromJSDate(parent.completed).diff(
-              DateTime.fromJSDate(parent.started)
-            ).hours / 24
-          : null;
-      parent.cycleTime = cycleTime;
+      parent.cycleTime = getCycleTime(parent.started, parent.completed);
     }
     await issuesRepo.save(issues);
   }

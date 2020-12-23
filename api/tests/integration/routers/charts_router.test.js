@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import "reflect-metadata";
 import { HierarchyLevel } from "../../../models/entities/hierarchy_level";
 const request = require("supertest");
@@ -30,8 +31,8 @@ describe("charts_router", () => {
         IssueFactory.build({
           status: "Done",
           statusCategory: "Done",
-          started: new Date(2020, 1, 1, 0, 0),
-          completed: new Date(2020, 1, 2, 0, 0),
+          started: DateTime.local(2020, 2, 1, 0, 0),
+          completed: DateTime.local(2020, 2, 2, 0, 0),
           cycleTime: 1,
         })
       );
@@ -39,8 +40,8 @@ describe("charts_router", () => {
         IssueFactory.build({
           status: "Done",
           statusCategory: "Done",
-          started: new Date(2020, 1, 3, 0, 0),
-          completed: new Date(2020, 1, 5, 0, 0),
+          started: DateTime.local(2020, 2, 3, 0, 0),
+          completed: DateTime.local(2020, 2, 5, 0, 0),
           cycleTime: 2,
         })
       );
@@ -138,8 +139,8 @@ describe("charts_router", () => {
           status: "Done",
           statusCategory: "Done",
           hierarchyLevel: "Story",
-          started: new Date(2020, 1, 1, 0, 0),
-          completed: new Date(2020, 1, 2, 0, 0),
+          started: DateTime.local(2020, 2, 1, 0, 0),
+          completed: DateTime.local(2020, 2, 2, 0, 0),
           cycleTime: 1,
         })
       );
@@ -149,8 +150,8 @@ describe("charts_router", () => {
           status: "Done",
           statusCategory: "Done",
           hierarchyLevel: "Epic",
-          started: new Date(2020, 1, 3, 0, 0),
-          completed: new Date(2020, 1, 5, 0, 0),
+          started: DateTime.local(2020, 2, 3, 0, 0),
+          completed: DateTime.local(2020, 2, 5, 0, 0),
           cycleTime: 2,
         })
       );
@@ -191,8 +192,8 @@ describe("charts_router", () => {
         IssueFactory.build({
           status: "Done",
           statusCategory: "Done",
-          started: new Date(2020, 1, 1, 0, 0),
-          completed: new Date(2020, 1, 2, 0, 0),
+          started: DateTime.local(2020, 2, 1, 0, 0),
+          completed: DateTime.local(2020, 2, 2, 0, 0),
           cycleTime: 1,
         })
       );
@@ -200,8 +201,8 @@ describe("charts_router", () => {
         IssueFactory.build({
           status: "Done",
           statusCategory: "Done",
-          started: new Date(2020, 1, 3, 0, 0),
-          completed: new Date(2020, 1, 5, 0, 0),
+          started: DateTime.local(2020, 2, 3, 0, 0),
+          completed: DateTime.local(2020, 2, 5, 0, 0),
           cycleTime: 2,
         })
       );

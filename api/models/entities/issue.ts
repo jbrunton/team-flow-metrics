@@ -1,4 +1,6 @@
+import { DateTime } from "luxon";
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { DateTimeTransformer } from "../../helpers/date_helper";
 
 export type TransitionStatus = {
   name: string;
@@ -34,8 +36,8 @@ export class Issue {
   @Column()
   resolution: string;
 
-  @Column()
-  created: Date;
+  @Column({ type: "timestamp", transformer: DateTimeTransformer })
+  created: DateTime;
 
   @Column()
   hierarchyLevel: string;
@@ -61,14 +63,14 @@ export class Issue {
   })
   transitions: Array<Transition>;
 
-  @Column("timestamp")
-  started: Date;
+  @Column({ type: "timestamp", transformer: DateTimeTransformer })
+  started: DateTime;
 
-  @Column("timestamp")
-  completed: Date;
+  @Column({ type: "timestamp", transformer: DateTimeTransformer })
+  completed: DateTime;
 
-  @Column("timestamp")
-  lastTransition: Date;
+  @Column({ type: "timestamp", transformer: DateTimeTransformer })
+  lastTransition: DateTime;
 
   @Column()
   cycleTime: number;
