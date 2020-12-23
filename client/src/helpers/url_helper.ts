@@ -1,7 +1,6 @@
 import { DateTime } from "luxon";
 
-export const formatDateParam = (date: Date) =>
-  DateTime.fromJSDate(date).toFormat("yyyy-MM-dd");
+export const formatDateParam = (date: DateTime) => date.toFormat("yyyy-MM-dd");
 
 export const buildQueryParams = (
   queryParams: Record<string, unknown>
@@ -11,7 +10,7 @@ export const buildQueryParams = (
   ).reduce((obj, key) => {
     const value = queryParams[key];
     const serializedValue =
-      value instanceof Date ? formatDateParam(value) : value;
+      value instanceof DateTime ? formatDateParam(value) : value;
     return { ...obj, [key]: serializedValue };
   }, {});
   return new URLSearchParams(serializedParams).toString();

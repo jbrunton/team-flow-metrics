@@ -68,6 +68,7 @@ import IssuesList from "@/components/IssuesList.vue";
 import axios from "axios";
 import { formatDate } from "../helpers/date_helper";
 import { formatNumber } from "../helpers/format_helper";
+import { DateTime } from "luxon";
 
 type Issue = {
   key: string;
@@ -138,11 +139,11 @@ export default Vue.extend({
   methods: {
     formatDate,
     formatNumber,
-    parseDate(input?: string): Date {
+    parseDate(input?: string): DateTime {
       if (!input) {
         return null;
       }
-      return new Date(input);
+      return DateTime.fromISO(input);
     },
     matchQuery(issue: Issue) {
       const query = this.searchQuery.trim();
