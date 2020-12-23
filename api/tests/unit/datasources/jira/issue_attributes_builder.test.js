@@ -3,6 +3,7 @@ const {
 } = require("../../../../datasources/jira/issue_attributes_builder");
 const { getRepository } = require("typeorm");
 const { Field } = require("../../../../models/entities/field");
+const { DateTime } = require("luxon");
 
 describe("IssueAttributesBuilder", () => {
   const statuses = [
@@ -164,7 +165,9 @@ describe("IssueAttributesBuilder", () => {
         hierarchyLevels
       ).build(json);
 
-      expect(issue.started).toEqual(new Date("2020-01-02T09:00:00.000Z"));
+      expect(issue.started).toEqual(
+        DateTime.fromISO("2020-01-02T09:00:00.000Z")
+      );
     });
 
     it("ignores events without status changes", () => {
@@ -306,7 +309,9 @@ describe("IssueAttributesBuilder", () => {
         hierarchyLevels
       ).build(json);
 
-      expect(issue.completed).toEqual(new Date("2020-01-02T09:00:00.000Z"));
+      expect(issue.completed).toEqual(
+        DateTime.fromISO("2020-01-02T09:00:00.000Z")
+      );
     });
 
     it("is null if the issue was reopened", () => {
@@ -419,7 +424,7 @@ describe("IssueAttributesBuilder", () => {
       ).build(json);
 
       expect(issue.lastTransition).toEqual(
-        new Date("2020-01-03T09:00:00.000Z")
+        DateTime.fromISO("2020-01-03T09:00:00.000Z")
       );
     });
   });

@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { Factory } from "rosie";
 import { Issue } from "../../models/entities/issue";
 
@@ -13,7 +14,7 @@ export const IssueFactory = Factory.define("Issue", Issue)
     ["key"],
     (key) => `https://jira.example.com/browse/${key}`
   )
-  .attr("created", () => new Date())
+  .attr("created", () => DateTime.local())
   .attrs({
     resolution: null,
     epicKey: null,

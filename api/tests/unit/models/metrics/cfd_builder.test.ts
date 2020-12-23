@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { Issue } from "../../../../models/entities/issue";
 import { CfdBuilder } from "../../../../models/metrics/cfd_builder";
 import { IssueFactory } from "../../../factories/issue_factory";
@@ -9,16 +10,16 @@ describe("CfdBuilder", () => {
     issue1 = IssueFactory.build({
       status: "Done",
       statusCategory: "Done",
-      created: new Date(2020, 1, 1, 10, 30),
-      started: new Date(2020, 1, 2, 11, 0),
-      completed: new Date(2020, 1, 3, 11, 30),
+      created: DateTime.local(2020, 1, 1, 10, 30),
+      started: DateTime.local(2020, 1, 2, 11, 0),
+      completed: DateTime.local(2020, 1, 3, 11, 30),
     });
     issue2 = IssueFactory.build({
       status: "Done",
       statusCategory: "Done",
-      created: new Date(2020, 1, 1, 9, 30),
-      started: new Date(2020, 1, 1, 10, 0),
-      completed: new Date(2020, 1, 4, 11, 30),
+      created: DateTime.local(2020, 1, 1, 9, 30),
+      started: DateTime.local(2020, 1, 1, 10, 0),
+      completed: DateTime.local(2020, 1, 4, 11, 30),
     });
   });
 
@@ -29,18 +30,18 @@ describe("CfdBuilder", () => {
       expect(builder.transitions()).toEqual([
         {
           key: issue1.key,
-          date: new Date(2020, 1, 1, 10, 30),
+          date: DateTime.local(2020, 1, 1, 10, 30),
           toStatusCategory: "To Do",
         },
         {
           key: issue1.key,
-          date: new Date(2020, 1, 2, 11, 0),
+          date: DateTime.local(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
           toStatusCategory: "In Progress",
         },
         {
           key: issue1.key,
-          date: new Date(2020, 1, 3, 11, 30),
+          date: DateTime.local(2020, 1, 3, 11, 30),
           fromStatusCategory: "In Progress",
           toStatusCategory: "Done",
         },
@@ -51,20 +52,20 @@ describe("CfdBuilder", () => {
       const issue = IssueFactory.build({
         status: "In Progress",
         statusCategory: "In Progress",
-        created: new Date(2020, 1, 1, 10, 30),
-        started: new Date(2020, 1, 2, 11, 0),
+        created: DateTime.local(2020, 1, 1, 10, 30),
+        started: DateTime.local(2020, 1, 2, 11, 0),
       });
       const builder = new CfdBuilder();
       builder.addIssues([issue]);
       expect(builder.transitions()).toEqual([
         {
           key: issue.key,
-          date: new Date(2020, 1, 1, 10, 30),
+          date: DateTime.local(2020, 1, 1, 10, 30),
           toStatusCategory: "To Do",
         },
         {
           key: issue.key,
-          date: new Date(2020, 1, 2, 11, 0),
+          date: DateTime.local(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
           toStatusCategory: "In Progress",
         },
@@ -75,20 +76,20 @@ describe("CfdBuilder", () => {
       const issue = IssueFactory.build({
         status: "Done",
         statusCategory: "Done",
-        created: new Date(2020, 1, 1, 10, 30),
-        completed: new Date(2020, 1, 2, 11, 0),
+        created: DateTime.local(2020, 1, 1, 10, 30),
+        completed: DateTime.local(2020, 1, 2, 11, 0),
       });
       const builder = new CfdBuilder();
       builder.addIssues([issue]);
       expect(builder.transitions()).toEqual([
         {
           key: issue.key,
-          date: new Date(2020, 1, 1, 10, 30),
+          date: DateTime.local(2020, 1, 1, 10, 30),
           toStatusCategory: "To Do",
         },
         {
           key: issue.key,
-          date: new Date(2020, 1, 2, 11, 0),
+          date: DateTime.local(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
           toStatusCategory: "Done",
         },
@@ -101,35 +102,35 @@ describe("CfdBuilder", () => {
       expect(builder.transitions()).toEqual([
         {
           key: issue2.key,
-          date: new Date(2020, 1, 1, 9, 30),
+          date: DateTime.local(2020, 1, 1, 9, 30),
           toStatusCategory: "To Do",
         },
         {
           key: issue2.key,
-          date: new Date(2020, 1, 1, 10, 0),
+          date: DateTime.local(2020, 1, 1, 10, 0),
           fromStatusCategory: "To Do",
           toStatusCategory: "In Progress",
         },
         {
           key: issue1.key,
-          date: new Date(2020, 1, 1, 10, 30),
+          date: DateTime.local(2020, 1, 1, 10, 30),
           toStatusCategory: "To Do",
         },
         {
           key: issue1.key,
-          date: new Date(2020, 1, 2, 11, 0),
+          date: DateTime.local(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
           toStatusCategory: "In Progress",
         },
         {
           key: issue1.key,
-          date: new Date(2020, 1, 3, 11, 30),
+          date: DateTime.local(2020, 1, 3, 11, 30),
           fromStatusCategory: "In Progress",
           toStatusCategory: "Done",
         },
         {
           key: issue2.key,
-          date: new Date(2020, 1, 4, 11, 30),
+          date: DateTime.local(2020, 1, 4, 11, 30),
           fromStatusCategory: "In Progress",
           toStatusCategory: "Done",
         },
@@ -148,35 +149,35 @@ describe("CfdBuilder", () => {
       builder.addIssues([issue1]);
       expect(builder.build()).toEqual([
         {
-          date: new Date(2020, 0, 31),
+          date: DateTime.local(2019, 12, 31),
           total: 0,
           toDo: 0,
           inProgress: 0,
           done: 0,
         },
         {
-          date: new Date(2020, 1, 1),
+          date: DateTime.local(2020, 1, 1),
           total: 1,
           toDo: 1,
           inProgress: 0,
           done: 0,
         },
         {
-          date: new Date(2020, 1, 2),
+          date: DateTime.local(2020, 1, 2),
           total: 1,
           toDo: 0,
           inProgress: 1,
           done: 0,
         },
         {
-          date: new Date(2020, 1, 3),
+          date: DateTime.local(2020, 1, 3),
           total: 1,
           toDo: 0,
           inProgress: 0,
           done: 1,
         },
         {
-          date: new Date(2020, 1, 4),
+          date: DateTime.local(2020, 1, 4),
           total: 1,
           toDo: 0,
           inProgress: 0,
@@ -186,54 +187,54 @@ describe("CfdBuilder", () => {
     });
 
     it("adds rows for each date", () => {
-      issue1.completed = new Date(2020, 1, 5, 10, 0);
+      issue1.completed = DateTime.local(2020, 1, 5, 10, 0);
       const builder = new CfdBuilder();
       builder.addIssues([issue1]);
       expect(builder.build()).toEqual([
         {
-          date: new Date(2020, 0, 31),
+          date: DateTime.local(2019, 12, 31),
           total: 0,
           toDo: 0,
           inProgress: 0,
           done: 0,
         },
         {
-          date: new Date(2020, 1, 1),
+          date: DateTime.local(2020, 1, 1),
           total: 1,
           toDo: 1,
           inProgress: 0,
           done: 0,
         },
         {
-          date: new Date(2020, 1, 2),
+          date: DateTime.local(2020, 1, 2),
           total: 1,
           toDo: 0,
           inProgress: 1,
           done: 0,
         },
         {
-          date: new Date(2020, 1, 3),
+          date: DateTime.local(2020, 1, 3),
           total: 1,
           toDo: 0,
           inProgress: 1,
           done: 0,
         },
         {
-          date: new Date(2020, 1, 4),
+          date: DateTime.local(2020, 1, 4),
           total: 1,
           toDo: 0,
           inProgress: 1,
           done: 0,
         },
         {
-          date: new Date(2020, 1, 5),
+          date: DateTime.local(2020, 1, 5),
           total: 1,
           toDo: 0,
           inProgress: 0,
           done: 1,
         },
         {
-          date: new Date(2020, 1, 6),
+          date: DateTime.local(2020, 1, 6),
           total: 1,
           toDo: 0,
           inProgress: 0,

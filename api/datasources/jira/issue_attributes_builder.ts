@@ -4,7 +4,7 @@ import { Field } from "../../models/entities/field";
 import { Transition } from "../../models/entities/issue";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
-import { compareDates, compareDateTimes } from "../../helpers/date_helper";
+import { compareDateTimes, getCycleTime } from "../../helpers/date_helper";
 
 export class IssueAttributesBuilder {
   private epicLinkFieldId: string;
@@ -39,25 +39,22 @@ export class IssueAttributesBuilder {
     status: string;
     statusCategory: string;
     resolution: string;
-    created: Date;
+    created: DateTime;
     hierarchyLevel: string;
     externalUrl: string;
     transitions: Array<Transition>;
-    started: Date;
-    completed: Date;
-    lastTransition: Date;
+    started: DateTime;
+    completed: DateTime;
+    lastTransition: DateTime;
     cycleTime: number;
   } {
     const transitions = this.getTransitions(json);
     const lastTransition = transitions
-      .map((transition) => DateTime.fromISO(transition.date).toJSDate())
+      .map((transition) => DateTime.fromISO(transition.date))
       .slice(-1)[0];
     const startedDate = getStartedDate(transitions);
     const completedDate = getCompletedDate(transitions);
-    const cycleTime =
-      startedDate && completedDate
-        ? completedDate.diff(startedDate, "hours").hours / 24
-        : null;
+    const cycleTime = getCycleTime(startedDate, completedDate);
     const issueType = json["fields"]["issuetype"]["name"];
     const hierarchyLevel =
       this.hierarchyLevels[issueType] || this.hierarchyLevels["*"];
@@ -74,13 +71,13 @@ export class IssueAttributesBuilder {
       status: json["fields"]["status"]["name"],
       statusCategory: json["fields"]["status"]["statusCategory"]["name"],
       resolution: resolution,
-      created: DateTime.fromISO(json["fields"]["created"]).toJSDate(),
+      created: DateTime.fromISO(json["fields"]["created"]),
       hierarchyLevel: hierarchyLevel.name,
       epicKey: json["fields"][this.epicLinkFieldId],
       externalUrl: new URL(`browse/${json["key"]}`, process.env.JIRA_HOST).href,
       transitions: serializeTransitions(transitions),
-      started: startedDate ? startedDate.toJSDate() : null,
-      completed: completedDate ? completedDate.toJSDate() : null,
+      started: startedDate,
+      completed: completedDate,
       lastTransition: lastTransition,
       cycleTime: cycleTime,
     };

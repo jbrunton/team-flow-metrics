@@ -1,9 +1,9 @@
 import { Issue } from "../entities/issue";
 import { DateTime } from "luxon";
-import { compareDates } from "../../helpers/date_helper";
+import { compareDateTimes } from "../../helpers/date_helper";
 
 export type CfdRow = {
-  date: Date;
+  date: DateTime;
   total: number;
   toDo: number;
   inProgress: number;
@@ -11,7 +11,7 @@ export type CfdRow = {
 };
 
 type CfdTransition = {
-  date: Date;
+  date: DateTime;
   key: string;
   fromStatusCategory?: string;
   toStatusCategory: string;
@@ -24,21 +24,15 @@ export class CfdBuilder {
     this.issues = this.issues.concat(issues);
   }
 
-  build(chartFromDate?: Date, chartToDate?: Date): CfdRow[] {
+  build(chartFromDate?: DateTime, chartToDate?: DateTime): CfdRow[] {
     const transitions = this.transitions();
     if (!transitions.length) {
       return [];
     }
     const firstDate = transitions[0].date;
     const lastDate = transitions[transitions.length - 1].date;
-    const fromDate = DateTime.fromJSDate(firstDate)
-      .startOf("day")
-      .minus({ days: 1 })
-      .toJSDate();
-    const toDate = DateTime.fromJSDate(lastDate)
-      .startOf("day")
-      .plus({ days: 1 })
-      .toJSDate();
+    const fromDate = firstDate.startOf("day").minus({ days: 1 });
+    const toDate = lastDate.startOf("day").plus({ days: 1 });
     const firstRow: CfdRow = {
       date: fromDate,
       total: 0,
@@ -49,16 +43,9 @@ export class CfdBuilder {
     const rows = transitions.reduce<CfdRow[]>(
       (rows, transition) => {
         let currentRow = rows[rows.length - 1];
-        while (
-          !DateTime.fromJSDate(currentRow.date).hasSame(
-            DateTime.fromJSDate(transition.date),
-            "day"
-          )
-        ) {
+        while (!currentRow.date.hasSame(transition.date, "day")) {
           currentRow = {
-            date: DateTime.fromJSDate(currentRow.date)
-              .plus({ days: 1 })
-              .toJSDate(),
+            date: currentRow.date.plus({ days: 1 }),
             total: currentRow.total,
             toDo: currentRow.toDo,
             inProgress: currentRow.inProgress,
@@ -105,10 +92,7 @@ export class CfdBuilder {
     });
     if (chartFromDate && chartToDate) {
       return rows.filter((row) => {
-        return (
-          DateTime.fromJSDate(chartFromDate) < DateTime.fromJSDate(row.date) &&
-          DateTime.fromJSDate(row.date) < DateTime.fromJSDate(chartToDate)
-        );
+        return chartFromDate < row.date && row.date < chartToDate;
       });
     }
     return rows;
@@ -118,7 +102,11 @@ export class CfdBuilder {
     return this.issues
       .map((issue) => {
         const transitions: CfdTransition[] = [
-          { date: issue.created, key: issue.key, toStatusCategory: "To Do" },
+          {
+            date: issue.created,
+            key: issue.key,
+            toStatusCategory: "To Do",
+          },
         ];
         if (issue.started) {
           transitions.push({
@@ -139,6 +127,6 @@ export class CfdBuilder {
         return transitions;
       })
       .flat()
-      .sort((t1, t2) => compareDates(t1.date, t2.date));
+      .sort((t1, t2) => compareDateTimes(t1.date, t2.date));
   }
 }

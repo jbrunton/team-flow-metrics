@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import "reflect-metadata";
 import { HierarchyLevel } from "../../../models/entities/hierarchy_level";
 import { IssueFactory } from "../../factories/issue_factory";
@@ -26,10 +27,10 @@ describe("issues_router", () => {
 
   it("should return a list of issues", async () => {
     const issue1 = await getRepository(Issue).save(
-      IssueFactory.build({ created: new Date(2020, 0, 1) })
+      IssueFactory.build({ created: DateTime.local(2020, 1, 1) })
     );
     const issue2 = await getRepository(Issue).save(
-      IssueFactory.build({ created: new Date(2020, 0, 1) })
+      IssueFactory.build({ created: DateTime.local(2020, 1, 1) })
     );
 
     const res = await request(app).get("/issues");
@@ -38,8 +39,8 @@ describe("issues_router", () => {
     expect(res.body).toEqual({
       count: 2,
       issues: [
-        Object.assign({}, issue1, { created: "2020-01-01T00:00:00.000Z" }),
-        Object.assign({}, issue2, { created: "2020-01-01T00:00:00.000Z" }),
+        Object.assign({}, issue1, { created: "2020-01-01T00:00:00.000+00:00" }),
+        Object.assign({}, issue2, { created: "2020-01-01T00:00:00.000+00:00" }),
       ],
     });
   });
