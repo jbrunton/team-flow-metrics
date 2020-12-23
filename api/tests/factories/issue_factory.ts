@@ -8,7 +8,11 @@ export const IssueFactory = Factory.define("Issue", Issue)
   .attr("status", "Backlog")
   .attr("statusCategory", "To Do")
   .attr("hierarchyLevel", "Story")
-  .attr("externalUrl", ["key"], (key) => `https://jira.example.com/browse/${key}`)
+  .attr(
+    "externalUrl",
+    ["key"],
+    (key) => `https://jira.example.com/browse/${key}`
+  )
   .attr("created", () => new Date())
   .attrs({
     resolution: null,
@@ -20,5 +24,5 @@ export const IssueFactory = Factory.define("Issue", Issue)
     completed: null,
     lastTransition: null,
     cycleTime: null,
-    transitions: []
+    transitions: [],
   });

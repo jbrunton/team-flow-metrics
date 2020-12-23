@@ -11,7 +11,11 @@ export class IssueAttributesBuilder {
   private hierarchyLevels: { [issueType: string]: HierarchyLevel } = {};
   private statusCategories: { [externalId: string]: string } = {};
 
-  constructor(fields: Array<Field>, statuses: Array<Status>, hierarchyLevels: Array<HierarchyLevel>) {
+  constructor(
+    fields: Array<Field>,
+    statuses: Array<Status>,
+    hierarchyLevels: Array<HierarchyLevel>
+  ) {
     for (let field of fields) {
       if (field.name === "Epic Link") {
         this.epicLinkFieldId = field.externalId;
@@ -25,34 +29,42 @@ export class IssueAttributesBuilder {
     }
   }
 
-  build(json: JSON): {
-    key: string,
-    title: string,
-    issueType: string,
-    epicKey: string,
-    status: string,
-    statusCategory: string,
-    resolution: string,
-    created: Date,
-    hierarchyLevel: string,
-    externalUrl: string,
-    transitions: Array<Transition>,
-    started: Date,
-    completed: Date,
-    lastTransition: Date,
-    cycleTime: number
+  build(
+    json: JSON
+  ): {
+    key: string;
+    title: string;
+    issueType: string;
+    epicKey: string;
+    status: string;
+    statusCategory: string;
+    resolution: string;
+    created: Date;
+    hierarchyLevel: string;
+    externalUrl: string;
+    transitions: Array<Transition>;
+    started: Date;
+    completed: Date;
+    lastTransition: Date;
+    cycleTime: number;
   } {
     const transitions = this.getTransitions(json);
     const lastTransition = transitions
-      .map(transition => DateTime.fromISO(transition.date).toJSDate())
+      .map((transition) => DateTime.fromISO(transition.date).toJSDate())
       .slice(-1)[0];
     const startedDate = getStartedDate(transitions);
     const completedDate = getCompletedDate(transitions);
-    const cycleTime = startedDate && completedDate ? completedDate.diff(startedDate, 'hours').hours / 24 : null;
+    const cycleTime =
+      startedDate && completedDate
+        ? completedDate.diff(startedDate, "hours").hours / 24
+        : null;
     const issueType = json["fields"]["issuetype"]["name"];
-    const hierarchyLevel = this.hierarchyLevels[issueType] || this.hierarchyLevels["*"];
+    const hierarchyLevel =
+      this.hierarchyLevels[issueType] || this.hierarchyLevels["*"];
     if (!hierarchyLevel) {
-      console.warn(`Could not find hierarchy level for ${json["key"]} (${issueType})`);
+      console.warn(
+        `Could not find hierarchy level for ${json["key"]} (${issueType})`
+      );
     }
     const resolution = getResolution(json);
     return {
@@ -70,57 +82,67 @@ export class IssueAttributesBuilder {
       started: startedDate ? startedDate.toJSDate() : null,
       completed: completedDate ? completedDate.toJSDate() : null,
       lastTransition: lastTransition,
-      cycleTime: cycleTime
+      cycleTime: cycleTime,
     };
   }
 
   private getTransitions(json): Array<Transition> {
     // TODO: What if changelog.total > changelog.maxResults? Are all entries always returned?
     return json.changelog.histories
-      .map(event => {
-        const statusChange = event.items.find(item => item.field == "status");
+      .map((event) => {
+        const statusChange = event.items.find((item) => item.field == "status");
         if (!statusChange) {
           return null;
         }
         const fromStatus = {
           name: statusChange.fromString,
-          category: this.statusCategories[statusChange.from]
+          category: this.statusCategories[statusChange.from],
         };
         const toStatus = {
           name: statusChange.toString,
-          category: this.statusCategories[statusChange.to]
+          category: this.statusCategories[statusChange.to],
         };
         if (!fromStatus.category) {
-          console.warn(`Could not find status with id ${statusChange.from} (${statusChange.fromString})`);
+          console.warn(
+            `Could not find status with id ${statusChange.from} (${statusChange.fromString})`
+          );
         }
         if (!toStatus.category) {
-          console.warn(`Could not find status with id ${statusChange.to} (${statusChange.toString})`);
+          console.warn(
+            `Could not find status with id ${statusChange.to} (${statusChange.toString})`
+          );
         }
         return {
           date: event.created,
           fromStatus,
-          toStatus
+          toStatus,
         };
       })
-      .filter(transition => transition)
-      .sort((t1, t2) => compareDateTimes(DateTime.fromISO(t1.date), DateTime.fromISO(t2.date)));
+      .filter((transition) => transition)
+      .sort((t1, t2) =>
+        compareDateTimes(DateTime.fromISO(t1.date), DateTime.fromISO(t2.date))
+      );
   }
 }
 
-function serializeTransitions(transitions: Array<Transition>): Array<Transition> {
-  return transitions.map(transition => {
+function serializeTransitions(
+  transitions: Array<Transition>
+): Array<Transition> {
+  return transitions.map((transition) => {
     const json = {
       date: DateTime.fromISO(transition.date).toISO(),
       fromStatus: transition.fromStatus,
-      toStatus: transition.toStatus
+      toStatus: transition.toStatus,
     };
     return json;
-  })
+  });
 }
 
 function getStartedDate(transitions: Array<Transition>): DateTime {
-  const startedTransition = transitions.find(transition => transition.toStatus.category === "In Progress");
-  
+  const startedTransition = transitions.find(
+    (transition) => transition.toStatus.category === "In Progress"
+  );
+
   if (!startedTransition) {
     return null;
   }

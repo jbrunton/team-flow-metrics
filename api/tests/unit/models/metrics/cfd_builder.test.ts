@@ -19,7 +19,7 @@ describe("CfdBuilder", () => {
       created: new Date(2020, 1, 1, 9, 30),
       started: new Date(2020, 1, 1, 10, 0),
       completed: new Date(2020, 1, 4, 11, 30),
-    });  
+    });
   });
 
   describe("#transitions", () => {
@@ -30,21 +30,21 @@ describe("CfdBuilder", () => {
         {
           key: issue1.key,
           date: new Date(2020, 1, 1, 10, 30),
-          toStatusCategory: "To Do"
+          toStatusCategory: "To Do",
         },
         {
           key: issue1.key,
           date: new Date(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
-          toStatusCategory: "In Progress"
+          toStatusCategory: "In Progress",
         },
         {
           key: issue1.key,
           date: new Date(2020, 1, 3, 11, 30),
           fromStatusCategory: "In Progress",
-          toStatusCategory: "Done"
+          toStatusCategory: "Done",
         },
-      ])
+      ]);
     });
 
     it("returns transitions for started issues", () => {
@@ -60,15 +60,15 @@ describe("CfdBuilder", () => {
         {
           key: issue.key,
           date: new Date(2020, 1, 1, 10, 30),
-          toStatusCategory: "To Do"
+          toStatusCategory: "To Do",
         },
         {
           key: issue.key,
           date: new Date(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
-          toStatusCategory: "In Progress"
+          toStatusCategory: "In Progress",
         },
-      ])
+      ]);
     });
 
     it("returns transitions for issues moved straight to done", () => {
@@ -84,15 +84,15 @@ describe("CfdBuilder", () => {
         {
           key: issue.key,
           date: new Date(2020, 1, 1, 10, 30),
-          toStatusCategory: "To Do"
+          toStatusCategory: "To Do",
         },
         {
           key: issue.key,
           date: new Date(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
-          toStatusCategory: "Done"
+          toStatusCategory: "Done",
         },
-      ])
+      ]);
     });
 
     it("sorts transitions by date", () => {
@@ -102,57 +102,87 @@ describe("CfdBuilder", () => {
         {
           key: issue2.key,
           date: new Date(2020, 1, 1, 9, 30),
-          toStatusCategory: "To Do"
+          toStatusCategory: "To Do",
         },
         {
           key: issue2.key,
           date: new Date(2020, 1, 1, 10, 0),
           fromStatusCategory: "To Do",
-          toStatusCategory: "In Progress"
+          toStatusCategory: "In Progress",
         },
         {
           key: issue1.key,
           date: new Date(2020, 1, 1, 10, 30),
-          toStatusCategory: "To Do"
+          toStatusCategory: "To Do",
         },
         {
           key: issue1.key,
           date: new Date(2020, 1, 2, 11, 0),
           fromStatusCategory: "To Do",
-          toStatusCategory: "In Progress"
+          toStatusCategory: "In Progress",
         },
         {
           key: issue1.key,
           date: new Date(2020, 1, 3, 11, 30),
           fromStatusCategory: "In Progress",
-          toStatusCategory: "Done"
+          toStatusCategory: "Done",
         },
         {
           key: issue2.key,
           date: new Date(2020, 1, 4, 11, 30),
           fromStatusCategory: "In Progress",
-          toStatusCategory: "Done"
+          toStatusCategory: "Done",
         },
-      ])
+      ]);
     });
-  })
+  });
 
   describe("#build", () => {
     it("returns an empty list if no issues are added", () => {
       const builder = new CfdBuilder();
       expect(builder.build()).toEqual([]);
-    })
+    });
 
     it("builds rows for the CFD when an issue is added", () => {
       const builder = new CfdBuilder();
       builder.addIssues([issue1]);
       expect(builder.build()).toEqual([
-        { date: new Date(2020, 0, 31), total: 0, toDo: 0, inProgress: 0, done: 0 },
-        { date: new Date(2020, 1, 1), total: 1, toDo: 1, inProgress: 0, done: 0 },
-        { date: new Date(2020, 1, 2), total: 1, toDo: 0, inProgress: 1, done: 0 },
-        { date: new Date(2020, 1, 3), total: 1, toDo: 0, inProgress: 0, done: 1 },
-        { date: new Date(2020, 1, 4), total: 1, toDo: 0, inProgress: 0, done: 1 },
-      ])
+        {
+          date: new Date(2020, 0, 31),
+          total: 0,
+          toDo: 0,
+          inProgress: 0,
+          done: 0,
+        },
+        {
+          date: new Date(2020, 1, 1),
+          total: 1,
+          toDo: 1,
+          inProgress: 0,
+          done: 0,
+        },
+        {
+          date: new Date(2020, 1, 2),
+          total: 1,
+          toDo: 0,
+          inProgress: 1,
+          done: 0,
+        },
+        {
+          date: new Date(2020, 1, 3),
+          total: 1,
+          toDo: 0,
+          inProgress: 0,
+          done: 1,
+        },
+        {
+          date: new Date(2020, 1, 4),
+          total: 1,
+          toDo: 0,
+          inProgress: 0,
+          done: 1,
+        },
+      ]);
     });
 
     it("adds rows for each date", () => {
@@ -160,14 +190,56 @@ describe("CfdBuilder", () => {
       const builder = new CfdBuilder();
       builder.addIssues([issue1]);
       expect(builder.build()).toEqual([
-        { date: new Date(2020, 0, 31), total: 0, toDo: 0, inProgress: 0, done: 0 },
-        { date: new Date(2020, 1, 1), total: 1, toDo: 1, inProgress: 0, done: 0 },
-        { date: new Date(2020, 1, 2), total: 1, toDo: 0, inProgress: 1, done: 0 },
-        { date: new Date(2020, 1, 3), total: 1, toDo: 0, inProgress: 1, done: 0 },
-        { date: new Date(2020, 1, 4), total: 1, toDo: 0, inProgress: 1, done: 0 },
-        { date: new Date(2020, 1, 5), total: 1, toDo: 0, inProgress: 0, done: 1 },
-        { date: new Date(2020, 1, 6), total: 1, toDo: 0, inProgress: 0, done: 1 },
-      ])
+        {
+          date: new Date(2020, 0, 31),
+          total: 0,
+          toDo: 0,
+          inProgress: 0,
+          done: 0,
+        },
+        {
+          date: new Date(2020, 1, 1),
+          total: 1,
+          toDo: 1,
+          inProgress: 0,
+          done: 0,
+        },
+        {
+          date: new Date(2020, 1, 2),
+          total: 1,
+          toDo: 0,
+          inProgress: 1,
+          done: 0,
+        },
+        {
+          date: new Date(2020, 1, 3),
+          total: 1,
+          toDo: 0,
+          inProgress: 1,
+          done: 0,
+        },
+        {
+          date: new Date(2020, 1, 4),
+          total: 1,
+          toDo: 0,
+          inProgress: 1,
+          done: 0,
+        },
+        {
+          date: new Date(2020, 1, 5),
+          total: 1,
+          toDo: 0,
+          inProgress: 0,
+          done: 1,
+        },
+        {
+          date: new Date(2020, 1, 6),
+          total: 1,
+          toDo: 0,
+          inProgress: 0,
+          done: 1,
+        },
+      ]);
     });
   });
 });

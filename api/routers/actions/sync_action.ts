@@ -18,14 +18,14 @@ export async function syncIssues(): Promise<Array<Issue>> {
 
   await issuesRepo.clear();
   await fieldsRepo.clear();
-  await statusesRepo.query('DELETE FROM statuses');
-  await hierarchyLevelsRepo.query('DELETE FROM hierarchy_levels');
+  await statusesRepo.query("DELETE FROM statuses");
+  await hierarchyLevelsRepo.query("DELETE FROM hierarchy_levels");
 
   console.log("Syncing Jira data...");
   const hierarchyLevels = [
     { name: "Story", issueType: "*" },
-    { name: "Epic", issueType: "Epic" }
-  ].map(level => hierarchyLevelsRepo.create(level));
+    { name: "Epic", issueType: "Epic" },
+  ].map((level) => hierarchyLevelsRepo.create(level));
   await hierarchyLevelsRepo.save(hierarchyLevels);
 
   const fields = await client.getFields();
@@ -34,7 +34,12 @@ export async function syncIssues(): Promise<Array<Issue>> {
   const statuses = await client.getStatuses();
   await statusesRepo.save(statuses);
 
-  const issues = await client.search(fields, statuses, hierarchyLevels, process.env.JIRA_QUERY);
+  const issues = await client.search(
+    fields,
+    statuses,
+    hierarchyLevels,
+    process.env.JIRA_QUERY
+  );
   await issuesRepo.save(issues);
 
   console.log("Building parent/child relationships...");
@@ -47,10 +52,15 @@ export async function syncIssues(): Promise<Array<Issue>> {
       for (let child of children) {
         child.epicId = parent.id;
       }
-      parent.percentDone = Math.round(children.filter(child => child.completed).length / children.length * 100);
+      parent.percentDone = Math.round(
+        (children.filter((child) => child.completed).length / children.length) *
+          100
+      );
     } else {
-      const childKeys = children.map(issue => issue.key)
-      console.warn(`Could not find parent ${epicKey} for issues [${childKeys.join(", ")}]`);
+      const childKeys = children.map((issue) => issue.key);
+      console.warn(
+        `Could not find parent ${epicKey} for issues [${childKeys.join(", ")}]`
+      );
     }
   }
   await issuesRepo.save(issues);
@@ -59,7 +69,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
   if (process.env.STATUS_CATEGORY_OVERRIDES) {
     (process.env.STATUS_CATEGORY_OVERRIDES || "")
       .split(",")
-      .forEach(override => {
+      .forEach((override) => {
         const [key, statusCategory] = override.split("=");
         statusCategoryOverrides[key] = statusCategory;
         console.log(`statusCategory override: ${key} = ${statusCategory}`);
@@ -70,22 +80,26 @@ export async function syncIssues(): Promise<Array<Issue>> {
   }
 
   if (process.env.EPIC_CYCLE_TIME_STRATEGY === "STORIES") {
-    console.log("EPIC_CYCLE_TIME_STRATEGY = STORIES, computing epic cycle times...");
+    console.log(
+      "EPIC_CYCLE_TIME_STRATEGY = STORIES, computing epic cycle times..."
+    );
     const resolutionExclusions = process.env.EPIC_CYCLE_TIME_EXCL_RESOLUTIONS
       ? process.env.EPIC_CYCLE_TIME_EXCL_RESOLUTIONS.split(",")
       : [];
     for (let parent of issueCollection.getParents()) {
       const children = issueCollection
         .getChildrenFor(parent.key)
-        .filter(child => {
+        .filter((child) => {
           const include = !resolutionExclusions.includes(child.resolution);
           if (!include) {
-            console.log(`Excluding ${child.key} from cycle time calculations for ${parent.key} (resolution = ${child.resolution})`);
+            console.log(
+              `Excluding ${child.key} from cycle time calculations for ${parent.key} (resolution = ${child.resolution})`
+            );
           }
           return include;
         });
       const started = children
-        .map(child => child.started)
+        .map((child) => child.started)
         .filter(identity)
         .sort(compareDates)[0];
       if (started) {
@@ -95,7 +109,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
       }
 
       const lastTransition = children
-        .map(child => child.lastTransition)
+        .map((child) => child.lastTransition)
         .filter(identity)
         .sort(compareDates)[0];
       if (lastTransition) {
@@ -104,19 +118,23 @@ export async function syncIssues(): Promise<Array<Issue>> {
         parent.lastTransition = null;
       }
 
-      if (parent.statusCategory !== "Done"
-        && process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT
-        && parent.lastTransition
-        && DateTime.fromJSDate(parent.lastTransition).diff(DateTime.local()).days <= -process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT
+      if (
+        parent.statusCategory !== "Done" &&
+        process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT &&
+        parent.lastTransition &&
+        DateTime.fromJSDate(parent.lastTransition).diff(DateTime.local())
+          .days <= -process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT
       ) {
-        console.log(`Done timeout hit for ${parent.key}, overriding status to ${process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT_STATUS}`);
+        console.log(
+          `Done timeout hit for ${parent.key}, overriding status to ${process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT_STATUS}`
+        );
         parent.status = process.env.EPIC_CYCLE_TIME_DONE_TIMEOUT_STATUS;
         parent.statusCategory = "Done";
       }
 
       if (parent.statusCategory === "Done") {
         const completed = children
-          .map(child => child.completed)
+          .map((child) => child.completed)
           .filter(identity)
           .sort(compareDates)
           .slice(-1)[0];
@@ -127,9 +145,12 @@ export async function syncIssues(): Promise<Array<Issue>> {
         }
       }
 
-      const cycleTime = parent.started && parent.completed
-        ? DateTime.fromJSDate(parent.completed).diff(DateTime.fromJSDate(parent.started)).hours / 24
-        : null;
+      const cycleTime =
+        parent.started && parent.completed
+          ? DateTime.fromJSDate(parent.completed).diff(
+              DateTime.fromJSDate(parent.started)
+            ).hours / 24
+          : null;
       parent.cycleTime = cycleTime;
     }
     await issuesRepo.save(issues);

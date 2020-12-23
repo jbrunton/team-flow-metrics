@@ -1,56 +1,66 @@
-import * as express from 'express';
-import { Between, IsNull, LessThan, MoreThan, MoreThanOrEqual, Not } from 'typeorm';
-import { CfdBuilder } from '../models/metrics/cfd_builder';
-import { DataTableBuilder } from '../models/metrics/data_table_builder';
+import * as express from "express";
+import {
+  Between,
+  IsNull,
+  LessThan,
+  MoreThan,
+  MoreThanOrEqual,
+  Not,
+} from "typeorm";
+import { CfdBuilder } from "../models/metrics/cfd_builder";
+import { DataTableBuilder } from "../models/metrics/data_table_builder";
 import { DateTime } from "luxon";
-const { jStat } = require('jstat');
-const router = express.Router()
-const { getRepository } = require('typeorm')
-import { Issue } from '../models/entities/issue';
+const { jStat } = require("jstat");
+const router = express.Router();
+const { getRepository } = require("typeorm");
+import { Issue } from "../models/entities/issue";
 import { takeWhile } from "lodash";
-import { dateRange, nextIntervalDate, StepInterval } from '../helpers/date_helper';
-const { formatDate } = require('../helpers/charts_helper');
+import {
+  dateRange,
+  nextIntervalDate,
+  StepInterval,
+} from "../helpers/date_helper";
+const { formatDate } = require("../helpers/charts_helper");
 
-router.get('/scatterplot', async (req, res) => {
+router.get("/scatterplot", async (req, res) => {
   if (!req.query.fromDate) {
     res.status(400).json({
-      error: "Required fromDate query param"
-    })
+      error: "Required fromDate query param",
+    });
   }
   if (!req.query.toDate) {
     res.status(400).json({
-      error: "Required toDate query param"
-    })
+      error: "Required toDate query param",
+    });
   }
   if (!req.query.hierarchyLevel) {
     res.status(400).json({
-      error: "Required hierarchyLevel query param"
-    })
+      error: "Required hierarchyLevel query param",
+    });
   }
 
   const fromDate = DateTime.fromISO(req.query.fromDate as string).toJSDate();
   const toDate = DateTime.fromISO(req.query.toDate as string).toJSDate();
   const hierarchyLevel = req.query.hierarchyLevel;
-  let issues = await getRepository(Issue)
-    .find({
-      where: {
-        completed: Between(fromDate, toDate),
-        issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
-        started: Not(IsNull())
-      },
-      order: {
-        completed: "ASC",
-      }
-    });
+  let issues = await getRepository(Issue).find({
+    where: {
+      completed: Between(fromDate, toDate),
+      issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
+      started: Not(IsNull()),
+    },
+    order: {
+      completed: "ASC",
+    },
+  });
 
   if (req.query.excludeOutliers === "true") {
-    const cycleTimes = issues.map(issue => issue.cycleTime);
+    const cycleTimes = issues.map((issue) => issue.cycleTime);
     const [q25, _, q75] = jStat.quartiles(cycleTimes);
     const iqr = q75 - q25;
     const cutoff = iqr * 1.5;
     const outlierFilter = (issue) => {
       return q25 - cutoff <= issue.cycleTime && issue.cycleTime <= q75 + cutoff;
-    }
+    };
     issues = issues.filter(outlierFilter);
   }
 
@@ -59,131 +69,137 @@ router.get('/scatterplot', async (req, res) => {
     interpolateNulls: true,
     series: {
       "1": {
-        "type": "steppedArea",
-        "color": "#f44336",
-        "areaOpacity": 0
+        type: "steppedArea",
+        color: "#f44336",
+        areaOpacity: 0,
       },
       "2": {
-        "type": "steppedArea",
-        "color": "#f44336",
-        "areaOpacity": 0,
-        "lineDashStyle": [
-          4,
-          4
-        ]
+        type: "steppedArea",
+        color: "#f44336",
+        areaOpacity: 0,
+        lineDashStyle: [4, 4],
       },
       "3": {
-        "type": "steppedArea",
-        "color": "#ff9800",
-        "areaOpacity": 0,
-        "lineDashStyle": [
-          4,
-          4
-        ]
+        type: "steppedArea",
+        color: "#ff9800",
+        areaOpacity: 0,
+        lineDashStyle: [4, 4],
       },
       "4": {
-        "type": "steppedArea",
-        "color": "#03a9f4",
-        "areaOpacity": 0,
-        "lineDashStyle": [
-          4,
-          4
-        ]
-      }
+        type: "steppedArea",
+        color: "#03a9f4",
+        areaOpacity: 0,
+        lineDashStyle: [4, 4],
+      },
     },
     legend: {
-      position: "none"
+      position: "none",
     },
     chartArea: {
       width: "90%",
       height: "80%",
-      top: "5%"
-    }
+      top: "5%",
+    },
   };
   const builder = new DataTableBuilder();
   builder.setColumns([
     {
       label: "completed_time",
-      type: "date"
+      type: "date",
     },
     {
       label: "cycle_time",
-      type: "number"
+      type: "number",
     },
     {
       label: "key",
       type: "string",
-      role: "annotationText"
-    }
-  ])
+      role: "annotationText",
+    },
+  ]);
 
-  builder.addRows(issues.map(issue => [
-    formatDate(issue.completed),
-    issue.cycleTime,
-    issue.key
-  ]))
+  builder.addRows(
+    issues.map((issue) => [
+      formatDate(issue.completed),
+      issue.cycleTime,
+      issue.key,
+    ])
+  );
 
-  builder.addPercentiles(1, [50, 70, 85, 95], formatDate(fromDate), formatDate(toDate));
+  builder.addPercentiles(
+    1,
+    [50, 70, 85, 95],
+    formatDate(fromDate),
+    formatDate(toDate)
+  );
 
   res.json({
     meta: {
-      issueCount: builder.rows.length
+      issueCount: builder.rows.length,
     },
     chartOpts: chartOpts,
-    chartData: builder.build()
-  })
-})
+    chartData: builder.build(),
+  });
+});
 
 router.get("/cfd", async (req, res) => {
   let issues: Issue[];
-  let fromDate: Date
-  let toDate: Date
+  let fromDate: Date;
+  let toDate: Date;
   if (req.query.epicKey) {
     const epicKey = req.query.epicKey;
     const epic = await getRepository(Issue).findOne({ key: epicKey });
     if (!epic) {
       res.status(401).json({
-        error: `Could not find epic with key ${epicKey}`
-      })
+        error: `Could not find epic with key ${epicKey}`,
+      });
     }
     issues = await getRepository(Issue).find({
-      epicId: epic.id
-    });  
+      epicId: epic.id,
+    });
   } else if (req.query.fromDate && req.query.toDate) {
-    fromDate = DateTime.fromISO(req.query.fromDate as string).toUTC().toJSDate();
-    toDate = DateTime.fromISO(req.query.toDate as string).toUTC().toJSDate();
+    fromDate = DateTime.fromISO(req.query.fromDate as string)
+      .toUTC()
+      .toJSDate();
+    toDate = DateTime.fromISO(req.query.toDate as string)
+      .toUTC()
+      .toJSDate();
     const hierarchyLevel = req.query.hierarchyLevel;
     const excludeStoppedIssues = req.query.excludeStoppedIssues === "true";
 
-    const completedIssues = await getRepository(Issue)
-      .find({
-        completed: MoreThan(fromDate),
-        issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
-        started: LessThan(toDate)
-      });
-    const inProgressIssues = await getRepository(Issue)
-      .find({
-        completed: IsNull(),
-        issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
-        started: LessThan(toDate)
-      });
+    const completedIssues = await getRepository(Issue).find({
+      completed: MoreThan(fromDate),
+      issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
+      started: LessThan(toDate),
+    });
+    const inProgressIssues = await getRepository(Issue).find({
+      completed: IsNull(),
+      issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
+      started: LessThan(toDate),
+    });
     issues = completedIssues
       .concat(inProgressIssues)
-      .filter(issue => !excludeStoppedIssues || issue.statusCategory !== "To Do");
+      .filter(
+        (issue) => !excludeStoppedIssues || issue.statusCategory !== "To Do"
+      );
   } else {
     if (!req.query.epicKey && !req.query.fromDate && !req.query.toDate) {
       return res.status(400).json({
-        error: "Required epicKey or fromDate and toDate query params"
-      })
-    }  
+        error: "Required epicKey or fromDate and toDate query params",
+      });
+    }
   }
 
   const cfdBuilder = new CfdBuilder();
   cfdBuilder.addIssues(issues);
-  const rows = cfdBuilder.build(
-    fromDate, toDate
-  ).map(cfdRow => {
-    const row = [formatDate(cfdRow.date), 0, cfdRow.total, cfdRow.done, cfdRow.inProgress];
+  const rows = cfdBuilder.build(fromDate, toDate).map((cfdRow) => {
+    const row = [
+      formatDate(cfdRow.date),
+      0,
+      cfdRow.total,
+      cfdRow.done,
+      cfdRow.inProgress,
+    ];
     if (req.query.epicKey) {
       row.push(cfdRow.toDo);
     }
@@ -192,261 +208,271 @@ router.get("/cfd", async (req, res) => {
   const builder = new DataTableBuilder();
   const columns = [
     {
-      "label": "Date",
-      "type": "date"
+      label: "Date",
+      type: "date",
     },
     {
-      "label": "Total",
-      "type": "number"
+      label: "Total",
+      type: "number",
     },
     {
-      "label": "Tooltip",
-      "type": "number",
-      "role": "tooltip"
+      label: "Tooltip",
+      type: "number",
+      role: "tooltip",
     },
     {
-      "label": "Done",
-      "type": "number"
+      label: "Done",
+      type: "number",
     },
     {
-      "label": "In Progress",
-      "type": "number"
+      label: "In Progress",
+      type: "number",
     },
   ];
   if (req.query.epicKey) {
     columns.push({
-      "label": "To Do",
-      "type": "number"
+      label: "To Do",
+      type: "number",
     });
   }
   builder.setColumns(columns);
   builder.addRows(rows);
-  res.json( {
-    "chartOpts": {
-      "chartArea": {
-        "width": "90%",
-        "height": "80%",
-        "top": "5%"
+  res.json({
+    chartOpts: {
+      chartArea: {
+        width: "90%",
+        height: "80%",
+        top: "5%",
       },
-      "height": 300,
-      "hAxis": {
-        "titleTextStyle": {
-          "color": "#333"
-        }
+      height: 300,
+      hAxis: {
+        titleTextStyle: {
+          color: "#333",
+        },
       },
-      "vAxis": req.query.epicKey ? {
-        "minValue": 0,
-        "textPosition": "none"
-      } : { "minValue": 0 },
-      "isStacked": true,
-      "lineWidth": 1,
-      "areaOpacity": 0.4,
-      "legend": {
-        "position": "top"
+      vAxis: req.query.epicKey
+        ? {
+            minValue: 0,
+            textPosition: "none",
+          }
+        : { minValue: 0 },
+      isStacked: true,
+      lineWidth: 1,
+      areaOpacity: 0.4,
+      legend: {
+        position: "top",
       },
-      "series": {
+      series: {
         "0": {
-          "color": "grey"
+          color: "grey",
         },
         "1": {
-          "color": "blue"
+          color: "blue",
         },
         "2": {
-          "color": "green"
+          color: "green",
         },
         "3": {
-          "color": "red"
+          color: "red",
         },
         "4": {
-          "color": "orange"
-        }
-      },
-      "crosshair": {
-        "trigger": "focus",
-        "orientation": "vertical",
-        "color": "grey"
-      },
-      "focusTarget": "category",
-      "annotations": {
-        "textStyle": {
-          "color": "black"
+          color: "orange",
         },
-        "domain": {
-          "style": "line",
-          "stem": {
-            "color": "red"
-          }
+      },
+      crosshair: {
+        trigger: "focus",
+        orientation: "vertical",
+        color: "grey",
+      },
+      focusTarget: "category",
+      annotations: {
+        textStyle: {
+          color: "black",
         },
-        "datum": {
-          "style": "point",
-          "stem": {
-            "color": "black",
-            "length": "12"
-          }
-        }
-      }
+        domain: {
+          style: "line",
+          stem: {
+            color: "red",
+          },
+        },
+        datum: {
+          style: "point",
+          stem: {
+            color: "black",
+            length: "12",
+          },
+        },
+      },
     },
-    "chartData": builder.build()
+    chartData: builder.build(),
   });
-})
+});
 
 router.get("/throughput", async (req, res) => {
   if (!req.query.fromDate) {
     res.status(400).json({
-      error: "Required fromDate query param"
-    })
+      error: "Required fromDate query param",
+    });
   }
   if (!req.query.toDate) {
     res.status(400).json({
-      error: "Required toDate query param"
-    })
+      error: "Required toDate query param",
+    });
   }
   if (!req.query.hierarchyLevel) {
     res.status(400).json({
-      error: "Required hierarchyLevel query param"
-    })
+      error: "Required hierarchyLevel query param",
+    });
   }
 
-  const fromDate = DateTime.fromISO(req.query.fromDate as string).toUTC().toJSDate();
-  const toDate = DateTime.fromISO(req.query.toDate  as string).toUTC().toJSDate();
+  const fromDate = DateTime.fromISO(req.query.fromDate as string)
+    .toUTC()
+    .toJSDate();
+  const toDate = DateTime.fromISO(req.query.toDate as string)
+    .toUTC()
+    .toJSDate();
   const hierarchyLevel = req.query.hierarchyLevel;
   const stepInterval = StepInterval[req.query.stepInterval as string];
   const dates = dateRange(fromDate, toDate, stepInterval);
-  if (DateTime.fromJSDate(dates[dates.length - 1]) < DateTime.fromJSDate(toDate)) {
+  if (
+    DateTime.fromJSDate(dates[dates.length - 1]) < DateTime.fromJSDate(toDate)
+  ) {
     dates.push(nextIntervalDate(dates[dates.length - 1], stepInterval));
   }
 
-  const completedIssues = await getRepository(Issue)
-    .find({
-      where: {
-        completed: Between(fromDate, toDate),
-        issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
-        started: Not(IsNull())
-      },
-      order: {
-        completed: "ASC"
-      }
-    });
+  const completedIssues = await getRepository(Issue).find({
+    where: {
+      completed: Between(fromDate, toDate),
+      issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
+      started: Not(IsNull()),
+    },
+    order: {
+      completed: "ASC",
+    },
+  });
 
-  const { rows } = dates.slice(1).reduce(({ issues, currentDate, rows }, nextDate) => {
-    const group = takeWhile(issues, issue => DateTime.fromJSDate(issue.completed) < DateTime.fromJSDate(nextDate));
-    const count = group.length;
-    const row = [formatDate(currentDate), count, DateTime.fromJSDate(currentDate).toFormat("yyyy-MM-dd")];
-    return {
-      issues: issues.slice(count),
-      currentDate: nextDate,
-      rows: rows.concat([row]),
-    };
-  }, { issues: completedIssues, currentDate: fromDate, rows: [] });
+  const { rows } = dates.slice(1).reduce(
+    ({ issues, currentDate, rows }, nextDate) => {
+      const group = takeWhile(
+        issues,
+        (issue) =>
+          DateTime.fromJSDate(issue.completed) < DateTime.fromJSDate(nextDate)
+      );
+      const count = group.length;
+      const row = [
+        formatDate(currentDate),
+        count,
+        DateTime.fromJSDate(currentDate).toFormat("yyyy-MM-dd"),
+      ];
+      return {
+        issues: issues.slice(count),
+        currentDate: nextDate,
+        rows: rows.concat([row]),
+      };
+    },
+    { issues: completedIssues, currentDate: fromDate, rows: [] }
+  );
 
   const builder = new DataTableBuilder();
   builder.setColumns([
     {
-      "label": "completed_time",
-      "type": "date"
+      label: "completed_time",
+      type: "date",
     },
     {
-      "label": "Count",
-      "type": "number"
+      label: "Count",
+      type: "number",
     },
     {
       label: "date",
       type: "string",
-      role: "annotationText"
-    }
+      role: "annotationText",
+    },
   ]);
   builder.addRows(rows);
-  
+
   res.json({
-    "chartOpts": {
-      "seriesType": "scatter",
-      "chartArea": {
-        "width": "90%",
-        "height": "80%",
-        "top": "5%"
+    chartOpts: {
+      seriesType: "scatter",
+      chartArea: {
+        width: "90%",
+        height: "80%",
+        top: "5%",
       },
-      "legend": {
-        "position": "top"
+      legend: {
+        position: "top",
       },
-      "series": {
+      series: {
         "0": {
-          "lineWidth": 1,
-          "pointSize": 4,
-          "color": "indianred"
+          lineWidth: 1,
+          pointSize: 4,
+          color: "indianred",
         },
         "1": {
-          "type": "steppedArea",
-          "color": "#f44336",
-          "areaOpacity": 0,
-          "lineDashStyle": [
-            4,
-            4
-          ]
+          type: "steppedArea",
+          color: "#f44336",
+          areaOpacity: 0,
+          lineDashStyle: [4, 4],
         },
         "2": {
-          "type": "steppedArea",
-          "color": "#ff9800",
-          "areaOpacity": 0,
-          "lineDashStyle": [
-            4,
-            4
-          ]
+          type: "steppedArea",
+          color: "#ff9800",
+          areaOpacity: 0,
+          lineDashStyle: [4, 4],
         },
         "3": {
-          "type": "steppedArea",
-          "color": "#03a9f4",
-          "areaOpacity": 0,
-          "lineDashStyle": [
-            4,
-            4
-          ]
-        }
+          type: "steppedArea",
+          color: "#03a9f4",
+          areaOpacity: 0,
+          lineDashStyle: [4, 4],
+        },
       },
-      "vAxis": {
-        "minValue": 0
-      }
+      vAxis: {
+        minValue: 0,
+      },
     },
-    "chartData": builder.build(),
-  })
+    chartData: builder.build(),
+  });
 });
 
 router.get("/throughput/closedBetween", async (req, res) => {
   if (!req.query.fromDate) {
     res.status(400).json({
-      error: "Required fromDate query param"
-    })
+      error: "Required fromDate query param",
+    });
   }
 
   if (!req.query.hierarchyLevel) {
     res.status(400).json({
-      error: "Required hierarchyLevel query param"
-    })
+      error: "Required hierarchyLevel query param",
+    });
   }
 
-  const fromDate = DateTime.fromISO(req.query.fromDate as string).toUTC().toJSDate();
+  const fromDate = DateTime.fromISO(req.query.fromDate as string)
+    .toUTC()
+    .toJSDate();
   const stepInterval = StepInterval[req.query.stepInterval as string];
   const toDate = nextIntervalDate(fromDate, stepInterval);
   const hierarchyLevel = req.query.hierarchyLevel;
-  
-  const completedIssues = await getRepository(Issue)
-    .find({
-      where: {
-        completed: Between(fromDate, toDate),
-        issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
-        started: Not(IsNull())
-      },
-      order: {
-        completed: "ASC"
-      }
-    });
+
+  const completedIssues = await getRepository(Issue).find({
+    where: {
+      completed: Between(fromDate, toDate),
+      issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
+      started: Not(IsNull()),
+    },
+    order: {
+      completed: "ASC",
+    },
+  });
 
   res.json({
     count: completedIssues.length,
-    issues: completedIssues
+    issues: completedIssues,
   });
 });
 
 module.exports = {
-  routerPath: '/charts',
-  router: router
-}
+  routerPath: "/charts",
+  router: router,
+};

@@ -1,80 +1,79 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 export type TransitionStatus = {
-    name: string,
-    category: string
-}
+  name: string;
+  category: string;
+};
 
 export type Transition = {
-    date: string,
-    fromStatus: TransitionStatus,
-    toStatus: TransitionStatus
-}
+  date: string;
+  fromStatus: TransitionStatus;
+  toStatus: TransitionStatus;
+};
 
-@Entity({ name: 'issues' })
+@Entity({ name: "issues" })
 export class Issue {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column()
+  key: string;
 
-    @Column()
-    key: string;
+  @Column()
+  title: string;
 
-    @Column()
-    title: string;
+  @Column()
+  issueType: string;
 
-    @Column()
-    issueType: string;
+  @Column()
+  status: string;
 
-    @Column()
-    status: string;
+  @Column()
+  statusCategory: string;
 
-    @Column()
-    statusCategory: string;
+  @Column()
+  resolution: string;
 
-    @Column()
-    resolution: string;
+  @Column()
+  created: Date;
 
-    @Column()
-    created: Date;
+  @Column()
+  hierarchyLevel: string;
 
-    @Column()
-    hierarchyLevel: string;
+  @Column()
+  externalUrl: string;
 
-    @Column()
-    externalUrl: string;
+  @Column()
+  epicKey: string;
 
-    @Column()
-    epicKey: string;
+  @Column()
+  epicId: number;
 
-    @Column()
-    epicId: number;
+  @Column()
+  childCount: number;
 
-    @Column()
-    childCount: number;
+  @Column()
+  percentDone: number;
 
-    @Column()
-    percentDone: number;
+  @Column({
+    type: "jsonb",
+    array: false,
+  })
+  transitions: Array<Transition>;
 
-    @Column({
-        type: 'jsonb',
-        array: false
-    })
-    transitions: Array<Transition>;
+  @Column("timestamp")
+  started: Date;
 
-    @Column("timestamp")
-    started: Date;
+  @Column("timestamp")
+  completed: Date;
 
-    @Column("timestamp")
-    completed: Date;
+  @Column("timestamp")
+  lastTransition: Date;
 
-    @Column("timestamp")
-    lastTransition: Date;
+  @Column()
+  cycleTime: number;
 
-    @Column()
-    cycleTime: number;
-
-    constructor(issue?: Partial<Issue>) {
-        Object.assign(this, issue);
-    }
+  constructor(issue?: Partial<Issue>) {
+    Object.assign(this, issue);
+  }
 }

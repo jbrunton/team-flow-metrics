@@ -1,1 +1,1 @@
-process.env.JIRA_HOST = 'https://jira.example.com'
+process.env.JIRA_HOST = "https://jira.example.com";

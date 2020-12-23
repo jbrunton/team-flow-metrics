@@ -1,81 +1,86 @@
 import "reflect-metadata";
 import { HierarchyLevel } from "../../../models/entities/hierarchy_level";
-const request = require('supertest')
-const { createApp } = require('../../../app')
-const { Issue } = require('../../../models/entities/issue')
-const DbFactory = require('../fixtures/db_factory');
+const request = require("supertest");
+const { createApp } = require("../../../app");
+const { Issue } = require("../../../models/entities/issue");
+const DbFactory = require("../fixtures/db_factory");
 import { IssueFactory } from "../../factories/issue_factory";
 
-const { getConnection, getRepository } = require('typeorm')
+const { getConnection, getRepository } = require("typeorm");
 
-describe('charts_router', () => {
+describe("charts_router", () => {
   let app;
 
   beforeAll(async () => {
     app = await createApp();
     await DbFactory.prepareDatabase();
-  })
+  });
 
   afterAll(async () => {
     await getConnection().close();
-  })
+  });
 
   beforeEach(async () => {
     await DbFactory.resetDatabase();
-  })
+  });
 
-  describe('GET /scatterplot', () => {
-    it('should return cycle time data', async () => {
-      const issue1 = await getRepository(Issue).save(IssueFactory.build({
-        status: "Done",
-        statusCategory: "Done",
-        started: new Date(2020, 1, 1, 0, 0),
-        completed: new Date(2020, 1, 2, 0, 0),
-        cycleTime: 1
-      }));
-      const issue2 = await getRepository(Issue).save(IssueFactory.build({
-        status: "Done",
-        statusCategory: "Done",
-        started: new Date(2020, 1, 3, 0, 0),
-        completed: new Date(2020, 1, 5, 0, 0),
-        cycleTime: 2
-      }));
+  describe("GET /scatterplot", () => {
+    it("should return cycle time data", async () => {
+      const issue1 = await getRepository(Issue).save(
+        IssueFactory.build({
+          status: "Done",
+          statusCategory: "Done",
+          started: new Date(2020, 1, 1, 0, 0),
+          completed: new Date(2020, 1, 2, 0, 0),
+          cycleTime: 1,
+        })
+      );
+      const issue2 = await getRepository(Issue).save(
+        IssueFactory.build({
+          status: "Done",
+          statusCategory: "Done",
+          started: new Date(2020, 1, 3, 0, 0),
+          completed: new Date(2020, 1, 5, 0, 0),
+          cycleTime: 2,
+        })
+      );
 
-      const res = await request(app)
-        .get('/charts/scatterplot?fromDate=2020-01-01&toDate=2020-03-01&hierarchyLevel=Story')
-      
-      expect(res.statusCode).toEqual(200)
+      const res = await request(app).get(
+        "/charts/scatterplot?fromDate=2020-01-01&toDate=2020-03-01&hierarchyLevel=Story"
+      );
+
+      expect(res.statusCode).toEqual(200);
       expect(res.body.chartData).toEqual({
         cols: [
           {
             label: "completed_time",
-            type: "date"
+            type: "date",
           },
           {
             label: "cycle_time",
-            type: "number"
+            type: "number",
           },
           {
             label: "key",
             type: "string",
-            role: "annotationText"
+            role: "annotationText",
           },
           {
             label: "95th Percentile",
-            type: "number"
+            type: "number",
           },
           {
             label: "85th Percentile",
-            type: "number"
+            type: "number",
           },
           {
             label: "70th Percentile",
-            type: "number"
+            type: "number",
           },
           {
             label: "50th Percentile",
-            type: "number"
-          }
+            type: "number",
+          },
         ],
         rows: [
           {
@@ -86,7 +91,7 @@ describe('charts_router', () => {
               { v: 1 },
               { v: 1 },
               { v: 1 },
-              { v: 1 }
+              { v: 1 },
             ],
           },
           {
@@ -97,8 +102,8 @@ describe('charts_router', () => {
               { v: 1 },
               { v: 1 },
               { v: 1 },
-              { v: 1 }
-            ]
+              { v: 1 },
+            ],
           },
           {
             c: [
@@ -108,8 +113,8 @@ describe('charts_router', () => {
               { v: null },
               { v: null },
               { v: null },
-              { v: null }
-            ]
+              { v: null },
+            ],
           },
           {
             c: [
@@ -119,143 +124,127 @@ describe('charts_router', () => {
               { v: null },
               { v: null },
               { v: null },
-              { v: null }
+              { v: null },
             ],
           },
-        ]
-      })
-    })
+        ],
+      });
+    });
 
-    it('filters out epics', async () => {
-      const issue1 = await getRepository(Issue).save(IssueFactory.build({
-        issueType: 'Story',
-        status: "Done",
-        statusCategory: "Done",
-        hierarchyLevel: "Story",
-        started: new Date(2020, 1, 1, 0, 0),
-        completed: new Date(2020, 1, 2, 0, 0),
-        cycleTime: 1
-      }));
-      await getRepository(Issue).save(IssueFactory.build({
-        issueType: 'Epic',
-        status: "Done",
-        statusCategory: "Done",
-        hierarchyLevel: "Epic",
-        started: new Date(2020, 1, 3, 0, 0),
-        completed: new Date(2020, 1, 5, 0, 0),
-        cycleTime: 2
-      }));
+    it("filters out epics", async () => {
+      const issue1 = await getRepository(Issue).save(
+        IssueFactory.build({
+          issueType: "Story",
+          status: "Done",
+          statusCategory: "Done",
+          hierarchyLevel: "Story",
+          started: new Date(2020, 1, 1, 0, 0),
+          completed: new Date(2020, 1, 2, 0, 0),
+          cycleTime: 1,
+        })
+      );
+      await getRepository(Issue).save(
+        IssueFactory.build({
+          issueType: "Epic",
+          status: "Done",
+          statusCategory: "Done",
+          hierarchyLevel: "Epic",
+          started: new Date(2020, 1, 3, 0, 0),
+          completed: new Date(2020, 1, 5, 0, 0),
+          cycleTime: 2,
+        })
+      );
 
-      const res = await request(app)
-        .get('/charts/scatterplot?fromDate=2020-01-01&toDate=2020-03-01&hierarchyLevel=Story')
-      
-      expect(res.statusCode).toEqual(200)
+      const res = await request(app).get(
+        "/charts/scatterplot?fromDate=2020-01-01&toDate=2020-03-01&hierarchyLevel=Story"
+      );
+
+      expect(res.statusCode).toEqual(200);
       expect(res.body.chartData).toEqual({
         cols: [
           {
             label: "completed_time",
-            type: "date"
+            type: "date",
           },
           {
             label: "cycle_time",
-            type: "number"
+            type: "number",
           },
           {
             label: "key",
             type: "string",
-            role: "annotationText"
+            role: "annotationText",
           },
-
         ],
         rows: [
           {
-            c: [
-              { v: "Date(2020, 1, 2, 0, 0)" },
-              { v: 1 },
-              { v: issue1.key }
-            ]
-          }
-        ]
-      })
-    })
-  })
+            c: [{ v: "Date(2020, 1, 2, 0, 0)" }, { v: 1 }, { v: issue1.key }],
+          },
+        ],
+      });
+    });
+  });
 
-  describe('GET /throughput', () => {
-    it('returns throughput data', async () => {
-      const issue1 = await getRepository(Issue).save(IssueFactory.build({
-        status: "Done",
-        statusCategory: "Done",
-        started: new Date(2020, 1, 1, 0, 0),
-        completed: new Date(2020, 1, 2, 0, 0),
-        cycleTime: 1
-      }));
-      const issue2 = await getRepository(Issue).save(IssueFactory.build({
-        status: "Done",
-        statusCategory: "Done",
-        started: new Date(2020, 1, 3, 0, 0),
-        completed: new Date(2020, 1, 5, 0, 0),
-        cycleTime: 2
-      }));
+  describe("GET /throughput", () => {
+    it("returns throughput data", async () => {
+      const issue1 = await getRepository(Issue).save(
+        IssueFactory.build({
+          status: "Done",
+          statusCategory: "Done",
+          started: new Date(2020, 1, 1, 0, 0),
+          completed: new Date(2020, 1, 2, 0, 0),
+          cycleTime: 1,
+        })
+      );
+      const issue2 = await getRepository(Issue).save(
+        IssueFactory.build({
+          status: "Done",
+          statusCategory: "Done",
+          started: new Date(2020, 1, 3, 0, 0),
+          completed: new Date(2020, 1, 5, 0, 0),
+          cycleTime: 2,
+        })
+      );
 
-      const res = await request(app)
-        .get('/charts/throughput?fromDate=2020-02-01&toDate=2020-02-06&hierarchyLevel=Story&stepInterval=Daily')
-      
-      expect(res.statusCode).toEqual(200)
+      const res = await request(app).get(
+        "/charts/throughput?fromDate=2020-02-01&toDate=2020-02-06&hierarchyLevel=Story&stepInterval=Daily"
+      );
+
+      expect(res.statusCode).toEqual(200);
       expect(res.body.chartData).toEqual({
         cols: [
           {
             label: "completed_time",
-            type: "date"
+            type: "date",
           },
           {
             label: "Count",
-            type: "number"
+            type: "number",
           },
           {
             label: "date",
             role: "annotationText",
             type: "string",
-          }
+          },
         ],
         rows: [
           {
-            c: [
-              { v: "Date(2020, 1, 1, 0, 0)" },
-              { v: 0 },
-              { v: "2020-02-01" },
-            ]
+            c: [{ v: "Date(2020, 1, 1, 0, 0)" }, { v: 0 }, { v: "2020-02-01" }],
           },
           {
-            c: [
-              { v: "Date(2020, 1, 2, 0, 0)" },
-              { v: 1 },
-              { v: "2020-02-02" },
-            ]
+            c: [{ v: "Date(2020, 1, 2, 0, 0)" }, { v: 1 }, { v: "2020-02-02" }],
           },
           {
-            c: [
-              { v: "Date(2020, 1, 3, 0, 0)" },
-              { v: 0 },
-              { v: "2020-02-03" },
-            ]
+            c: [{ v: "Date(2020, 1, 3, 0, 0)" }, { v: 0 }, { v: "2020-02-03" }],
           },
           {
-            c: [
-              { v: "Date(2020, 1, 4, 0, 0)" },
-              { v: 0 },
-              { v: "2020-02-04" },
-            ]
+            c: [{ v: "Date(2020, 1, 4, 0, 0)" }, { v: 0 }, { v: "2020-02-04" }],
           },
           {
-            c: [
-              { v: "Date(2020, 1, 5, 0, 0)" },
-              { v: 1 },
-              { v: "2020-02-05" },
-            ],
+            c: [{ v: "Date(2020, 1, 5, 0, 0)" }, { v: 1 }, { v: "2020-02-05" }],
           },
-        ]
-      })
-    })
-  })
-})
-
+        ],
+      });
+    });
+  });
+});

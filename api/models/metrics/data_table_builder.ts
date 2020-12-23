@@ -1,27 +1,27 @@
 import { jStat } from "jstat";
 
 type DataTableColumn = {
-  label: string,
-  type: string,
-  role?: string
-}
+  label: string;
+  type: string;
+  role?: string;
+};
 
 type DataTableValue = {
-  v: unknown
-}
+  v: unknown;
+};
 
 type DataTableRow = {
-  c: Array<DataTableValue>
-}
+  c: Array<DataTableValue>;
+};
 
 type DataTable = {
-  cols: Array<DataTableColumn>,
-  rows: Array<DataTableRow>
-}
+  cols: Array<DataTableColumn>;
+  rows: Array<DataTableRow>;
+};
 
 export class DataTableBuilder {
-  public rows: Array<Array<unknown>>
-  public cols: Array<DataTableColumn>
+  public rows: Array<Array<unknown>>;
+  public cols: Array<DataTableColumn>;
 
   constructor() {
     this.rows = [];
@@ -43,10 +43,15 @@ export class DataTableBuilder {
   }
 
   getColumnValues(colIndex: number) {
-    return this.rows.map(row => row[colIndex]);
+    return this.rows.map((row) => row[colIndex]);
   }
 
-  addPercentiles(colIndex: number, percentiles: Array<unknown>, fromValue: any, toValue: any) {
+  addPercentiles(
+    colIndex: number,
+    percentiles: Array<unknown>,
+    fromValue: any,
+    toValue: any
+  ) {
     if (this.rows.length <= 1) {
       return;
     }
@@ -54,20 +59,22 @@ export class DataTableBuilder {
     const padding = new Array(this.cols.length - 1).fill(null);
 
     const columnValues = this.getColumnValues(colIndex);
-    const percentileValues = percentiles.map(percentile => {
-      return jStat.percentile(columnValues, percentile as number / 100.0);
-    }).reverse();
+    const percentileValues = percentiles
+      .map((percentile) => {
+        return jStat.percentile(columnValues, (percentile as number) / 100.0);
+      })
+      .reverse();
 
-    percentiles.reverse().forEach(percentile => {
+    percentiles.reverse().forEach((percentile) => {
       this.cols.push({
         label: `${percentile}th Percentile`,
-        type: "number"
+        type: "number",
       });
-      this.rows.forEach(row => {
+      this.rows.forEach((row) => {
         row.push(null);
       });
     });
-    
+
     this.rows.unshift([toValue].concat(padding).concat(percentileValues));
     this.rows.unshift([fromValue].concat(padding).concat(percentileValues));
   }
@@ -76,12 +83,12 @@ export class DataTableBuilder {
     const rows = [] as Array<DataTableRow>;
     for (let row of this.rows) {
       rows.push({
-        c: row.map(value => ({ v: value }))
+        c: row.map((value) => ({ v: value })),
       });
     }
     return {
       cols: this.cols,
-      rows: rows
+      rows: rows,
     };
   }
 }
