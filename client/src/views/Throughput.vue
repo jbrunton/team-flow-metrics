@@ -51,6 +51,7 @@ import IssuesList from "@/components/IssuesList.vue";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
 import { getDefaultChartParams } from "@/helpers/chart_helper";
+import { DateTime } from "luxon";
 
 export default Vue.extend({
   name: "Issues",
@@ -141,11 +142,11 @@ export default Vue.extend({
       }
     },
 
-    parseDate(input?: string): Date {
+    parseDate(input?: string): DateTime {
       if (!input) {
         return null;
       }
-      return new Date(input);
+      return DateTime.fromISO(input);
     }
   },
 

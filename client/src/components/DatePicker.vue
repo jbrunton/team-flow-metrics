@@ -71,6 +71,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { DateTime } from "luxon";
 import {
   formatDate,
   getRelativeDateRanges,
@@ -85,29 +86,37 @@ export default Vue.extend({
     return {
       relativeDateRanges: getRelativeDateRanges(),
       calendarMonthRanges: getCalendarMonthRanges(),
-      fromDate,
-      toDate
+      fromDate: fromDate.toJSDate(),
+      toDate: toDate.toJSDate()
     };
   },
   methods: {
     selectRange(range: DateRange) {
-      this.fromDate = range.fromDate;
-      this.toDate = range.toDate;
+      this.fromDate = range.fromDate.toJSDate();
+      this.toDate = range.toDate.toJSDate();
     },
     formatDate
   },
   computed: {
     input() {
-      return [this.fromDate, this.toDate];
+      return [
+        DateTime.fromJSDate(this.fromDate),
+        DateTime.fromJSDate(this.toDate)
+      ];
     }
   },
   watch: {
-    value() {
-      this.fromDate = this.value[0];
-      this.toDate = this.value[1];
+    value(value) {
+      this.fromDate = value[0].toJSDate();
+      this.toDate = value[1].toJSDate();
     },
-    input() {
-      this.$emit("input", this.input);
+    input(newValue: [DateTime, DateTime], prevValue: [DateTime, DateTime]) {
+      if (
+        !newValue[0].equals(prevValue[0]) ||
+        !newValue[1].equals(prevValue[1])
+      ) {
+        this.$emit("input", this.input);
+      }
     }
   }
 });

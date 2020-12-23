@@ -256,23 +256,17 @@ export default Vue.extend({
         data: data
       };
     },
-    parseDate(input?: string): Date {
+    parseDate(input?: string): DateTime {
       if (!input) {
         return null;
       }
-      return new Date(input);
+      return DateTime.fromISO(input);
     },
-    truncateDate(date: Date): Date {
-      if (
-        date &&
-        DateTime.fromJSDate(date) < DateTime.fromJSDate(this.epic.started)
-      ) {
+    truncateDate(date: DateTime): DateTime {
+      if (date && date < this.epic.started) {
         return this.epic.started;
       }
-      if (
-        date &&
-        DateTime.fromJSDate(date) > DateTime.fromJSDate(this.epic.completed)
-      ) {
+      if (date && date > this.epic.completed) {
         return this.epic.completed;
       }
       return date;

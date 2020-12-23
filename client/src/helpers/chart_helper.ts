@@ -1,14 +1,15 @@
+import { DateTime } from "luxon";
 import { Route } from "vue-router";
 import { getDefaultDateRange } from "./date_helper";
 
 export type ChartParams = {
-  dates: [Date, Date];
+  dates: [DateTime, DateTime];
   selectedLevel: string;
 };
 
 export const getDefaultChartParams = (
   query: Route["query"],
-  now?: Date
+  now?: DateTime
 ): ChartParams => {
   return {
     dates: getDefaultDateRange(query, now),
