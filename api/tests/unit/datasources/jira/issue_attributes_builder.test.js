@@ -43,7 +43,7 @@ describe('IssueAttributesBuilder', () => {
     expect(issue.externalUrl).toEqual('https://jira.example.com/browse/DEMO-101');
   })
 
-  describe("#parentKey", () => {
+  describe("#epicKey", () => {
     it("sets the parent epic key", () => {
       const epicLinkField = new Field();
       epicLinkField.externalId = "customfield_10001";
@@ -71,7 +71,7 @@ describe('IssueAttributesBuilder', () => {
   
       const issue = new IssueAttributesBuilder(fields, statuses, hierarchyLevels).build(json);
   
-      expect(issue.parentKey).toEqual('DEMO-102');
+      expect(issue.epicKey).toEqual('DEMO-102');
     });
   })
 

@@ -35,13 +35,13 @@
                 <th style="width: 35%;">Parent</th>
                 <td>
                   <router-link
-                    v-if="issue.parentKey"
+                    v-if="issue.epicKey"
                     :to="{
                       name: 'IssueDetails',
-                      params: { key: issue.parentKey }
+                      params: { key: issue.epicKey }
                     }"
                   >
-                    {{ issue.parentKey }}
+                    {{ issue.epicKey }}
                   </router-link>
                   {{ this.parent ? `- ${this.parent.title}` : "" }}
                 </td>
@@ -177,9 +177,9 @@ export default Vue.extend({
       const issueResponse = await axios.get(`/api/issues/${this.issueKey}`);
       this.issue = issueResponse.data.issue;
 
-      if (this.issue.parentKey) {
+      if (this.issue.epicKey) {
         const parentResponse = await axios.get(
-          `/api/issues/${this.issue.parentKey}`
+          `/api/issues/${this.issue.epicKey}`
         );
         this.parent = parentResponse.data.issue;
       }

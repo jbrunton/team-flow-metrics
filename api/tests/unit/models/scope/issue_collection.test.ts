@@ -8,8 +8,8 @@ describe("IssueCollection", () => {
   let issue1, issue2, issue3, epic1: Issue
 
   beforeEach(() => {
-    issue1 = IssueFactory.build({ key: "STORY-101", parentKey: "EPIC-101" });
-    issue2 = IssueFactory.build({ key: "STORY-102", parentKey: "EPIC-101" });
+    issue1 = IssueFactory.build({ key: "STORY-101", epicKey: "EPIC-101" });
+    issue2 = IssueFactory.build({ key: "STORY-102", epicKey: "EPIC-101" });
     issue3 = IssueFactory.build({ key: "STORY-103", });
 
     epic1 = IssueFactory.build({ key: "EPIC-101", issueType: "Epic" });
@@ -44,14 +44,14 @@ describe("IssueCollection", () => {
     })
   })
 
-  describe("#getParentKeys", () => {
+  describe("#getepicKeys", () => {
     it("returns a list of keys of all parent issues", () => {
-      expect(collection.getParentKeys()).toEqual(["EPIC-101"]);
+      expect(collection.getepicKeys()).toEqual(["EPIC-101"]);
     })
 
     it("returns an empty list if there are no parent issues", () => {
       const collection = new IssueCollection([issue3]);
-      expect(collection.getParentKeys()).toEqual([]);
+      expect(collection.getepicKeys()).toEqual([]);
     })
   })
 

@@ -17,7 +17,7 @@ export class CreateIssues0000000000004 implements MigrationInterface {
             "externalUrl" character varying NOT NULL,
             "hierarchyLevel" character varying NOT NULL REFERENCES hierarchy_levels(name),
 
-            "parentKey" character varying,
+            "epicKey" character varying,
             "epicId" integer REFERENCES issues(id),
             "childCount" integer,
             "percentDone" integer,
