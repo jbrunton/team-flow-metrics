@@ -39,18 +39,18 @@ export async function syncIssues(): Promise<Array<Issue>> {
 
   console.log("Building parent/child relationships...");
   const issueCollection = new IssueCollection(issues);
-  for (let parentKey of issueCollection.getParentKeys()) {
-    const parent = issueCollection.getIssue(parentKey);
-    const children = issueCollection.getChildrenFor(parentKey);
+  for (let epicKey of issueCollection.getepicKeys()) {
+    const parent = issueCollection.getIssue(epicKey);
+    const children = issueCollection.getChildrenFor(epicKey);
     if (parent) {
       parent.childCount = children.length;
       for (let child of children) {
-        child.parentId = parent.id;
+        child.epicId = parent.id;
       }
       parent.percentDone = Math.round(children.filter(child => child.completed).length / children.length * 100);
     } else {
       const childKeys = children.map(issue => issue.key)
-      console.warn(`Could not find parent ${parentKey} for issues [${childKeys.join(", ")}]`);
+      console.warn(`Could not find parent ${epicKey} for issues [${childKeys.join(", ")}]`);
     }
   }
   await issuesRepo.save(issues);

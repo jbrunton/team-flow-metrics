@@ -45,10 +45,10 @@ export class Issue {
     externalUrl: string;
 
     @Column()
-    parentKey: string;
+    epicKey: string;
 
     @Column()
-    parentId: number;
+    epicId: number;
 
     @Column()
     childCount: number;

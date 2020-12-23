@@ -12,8 +12,8 @@ export const IssueFactory = Factory.define("Issue", Issue)
   .attr("created", () => new Date())
   .attrs({
     resolution: null,
-    parentKey: null,
-    parentId: null,
+    epicKey: null,
+    epicId: null,
     childCount: null,
     percentDone: null,
     started: null,

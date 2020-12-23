@@ -3,7 +3,7 @@ import { Issue } from "../entities/issue";
 export class IssueCollection {
   readonly issues: Array<Issue>;
   private index: { [key: string]: Issue } = {};
-  private children: { [parentKey: string]: Array<Issue> } = {};
+  private children: { [epicKey: string]: Array<Issue> } = {};
 
   constructor(issues: Array<Issue>) {
     this.issues = issues;
@@ -11,32 +11,32 @@ export class IssueCollection {
       this.index[issue.key] = issue;
     }
     for (let issue of issues) {
-      const parentKey = issue.parentKey
-      if (parentKey) {
-        if (!this.children[parentKey]) {
-          this.children[parentKey] = [];
+      const epicKey = issue.epicKey
+      if (epicKey) {
+        if (!this.children[epicKey]) {
+          this.children[epicKey] = [];
         }
 
-        this.children[parentKey].push(issue);
+        this.children[epicKey].push(issue);
       }
     }
   }
 
-  getChildrenFor(parentKey: string): Array<Issue> {
-    return this.children[parentKey];
+  getChildrenFor(epicKey: string): Array<Issue> {
+    return this.children[epicKey];
   }
 
   getIssue(key: string): Issue {
     return this.index[key];
   }
 
-  getParentKeys(): Array<string> {
+  getepicKeys(): Array<string> {
     return Object.keys(this.children);
   }
 
   getParents(): Array<Issue> {
-    return this.getParentKeys()
-      .map(parentKey => this.index[parentKey])
+    return this.getepicKeys()
+      .map(epicKey => this.index[epicKey])
       .filter(parent => parent);
   }
 }
