@@ -1,13 +1,13 @@
-const express = require('express')
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   res.json({
-    greeting: 'Hello, world!'
-  })
-})
+    greeting: "Hello, world!",
+  });
+});
 
 module.exports = {
-  routerPath: '/greetings',
-  router: router
-}
+  routerPath: "/greetings",
+  router: router,
+};

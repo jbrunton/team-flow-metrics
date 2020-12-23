@@ -1,9 +1,8 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class CreateIssues0000000000004 implements MigrationInterface {
-
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`CREATE TABLE "issues" (
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`CREATE TABLE "issues" (
             "id" SERIAL NOT NULL,
 
             "key" character varying NOT NULL UNIQUE,
@@ -30,10 +29,9 @@ export class CreateIssues0000000000004 implements MigrationInterface {
             "cycleTime" real,
             CONSTRAINT "PK_ISSUES_ID" PRIMARY KEY ("id")
         )`);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP TABLE "issues"`);
-    }
-
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`DROP TABLE "issues"`);
+  }
 }

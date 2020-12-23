@@ -1,12 +1,10 @@
-import {Entity, PrimaryColumn, Column} from "typeorm";
+import { Entity, PrimaryColumn, Column } from "typeorm";
 
-@Entity({ name: 'hierarchy_levels' })
+@Entity({ name: "hierarchy_levels" })
 export class HierarchyLevel {
+  @PrimaryColumn()
+  name: string;
 
-    @PrimaryColumn()
-    name: string;
-
-    @Column()
-    issueType: string;
-
+  @Column()
+  issueType: string;
 }

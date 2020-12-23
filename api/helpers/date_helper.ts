@@ -5,19 +5,28 @@ export enum StepInterval {
   Weekly = "Weekly",
   BiWeekly = "Bi-Weekly",
   Monthly = "Monthly",
-};
+}
 
 export const nextIntervalDate = (date: Date, interval: StepInterval): Date => {
-  switch(interval) {
-    case StepInterval.Daily: return DateTime.fromJSDate(date).plus({ days: 1 }).toJSDate();
-    case StepInterval.Weekly: return DateTime.fromJSDate(date).plus({ weeks: 1 }).toJSDate();
-    case StepInterval.BiWeekly: return DateTime.fromJSDate(date).plus({ weeks: 2 }).toJSDate();
-    case StepInterval.Monthly: return DateTime.fromJSDate(date).plus({ months: 1 }).toJSDate();
-    default: throw new Error(`Unexpected interval: ${interval}`);
+  switch (interval) {
+    case StepInterval.Daily:
+      return DateTime.fromJSDate(date).plus({ days: 1 }).toJSDate();
+    case StepInterval.Weekly:
+      return DateTime.fromJSDate(date).plus({ weeks: 1 }).toJSDate();
+    case StepInterval.BiWeekly:
+      return DateTime.fromJSDate(date).plus({ weeks: 2 }).toJSDate();
+    case StepInterval.Monthly:
+      return DateTime.fromJSDate(date).plus({ months: 1 }).toJSDate();
+    default:
+      throw new Error(`Unexpected interval: ${interval}`);
   }
 };
 
-export const dateRange = (startDate: Date, endDate: Date, interval: StepInterval): Date[] => {
+export const dateRange = (
+  startDate: Date,
+  endDate: Date,
+  interval: StepInterval
+): Date[] => {
   if (DateTime.fromJSDate(startDate) > DateTime.fromJSDate(endDate)) {
     return [];
   }

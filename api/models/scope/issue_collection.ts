@@ -11,7 +11,7 @@ export class IssueCollection {
       this.index[issue.key] = issue;
     }
     for (let issue of issues) {
-      const epicKey = issue.epicKey
+      const epicKey = issue.epicKey;
       if (epicKey) {
         if (!this.children[epicKey]) {
           this.children[epicKey] = [];
@@ -36,7 +36,7 @@ export class IssueCollection {
 
   getParents(): Array<Issue> {
     return this.getepicKeys()
-      .map(epicKey => this.index[epicKey])
-      .filter(parent => parent);
+      .map((epicKey) => this.index[epicKey])
+      .filter((parent) => parent);
   }
 }
