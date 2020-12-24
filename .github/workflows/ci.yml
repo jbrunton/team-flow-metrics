@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [api, client]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install dependencies
+        run: npm install && npx lerna bootstrap --scope ${{ matrix.package }}
+
+      - name: static anlysis
+        run: npx lerna run lint:check --scope ${{ matrix.package }}
+
+      - name: unit test
+        run: npx lerna run test:unit --scope ${{ matrix.package }}
+
+      - name: integration test
+        run: |
+          cp default.env .env
+          NODE_ENV=test npm run db:setup
+          npx lerna run test:integration --scope ${{ matrix.package }}
+        if: matrix.package == 'api'
