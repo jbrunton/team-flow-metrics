@@ -120,10 +120,10 @@
             <h2 class="subtitle">Transitions</h2>
             <table v-if="issue" class="table" style="width: 100%;">
               <tr
-                v-for="transition in issue.transitions"
-                :key="transition.date"
+                v-for="(transition, index) in issue.transitions"
+                :key="`transition-${index}`"
               >
-                <td>{{ transition.date }}</td>
+                <td>{{ formatTime(transition.date) }}</td>
                 <td :class="categoryClass(transition.fromStatus.category)">
                   {{ transition.fromStatus.name }}
                 </td>
@@ -151,8 +151,9 @@ table tr:last-child {
 
 <script lang="ts">
 import Vue from "vue";
-import axios from "axios";
 import StatusTag from "@/components/StatusTag.vue";
+import { fetchIssueChildren, fetchIssueDetails } from "@/api/http";
+import { formatTime } from "../helpers/date_helper";
 
 export default Vue.extend({
   name: "IssueDetails",
@@ -174,21 +175,17 @@ export default Vue.extend({
   },
   methods: {
     async fetchData() {
-      const issueResponse = await axios.get(`/api/issues/${this.issueKey}`);
-      this.issue = issueResponse.data.issue;
+      const issue = await fetchIssueDetails(this.issueKey);
+      this.issue = issue;
 
       if (this.issue.epicKey) {
-        const parentResponse = await axios.get(
-          `/api/issues/${this.issue.epicKey}`
-        );
-        this.parent = parentResponse.data.issue;
+        const parent = await fetchIssueDetails(this.issue.epicKey);
+        this.parent = parent;
       }
 
       if (this.issue.issueType === "Epic") {
-        const childrenResponse = await axios.get(
-          `/api/issues/${this.issue.key}/children`
-        );
-        this.children = childrenResponse.data.issues;
+        const children = await fetchIssueChildren(this.issueKey);
+        this.children = children;
       }
     },
     categoryClass(category: string): string {
@@ -198,7 +195,8 @@ export default Vue.extend({
         Done: "is-done"
       };
       return `${statusTypes[category]}-bg`;
-    }
+    },
+    formatTime
   },
   computed: {
     title() {

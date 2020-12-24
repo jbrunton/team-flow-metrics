@@ -1,9 +1,9 @@
 {
-  "name": "client",
+  "name": "metrics-client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve --port 5001",
     "build": "vue-cli-service build",
     "test": "npm run test:unit",
     "test:unit": "vue-cli-service test:unit",
@@ -16,13 +16,16 @@
     "buefy": "^0.9.4",
     "core-js": "^3.6.5",
     "jstat": "^1.9.4",
+    "lodash": "^4.17.20",
     "luxon": "^1.25.0",
+    "metrics-api": "^0.1.0",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",
+    "@types/lodash": "^4.14.166",
     "@types/luxon": "^1.25.0",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",

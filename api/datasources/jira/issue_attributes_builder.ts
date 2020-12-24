@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { URL } from "url";
 import { Field } from "../../models/entities/field";
-import { Transition } from "../../models/entities/issue";
+import { Issue, Transition } from "../../models/types";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
 import { compareDateTimes, getCycleTime } from "../../helpers/date_helper";
@@ -29,28 +29,10 @@ export class IssueAttributesBuilder {
     }
   }
 
-  build(
-    json: JSON
-  ): {
-    key: string;
-    title: string;
-    issueType: string;
-    epicKey: string;
-    status: string;
-    statusCategory: string;
-    resolution: string;
-    created: DateTime;
-    hierarchyLevel: string;
-    externalUrl: string;
-    transitions: Array<Transition>;
-    started: DateTime;
-    completed: DateTime;
-    lastTransition: DateTime;
-    cycleTime: number;
-  } {
+  build(json: JSON): Issue {
     const transitions = this.getTransitions(json);
     const lastTransition = transitions
-      .map((transition) => DateTime.fromISO(transition.date))
+      .map((transition) => transition.date)
       .slice(-1)[0];
     const startedDate = getStartedDate(transitions);
     const completedDate = getCompletedDate(transitions);
@@ -75,7 +57,7 @@ export class IssueAttributesBuilder {
       hierarchyLevel: hierarchyLevel.name,
       epicKey: json["fields"][this.epicLinkFieldId],
       externalUrl: new URL(`browse/${json["key"]}`, process.env.JIRA_HOST).href,
-      transitions: serializeTransitions(transitions),
+      transitions: transitions,
       started: startedDate,
       completed: completedDate,
       lastTransition: lastTransition,
@@ -116,23 +98,8 @@ export class IssueAttributesBuilder {
         };
       })
       .filter((transition) => transition)
-      .sort((t1, t2) =>
-        compareDateTimes(DateTime.fromISO(t1.date), DateTime.fromISO(t2.date))
-      );
+      .sort((t1, t2) => compareDateTimes(t1.date, t2.date));
   }
-}
-
-function serializeTransitions(
-  transitions: Array<Transition>
-): Array<Transition> {
-  return transitions.map((transition) => {
-    const json = {
-      date: DateTime.fromISO(transition.date).toISO(),
-      fromStatus: transition.fromStatus,
-      toStatus: transition.toStatus,
-    };
-    return json;
-  });
 }
 
 function getStartedDate(transitions: Array<Transition>): DateTime {
@@ -144,7 +111,7 @@ function getStartedDate(transitions: Array<Transition>): DateTime {
     return null;
   }
 
-  return DateTime.fromISO(startedTransition.date);
+  return startedTransition.date;
 }
 
 function getCompletedDate(transitions: Array<Transition>): DateTime {
@@ -164,7 +131,7 @@ function getCompletedDate(transitions: Array<Transition>): DateTime {
     return null;
   }
 
-  return DateTime.fromISO(lastTransition.date);
+  return lastTransition.date;
 }
 
 function getResolution(json: JSON): string {

@@ -1,5 +1,6 @@
 {
-  "name": "api",
+  "name": "metrics-api",
+  "version": "0.1.0",
   "scripts": {
     "debug": "NODE_ENV=development nodemon --ext 'ts,js,json' --inspect --exec 'ts-node main.ts'",
     "test": "npm run test:unit && npm run test:integration",
@@ -46,6 +47,6 @@
     "rosie": "^2.0.1",
     "supertest": "^5.0.0",
     "ts-node": "3.3.0",
-    "typescript": "3.3.3333"
+    "typescript": "~3.9.3"
   }
 }

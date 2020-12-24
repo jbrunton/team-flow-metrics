@@ -3,5 +3,6 @@ module.exports = {
   devServer: {
     disableHostCheck: true,
     progress: false
-  }
+  },
+  chainWebpack: config => config.resolve.symlinks(false)
 };

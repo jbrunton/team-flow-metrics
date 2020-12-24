@@ -1,20 +1,14 @@
 import { DateTime } from "luxon";
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { DateTimeTransformer } from "../../helpers/date_helper";
-
-export type TransitionStatus = {
-  name: string;
-  category: string;
-};
-
-export type Transition = {
-  date: string;
-  fromStatus: TransitionStatus;
-  toStatus: TransitionStatus;
-};
+import {
+  Issue as IssueInterface,
+  Transition,
+  TransitionsTransformer,
+} from "../types";
 
 @Entity({ name: "issues" })
-export class Issue {
+export class Issue implements IssueInterface {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -60,8 +54,9 @@ export class Issue {
   @Column({
     type: "jsonb",
     array: false,
+    transformer: TransitionsTransformer,
   })
-  transitions: Array<Transition>;
+  transitions: Transition[];
 
   @Column({ type: "timestamp", transformer: DateTimeTransformer })
   started: DateTime;

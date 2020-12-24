@@ -32,12 +32,14 @@ services:
 
   client:
     build:
-      context: ./client
+      context: .
+      dockerfile: client.Dockerfile
     ports:
       - 3000:3000
     volumes:
-      - /app/node_modules
-      - ./client:/app
+      - /app/client/node_modules
+      - /app/api/node_modules
+      - ./:/app
     depends_on:
       - api
       - nginx
