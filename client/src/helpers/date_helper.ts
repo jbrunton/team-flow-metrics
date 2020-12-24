@@ -115,3 +115,7 @@ export function timeBetween(d1: DateTime, d2: DateTime): number {
   const diff = d2.diff(d2, "hours");
   return diff.hours / 24;
 }
+
+export function parseDate(input?: string): DateTime | null {
+  return input ? DateTime.fromISO(input) : null;
+}

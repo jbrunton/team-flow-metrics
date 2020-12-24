@@ -197,6 +197,7 @@ import StatusTag from "@/components/StatusTag.vue";
 import { formatDate, timeBetween } from "../helpers/date_helper";
 import { formatNumber } from "../helpers/format_helper";
 import { DateTime } from "luxon";
+import { fetchIssueChildren, fetchIssueDetails } from "@/api/http";
 
 export default Vue.extend({
   name: "EpicReport",
@@ -274,35 +275,13 @@ export default Vue.extend({
     formatDate,
     formatNumber,
     async fetchData() {
-      const issueResponse = await axios.get(`/api/issues/${this.key}`);
-      this.epic = issueResponse.data.issue;
-      this.epic.created = this.parseDate(this.epic.created);
-      this.epic.started = this.parseDate(this.epic.started);
-      this.epic.completed = this.parseDate(this.epic.completed);
-      this.epic.lastTransition = this.parseDate(this.epic.lastTransition);
+      const epic = await fetchIssueDetails(this.key);
+      this.epic = epic;
 
       this.initCharts();
 
-      const childrenResponse = await axios.get(
-        `/api/issues/${this.epic.key}/children`
-      );
-      this.children = this.issues = childrenResponse.data.issues.map(issue => {
-        return {
-          key: issue.key,
-          title: issue.title,
-          issueType: issue.issueType,
-          externalUrl: issue.externalUrl,
-          status: issue.status,
-          statusCategory: issue.statusCategory,
-          resolution: issue.resolution,
-          childCount: issue.childCount,
-          created: this.parseDate(issue.created),
-          started: this.parseDate(issue.started),
-          completed: this.parseDate(issue.completed),
-          lastTransition: this.parseDate(issue.lastTransition),
-          cycleTime: issue.cycleTime
-        };
-      });
+      const children = await fetchIssueChildren(this.key);
+      this.children = children;
 
       if (this.epic.started && this.epic.completed) {
         const totalTime = timeBetween(this.epic.started, this.epic.completed);

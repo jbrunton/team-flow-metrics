@@ -65,25 +65,10 @@
 <script lang="ts">
 import Vue from "vue";
 import IssuesList from "@/components/IssuesList.vue";
-import axios from "axios";
+import { Issue } from "metrics-api/models/types";
 import { formatDate } from "../helpers/date_helper";
 import { formatNumber } from "../helpers/format_helper";
-import { DateTime } from "luxon";
-
-type Issue = {
-  key: string;
-  title: string;
-  issueType: string;
-  externalUrl: string;
-  status: string;
-  statusCategory: string;
-  childCount?: number;
-  percentDone?: number;
-  created?: Date;
-  started?: Date;
-  completed?: Date;
-  cycleTime?: number;
-};
+import { fetchIssues } from "../api/http";
 
 export default Vue.extend({
   name: "Issues",
@@ -99,25 +84,7 @@ export default Vue.extend({
     };
   },
   mounted() {
-    axios.get(`/api/issues`).then(response => {
-      this.issues = response.data.issues.map(issue => {
-        return {
-          key: issue.key,
-          title: issue.title,
-          issueType: issue.issueType,
-          externalUrl: issue.externalUrl,
-          status: issue.status,
-          statusCategory: issue.statusCategory,
-          childCount: issue.childCount,
-          percentDone: issue.percentDone,
-          created: this.parseDate(issue.created),
-          started: this.parseDate(issue.started),
-          completed: this.parseDate(issue.completed),
-          lastTransition: this.parseDate(issue.lastTransition),
-          cycleTime: issue.cycleTime
-        };
-      });
-    });
+    this.fetchData();
   },
   computed: {
     results: function() {
@@ -137,14 +104,12 @@ export default Vue.extend({
     }
   },
   methods: {
+    async fetchData() {
+      const issues = await fetchIssues();
+      this.issues = issues;
+    },
     formatDate,
     formatNumber,
-    parseDate(input?: string): DateTime {
-      if (!input) {
-        return null;
-      }
-      return DateTime.fromISO(input);
-    },
     matchQuery(issue: Issue) {
       const query = this.searchQuery.trim();
       if (query === "") {
