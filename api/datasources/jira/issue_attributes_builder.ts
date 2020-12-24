@@ -92,7 +92,7 @@ export class IssueAttributesBuilder {
           );
         }
         return {
-          date: event.created,
+          date: DateTime.fromISO(event.created),
           fromStatus,
           toStatus,
         };

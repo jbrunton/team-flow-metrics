@@ -1,7 +1,6 @@
 const {
   IssueAttributesBuilder,
 } = require("../../../../datasources/jira/issue_attributes_builder");
-const { getRepository } = require("typeorm");
 const { Field } = require("../../../../models/entities/field");
 const { DateTime } = require("luxon");
 
@@ -166,7 +165,7 @@ describe("IssueAttributesBuilder", () => {
       ).build(json);
 
       expect(issue.started).toEqual(
-        DateTime.fromISO("2020-01-02T09:00:00.000Z")
+        DateTime.fromISO("2020-01-02T10:00:00.000+0100")
       );
     });
 
