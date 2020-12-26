@@ -11,11 +11,7 @@
       </div>
     </div>
 
-    <div class="field">
-      <b-checkbox v-model="excludeOutliers">
-        Exclude outliers
-      </b-checkbox>
-    </div>
+    <ExcludeOutliers v-model="excludeOutliers" />
 
     <div id="chart_div"></div>
 
@@ -44,6 +40,7 @@ import { getDefaultChartParams } from "@/helpers/chart_helper";
 import IssueDetails from "@/components/IssueDetails.vue";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
+import ExcludeOutliers from "@/components/ExcludeOutliers.vue";
 
 export default Vue.extend({
   name: "Issues",
@@ -51,7 +48,8 @@ export default Vue.extend({
   components: {
     IssueDetails,
     DatePicker,
-    HierarchyLevelPicker
+    HierarchyLevelPicker,
+    ExcludeOutliers
   },
 
   data() {
