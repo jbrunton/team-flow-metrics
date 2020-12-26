@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
-import { Issue } from "../../../../models/entities/issue";
-import { CfdBuilder } from "../../../../models/metrics/cfd_builder";
-import { IssueFactory } from "../../../factories/issue_factory";
+import { CfdBuilder } from "../../../metrics/cfd_builder";
+import { Issue } from "../../../models/entities/issue";
+import { IssueFactory } from "../../factories/issue_factory";
 
 describe("CfdBuilder", () => {
   let issue1, issue2: Issue;

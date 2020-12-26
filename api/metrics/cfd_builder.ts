@@ -1,6 +1,6 @@
-import { Issue } from "../entities/issue";
+import { Issue } from "../models/entities/issue";
 import { DateTime } from "luxon";
-import { compareDateTimes } from "../../helpers/date_helper";
+import { compareDateTimes } from "../helpers/date_helper";
 
 export type CfdRow = {
   date: DateTime;

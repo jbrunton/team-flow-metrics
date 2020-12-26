@@ -23,9 +23,9 @@ export class DataTableBuilder {
   public rows: Array<Array<unknown>>;
   public cols: Array<DataTableColumn>;
 
-  constructor() {
+  constructor(cols: Array<DataTableColumn> = []) {
     this.rows = [];
-    this.cols = [];
+    this.cols = cols;
   }
 
   setColumns(cols: Array<DataTableColumn>) {
@@ -80,15 +80,12 @@ export class DataTableBuilder {
   }
 
   build(): DataTable {
-    const rows = [] as Array<DataTableRow>;
-    for (let row of this.rows) {
-      rows.push({
-        c: row.map((value) => ({ v: value })),
-      });
-    }
+    const rows = this.rows.map((row) => {
+      return { c: row.map((value) => ({ v: value })) };
+    });
     return {
       cols: this.cols,
-      rows: rows,
+      rows,
     };
   }
 }
