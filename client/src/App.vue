@@ -45,9 +45,59 @@ $primary-light: findLightColor($primary);
 $primary-dark: findDarkColor($primary);
 $primary-invert: findColorInvert($primary);
 
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
+
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')
 $colors: mergeColorMaps(
   (
+    "white": (
+      $white,
+      $black
+    ),
+    "black": (
+      $black,
+      $white
+    ),
+    "light": (
+      $light,
+      $light-invert
+    ),
+    "dark": (
+      $dark,
+      $dark-invert
+    ),
+    "primary": (
+      $primary,
+      $primary-invert,
+      $primary-light,
+      $primary-dark
+    ),
+    "link": (
+      $link,
+      $link-invert,
+      $link-light,
+      $link-dark
+    ),
+    "success": (
+      $success,
+      $success-invert,
+      $success-light,
+      $success-dark
+    ),
+    "warning": (
+      $warning,
+      $warning-invert,
+      $warning-light,
+      $warning-dark
+    ),
+    "danger": (
+      $danger,
+      $danger-invert,
+      $danger-light,
+      $danger-dark
+    ),
     "none": (
       rgb(199, 199, 199),
       $black
@@ -80,9 +130,7 @@ $colors: mergeColorMaps(
   $custom-colors
 );
 
-$link: $primary;
-$link-invert: $primary-invert;
-$link-focus-border: $primary;
+$tooltip-color: $primary-light;
 
 // Import Bulma and Buefy styles
 @import "~bulma";
