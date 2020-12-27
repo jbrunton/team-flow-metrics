@@ -1,16 +1,12 @@
 import DbFactory from "../fixtures/db_factory";
-import {
-  ScatterplotBuilder,
-  ScatterplotParams,
-} from "../../../metrics/scatterplot_builder";
+import { queryData } from "../../../metrics/scatterplot";
 import { DateTime } from "luxon";
 import { getConnection, createConnection, getRepository } from "typeorm";
 import { Issue } from "../../../models/entities/issue";
 import { IssueFactory } from "../../factories/issue_factory";
 import { times } from "lodash";
 
-describe("ScatterplotBuilder", () => {
-  let builder;
+describe("queryData", () => {
   let params;
 
   beforeAll(async () => {
@@ -24,7 +20,6 @@ describe("ScatterplotBuilder", () => {
 
   beforeEach(async () => {
     await DbFactory.resetDatabase();
-    builder = new ScatterplotBuilder();
     params = {
       fromDate: DateTime.local(2020, 2, 1),
       toDate: DateTime.local(2020, 3, 1),
@@ -53,7 +48,7 @@ describe("ScatterplotBuilder", () => {
       })
     );
 
-    const issues = await builder.queryData(params);
+    const issues = await queryData(params);
 
     expect(issues).toEqual([expectedIssue]);
   });
@@ -73,7 +68,7 @@ describe("ScatterplotBuilder", () => {
       })
     );
 
-    const issues = await builder.queryData({
+    const issues = await queryData({
       ...params,
       hierarchyLevel: "Epic",
     });
@@ -99,7 +94,7 @@ describe("ScatterplotBuilder", () => {
       })
     );
 
-    const issues = await builder.queryData({
+    const issues = await queryData({
       ...params,
       excludeOutliers: true,
     });
