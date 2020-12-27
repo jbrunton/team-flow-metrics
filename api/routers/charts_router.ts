@@ -12,15 +12,11 @@ import {
   nextIntervalDate,
   StepInterval,
 } from "../helpers/date_helper";
-import {
-  ScatterplotBuilder,
-  ScatterplotParams,
-  ValidationError,
-} from "../metrics/scatterplot_builder";
+import { buildScatterplot } from "../metrics/scatterplot";
 const { formatDate } = require("../helpers/charts_helper");
 
 router.get("/scatterplot", async (req, res) => {
-  return new ScatterplotBuilder().apply(req, res);
+  return buildScatterplot(req, res);
 });
 
 router.get("/cfd", async (req, res) => {
