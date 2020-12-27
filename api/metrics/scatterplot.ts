@@ -5,8 +5,8 @@ import { DataTableBuilder } from "./data_table_builder";
 import { ParsedQs } from "qs";
 import { Between, getRepository, IsNull, Not } from "typeorm";
 import { excludeOutliers } from "../helpers/data_helper";
-import { Request, Response } from "express";
 import { ChartParams, ValidationError } from "./chart_params";
+import { chartBuilder } from "./chart_builder";
 
 export type ScatterplotParams = ChartParams & {
   excludeOutliers: boolean;
@@ -152,24 +152,9 @@ function getChartOps(data: Issue[]) {
   };
 }
 
-export async function buildScatterplot(req: Request, res: Response) {
-  let params: ScatterplotParams;
-  try {
-    params = parseParams(req.query);
-  } catch (e) {
-    if (e instanceof ValidationError) {
-      return res.status(400).json({
-        errors: e.validationErrors,
-      });
-    } else {
-      console.log(e);
-      return res.status(500);
-    }
-  }
-
-  const data = await queryData(params);
-  const dataTable = buildDataTable(data, params);
-  const response = buildResponse(dataTable, data);
-
-  return res.json(response);
-}
+export const buildScatterplot = chartBuilder(
+  parseParams,
+  queryData,
+  buildDataTable,
+  buildResponse
+);

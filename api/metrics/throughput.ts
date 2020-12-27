@@ -11,7 +11,7 @@ import { Issue } from "../models/entities/issue";
 import { ChartParams, ValidationError } from "./chart_params";
 import { DataTableBuilder } from "./data_table_builder";
 import { formatDate } from "../helpers/charts_helper";
-import { Request, Response } from "express";
+import { chartBuilder } from "./chart_builder";
 
 export type ThroughputParams = ChartParams & {
   stepInterval: StepInterval;
@@ -147,24 +147,9 @@ function getChartOps() {
   };
 }
 
-export async function buildThroughputChart(req: Request, res: Response) {
-  let params: ThroughputParams;
-  try {
-    params = parseParams(req.query);
-  } catch (e) {
-    if (e instanceof ValidationError) {
-      return res.status(400).json({
-        errors: e.validationErrors,
-      });
-    } else {
-      console.log(e);
-      return res.status(500);
-    }
-  }
-
-  const data = await queryData(params);
-  const dataTable = buildDataTable(data, params);
-  const response = buildResponse(dataTable, data);
-
-  return res.json(response);
-}
+export const buildThroughputChart = chartBuilder(
+  parseParams,
+  queryData,
+  buildDataTable,
+  buildResponse
+);
