@@ -1,6 +1,5 @@
 import { DateTime } from "luxon";
 import "reflect-metadata";
-import { HierarchyLevel } from "../../../models/entities/hierarchy_level";
 const request = require("supertest");
 const { createApp } = require("../../../app");
 const { Issue } = require("../../../models/entities/issue");
@@ -45,6 +44,15 @@ describe("charts_router", () => {
           cycleTime: 2,
         })
       );
+      const issue3 = await getRepository(Issue).save(
+        IssueFactory.build({
+          status: "Done",
+          statusCategory: "Done",
+          started: DateTime.local(2020, 2, 3, 0, 0),
+          completed: DateTime.local(2020, 2, 7, 0, 0),
+          cycleTime: 3,
+        })
+      );
 
       const res = await request(app).get(
         "/charts/scatterplot?fromDate=2020-01-01&toDate=2020-03-01&hierarchyLevel=Story"
@@ -67,18 +75,6 @@ describe("charts_router", () => {
             role: "annotationText",
           },
           {
-            label: "95th Percentile",
-            type: "number",
-          },
-          {
-            label: "85th Percentile",
-            type: "number",
-          },
-          {
-            label: "70th Percentile",
-            type: "number",
-          },
-          {
             label: "50th Percentile",
             type: "number",
           },
@@ -89,10 +85,7 @@ describe("charts_router", () => {
               { v: "Date(2020, 0, 1, 0, 0)" },
               { v: null },
               { v: null },
-              { v: 1 },
-              { v: 1 },
-              { v: 1 },
-              { v: 1 },
+              { v: 2 },
             ],
           },
           {
@@ -100,10 +93,7 @@ describe("charts_router", () => {
               { v: "Date(2020, 2, 1, 0, 0)" },
               { v: null },
               { v: null },
-              { v: 1 },
-              { v: 1 },
-              { v: 1 },
-              { v: 1 },
+              { v: 2 },
             ],
           },
           {
@@ -111,9 +101,6 @@ describe("charts_router", () => {
               { v: "Date(2020, 1, 2, 0, 0)" },
               { v: 1 },
               { v: issue1.key },
-              { v: null },
-              { v: null },
-              { v: null },
               { v: null },
             ],
           },
@@ -123,8 +110,13 @@ describe("charts_router", () => {
               { v: 2 },
               { v: issue2.key },
               { v: null },
-              { v: null },
-              { v: null },
+            ],
+          },
+          {
+            c: [
+              { v: "Date(2020, 1, 7, 0, 0)" },
+              { v: 3 },
+              { v: issue3.key },
               { v: null },
             ],
           },

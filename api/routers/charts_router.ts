@@ -1,16 +1,8 @@
 import * as express from "express";
-import {
-  Between,
-  IsNull,
-  LessThan,
-  MoreThan,
-  MoreThanOrEqual,
-  Not,
-} from "typeorm";
-import { CfdBuilder } from "../models/metrics/cfd_builder";
-import { DataTableBuilder } from "../models/metrics/data_table_builder";
+import { Between, IsNull, LessThan, MoreThan, Not } from "typeorm";
+import { CfdBuilder } from "../metrics/cfd_builder";
+import { DataTableBuilder } from "../metrics/data_table_builder";
 import { DateTime } from "luxon";
-const { jStat } = require("jstat");
 const router = express.Router();
 const { getRepository } = require("typeorm");
 import { Issue } from "../models/entities/issue";
@@ -20,126 +12,15 @@ import {
   nextIntervalDate,
   StepInterval,
 } from "../helpers/date_helper";
+import {
+  ScatterplotBuilder,
+  ScatterplotParams,
+  ValidationError,
+} from "../metrics/scatterplot_builder";
 const { formatDate } = require("../helpers/charts_helper");
 
 router.get("/scatterplot", async (req, res) => {
-  if (!req.query.fromDate) {
-    res.status(400).json({
-      error: "Required fromDate query param",
-    });
-  }
-  if (!req.query.toDate) {
-    res.status(400).json({
-      error: "Required toDate query param",
-    });
-  }
-  if (!req.query.hierarchyLevel) {
-    res.status(400).json({
-      error: "Required hierarchyLevel query param",
-    });
-  }
-
-  const fromDate = DateTime.fromISO(req.query.fromDate as string);
-  const toDate = DateTime.fromISO(req.query.toDate as string);
-  const hierarchyLevel = req.query.hierarchyLevel;
-  let issues = await getRepository(Issue).find({
-    where: {
-      completed: Between(fromDate, toDate),
-      issueType: hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
-      started: Not(IsNull()),
-    },
-    order: {
-      completed: "ASC",
-    },
-  });
-
-  if (req.query.excludeOutliers === "true") {
-    const cycleTimes = issues.map((issue) => issue.cycleTime);
-    const [q25, _, q75] = jStat.quartiles(cycleTimes);
-    const iqr = q75 - q25;
-    const cutoff = iqr * 1.5;
-    const outlierFilter = (issue) => {
-      return q25 - cutoff <= issue.cycleTime && issue.cycleTime <= q75 + cutoff;
-    };
-    issues = issues.filter(outlierFilter);
-  }
-
-  const chartOpts = {
-    seriesType: "scatter",
-    interpolateNulls: true,
-    series: {
-      "1": {
-        type: "steppedArea",
-        color: "#f44336",
-        areaOpacity: 0,
-      },
-      "2": {
-        type: "steppedArea",
-        color: "#f44336",
-        areaOpacity: 0,
-        lineDashStyle: [4, 4],
-      },
-      "3": {
-        type: "steppedArea",
-        color: "#ff9800",
-        areaOpacity: 0,
-        lineDashStyle: [4, 4],
-      },
-      "4": {
-        type: "steppedArea",
-        color: "#03a9f4",
-        areaOpacity: 0,
-        lineDashStyle: [4, 4],
-      },
-    },
-    legend: {
-      position: "none",
-    },
-    chartArea: {
-      width: "90%",
-      height: "80%",
-      top: "5%",
-    },
-  };
-  const builder = new DataTableBuilder();
-  builder.setColumns([
-    {
-      label: "completed_time",
-      type: "date",
-    },
-    {
-      label: "cycle_time",
-      type: "number",
-    },
-    {
-      label: "key",
-      type: "string",
-      role: "annotationText",
-    },
-  ]);
-
-  builder.addRows(
-    issues.map((issue) => [
-      formatDate(issue.completed),
-      issue.cycleTime,
-      issue.key,
-    ])
-  );
-
-  builder.addPercentiles(
-    1,
-    [50, 70, 85, 95],
-    formatDate(fromDate),
-    formatDate(toDate)
-  );
-
-  res.json({
-    meta: {
-      issueCount: builder.rows.length,
-    },
-    chartOpts: chartOpts,
-    chartData: builder.build(),
-  });
+  return new ScatterplotBuilder().apply(req, res);
 });
 
 router.get("/cfd", async (req, res) => {
