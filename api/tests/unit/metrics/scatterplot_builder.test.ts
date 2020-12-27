@@ -1,8 +1,10 @@
 import { DateTime } from "luxon";
 import { IssueFactory } from "../../factories/issue_factory";
 import { times } from "lodash";
-import { ScatterplotBuilder } from "../../../metrics/scatterplot_builder";
-import { DataTableBuilder } from "../../../metrics/data_table_builder";
+import {
+  ScatterplotBuilder,
+  ValidationError,
+} from "../../../metrics/scatterplot_builder";
 
 describe("ScatterplotBuilder", () => {
   let builder: ScatterplotBuilder;
@@ -15,6 +17,51 @@ describe("ScatterplotBuilder", () => {
 
   beforeEach(() => {
     builder = new ScatterplotBuilder();
+  });
+
+  describe("#parseParams", () => {
+    it("parses the query params", () => {
+      const params = builder.parseParams({
+        fromDate: "2020-01-01",
+        toDate: "2020-02-01",
+        hierarchyLevel: "Story",
+        excludeOutliers: "true",
+      });
+      expect(params).toEqual({
+        fromDate: DateTime.local(2020, 1, 1),
+        toDate: DateTime.local(2020, 2, 1),
+        hierarchyLevel: "Story",
+        excludeOutliers: true,
+      });
+    });
+
+    it("defaults excludeOutliers to false", () => {
+      const params = builder.parseParams({
+        fromDate: "2020-01-01",
+        toDate: "2020-02-01",
+        hierarchyLevel: "Story",
+      });
+      expect(params).toEqual({
+        fromDate: DateTime.local(2020, 1, 1),
+        toDate: DateTime.local(2020, 2, 1),
+        hierarchyLevel: "Story",
+        excludeOutliers: false,
+      });
+    });
+
+    it("validates the params", () => {
+      try {
+        builder.parseParams({});
+        fail("Expected exception");
+      } catch (e) {
+        expect(e).toBeInstanceOf(ValidationError);
+        expect(e.validationErrors).toEqual([
+          "Missing query param: fromDate",
+          "Missing query param: toDate",
+          "Missing query param: hierarchyLevel",
+        ]);
+      }
+    });
   });
 
   describe("#buildDataTable", () => {
