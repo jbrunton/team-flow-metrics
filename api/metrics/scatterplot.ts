@@ -1,29 +1,16 @@
 import { DateTime } from "luxon";
 import { formatDate } from "../helpers/charts_helper";
-import { HierarchyLevel } from "../models/entities/hierarchy_level";
 import { Issue } from "../models/entities/issue";
 import { DataTableBuilder } from "./data_table_builder";
 import { ParsedQs } from "qs";
 import { Between, getRepository, IsNull, Not } from "typeorm";
 import { excludeOutliers } from "../helpers/data_helper";
 import { Request, Response } from "express";
+import { ChartParams, ValidationError } from "./chart_params";
 
-export type ScatterplotParams = {
-  fromDate: DateTime;
-  toDate: DateTime;
-  hierarchyLevel: string;
+export type ScatterplotParams = ChartParams & {
   excludeOutliers: boolean;
 };
-
-export class ValidationError extends Error {
-  public readonly validationErrors: string[];
-
-  constructor(validationErrors: string[]) {
-    super(`Invalid request: ${validationErrors.join(", ")}`);
-    this.validationErrors = validationErrors;
-    Object.setPrototypeOf(this, ValidationError.prototype);
-  }
-}
 
 export function parseParams(query: ParsedQs): ScatterplotParams {
   const errors = [];
