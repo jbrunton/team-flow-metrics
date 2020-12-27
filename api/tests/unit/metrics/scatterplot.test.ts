@@ -5,8 +5,8 @@ import {
   buildResponse,
   buildDataTable,
   parseParams,
-  ValidationError,
 } from "../../../metrics/scatterplot";
+import { ValidationError } from "../../../metrics/chart_params";
 
 const params = {
   fromDate: DateTime.local(2020, 1, 1),

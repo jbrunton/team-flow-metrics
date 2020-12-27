@@ -1,29 +1,16 @@
 import { DateTime } from "luxon";
 import { formatDate } from "../helpers/charts_helper";
-import { HierarchyLevel } from "../models/entities/hierarchy_level";
 import { Issue } from "../models/entities/issue";
 import { DataTableBuilder } from "./data_table_builder";
 import { ParsedQs } from "qs";
 import { Between, getRepository, IsNull, Not } from "typeorm";
 import { excludeOutliers } from "../helpers/data_helper";
-import { Request, Response } from "express";
+import { ChartParams, ValidationError } from "./chart_params";
+import { chartBuilder } from "./chart_builder";
 
-export type ScatterplotParams = {
-  fromDate: DateTime;
-  toDate: DateTime;
-  hierarchyLevel: string;
+export type ScatterplotParams = ChartParams & {
   excludeOutliers: boolean;
 };
-
-export class ValidationError extends Error {
-  public readonly validationErrors: string[];
-
-  constructor(validationErrors: string[]) {
-    super(`Invalid request: ${validationErrors.join(", ")}`);
-    this.validationErrors = validationErrors;
-    Object.setPrototypeOf(this, ValidationError.prototype);
-  }
-}
 
 export function parseParams(query: ParsedQs): ScatterplotParams {
   const errors = [];
@@ -165,24 +152,9 @@ function getChartOps(data: Issue[]) {
   };
 }
 
-export async function buildScatterplot(req: Request, res: Response) {
-  let params: ScatterplotParams;
-  try {
-    params = parseParams(req.query);
-  } catch (e) {
-    if (e instanceof ValidationError) {
-      return res.status(400).json({
-        errors: e.validationErrors,
-      });
-    } else {
-      console.log(e);
-      return res.status(500);
-    }
-  }
-
-  const data = await queryData(params);
-  const dataTable = buildDataTable(data, params);
-  const response = buildResponse(dataTable, data);
-
-  return res.json(response);
-}
+export const buildScatterplot = chartBuilder(
+  parseParams,
+  queryData,
+  buildDataTable,
+  buildResponse
+);
