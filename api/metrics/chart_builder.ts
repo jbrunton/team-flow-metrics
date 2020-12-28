@@ -7,15 +7,18 @@ export function chartBuilder<Params, Data>(
   parseParams: (ParsedQs) => Params,
   queryData: (Params) => Promise<Data[]>,
   buildDataTable: (Data, Params) => DataTableBuilder,
-  buildResponse: (DataTableBuilder, Data) => object
+  buildResponse: (DataTableBuilder, Data, Params) => object
 ) {
   return async (req: Request, res: Response) => {
-    let params: Params;
     try {
-      params = parseParams(req.query);
+      const params = parseParams(req.query);
+      const data = await queryData(params);
+      const dataTable = buildDataTable(data, params);
+      const response = buildResponse(dataTable, data, params);
+      return res.json(response);
     } catch (e) {
       if (e instanceof ValidationError) {
-        return res.status(400).json({
+        return res.status(e.statusCode).json({
           errors: e.validationErrors,
         });
       } else {
@@ -23,11 +26,5 @@ export function chartBuilder<Params, Data>(
         return res.status(500);
       }
     }
-
-    const data = await queryData(params);
-    const dataTable = buildDataTable(data, params);
-    const response = buildResponse(dataTable, data);
-
-    return res.json(response);
   };
 }
