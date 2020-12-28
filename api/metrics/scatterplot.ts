@@ -152,7 +152,7 @@ function getChartOps(data: Issue[]) {
   };
 }
 
-export const buildScatterplot = chartBuilder(
+export const buildScatterplot = chartBuilder<ScatterplotParams, Issue>(
   parseParams,
   queryData,
   buildDataTable,
