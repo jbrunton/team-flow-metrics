@@ -1,7 +1,8 @@
 import * as express from "express";
+import { getRepository } from "typeorm";
+import { Issue } from "../models/entities/issue";
+
 const router = express.Router();
-const { getRepository } = require("typeorm");
-const { Issue } = require("../models/entities/issue");
 
 router.get("/", async (req, res) => {
   const issues = await getRepository(Issue).find();

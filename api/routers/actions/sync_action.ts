@@ -44,12 +44,12 @@ export async function syncIssues(): Promise<Array<Issue>> {
 
   console.log("Building parent/child relationships...");
   const issueCollection = new IssueCollection(issues);
-  for (let epicKey of issueCollection.getepicKeys()) {
+  for (const epicKey of issueCollection.getepicKeys()) {
     const parent = issueCollection.getIssue(epicKey);
     const children = issueCollection.getChildrenFor(epicKey);
     if (parent) {
       parent.childCount = children.length;
-      for (let child of children) {
+      for (const child of children) {
         child.epicId = parent.id;
       }
       parent.percentDone = Math.round(
@@ -86,7 +86,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
     const resolutionExclusions = process.env.EPIC_CYCLE_TIME_EXCL_RESOLUTIONS
       ? process.env.EPIC_CYCLE_TIME_EXCL_RESOLUTIONS.split(",")
       : [];
-    for (let parent of issueCollection.getParents()) {
+    for (const parent of issueCollection.getParents()) {
       const children = issueCollection
         .getChildrenFor(parent.key)
         .filter((child) => {

@@ -37,7 +37,7 @@ export class DataTableBuilder {
   }
 
   addRows(rows: Array<Array<unknown>>) {
-    for (let row of rows) {
+    for (const row of rows) {
       this.rows.push(row);
     }
   }

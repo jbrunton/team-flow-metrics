@@ -16,15 +16,15 @@ export class IssueAttributesBuilder {
     statuses: Array<Status>,
     hierarchyLevels: Array<HierarchyLevel>
   ) {
-    for (let field of fields) {
+    for (const field of fields) {
       if (field.name === "Epic Link") {
         this.epicLinkFieldId = field.externalId;
       }
     }
-    for (let status of statuses) {
+    for (const status of statuses) {
       this.statusCategories[status.externalId] = status.category;
     }
-    for (let level of hierarchyLevels) {
+    for (const level of hierarchyLevels) {
       this.hierarchyLevels[level.issueType] = level;
     }
   }
