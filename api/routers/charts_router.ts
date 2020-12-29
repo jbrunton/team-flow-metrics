@@ -3,14 +3,15 @@ import { Between, IsNull, LessThan, MoreThan, Not } from "typeorm";
 import { CfdBuilder } from "../metrics/cfd_builder";
 import { DataTableBuilder } from "../metrics/data_table_builder";
 import { DateTime } from "luxon";
-const router = express.Router();
-const { getRepository } = require("typeorm");
+import { getRepository } from "typeorm";
 import { Issue } from "../models/entities/issue";
 import { nextIntervalDate, StepInterval } from "../helpers/date_helper";
 import { buildScatterplot } from "../metrics/scatterplot";
 import { buildThroughputChart } from "../metrics/throughput";
 import { buildCfd } from "../metrics/cfd";
-const { formatDate } = require("../helpers/charts_helper");
+import { formatDate } from "../helpers/charts_helper";
+
+const router = express.Router();
 
 router.get("/scatterplot", async (req, res) => {
   return buildScatterplot(req, res);

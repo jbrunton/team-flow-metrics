@@ -2,8 +2,9 @@ import * as express from "express";
 import { Field } from "../models/entities/field";
 import { HierarchyLevel } from "../models/entities/hierarchy_level";
 import { Status } from "../models/entities/status";
+import { getRepository } from "typeorm";
+
 const router = express.Router();
-const { getRepository } = require("typeorm");
 
 router.get("/fields", async (req, res) => {
   const fields = await getRepository(Field).find();

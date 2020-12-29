@@ -7,7 +7,7 @@ export function chartBuilder<Params, Data>(
   parseParams: (ParsedQs) => Params,
   queryData: (Params) => Promise<Data[]>,
   buildDataTable: (Data, Params) => DataTableBuilder,
-  buildResponse: (DataTableBuilder, Data, Params) => object
+  buildResponse: (DataTableBuilder, Data, Params) => unknown
 ) {
   return async (req: Request, res: Response) => {
     try {

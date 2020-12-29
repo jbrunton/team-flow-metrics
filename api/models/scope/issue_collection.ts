@@ -7,10 +7,10 @@ export class IssueCollection {
 
   constructor(issues: Array<Issue>) {
     this.issues = issues;
-    for (let issue of issues) {
+    for (const issue of issues) {
       this.index[issue.key] = issue;
     }
-    for (let issue of issues) {
+    for (const issue of issues) {
       const epicKey = issue.epicKey;
       if (epicKey) {
         if (!this.children[epicKey]) {
