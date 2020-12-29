@@ -13,7 +13,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lerna run --concurrency 1 --stream lint --since HEAD --exclude-dependents && git add -A ."
+      "pre-commit": "lerna run --concurrency 1 --stream pre-commit --since HEAD --exclude-dependents"
     }
   },
   "name": "team-flow-metrics"
