@@ -1,3 +1,4 @@
 {
-  "*.{vue}": "vue-cli-service lint"
+  "*.ts": "vue-cli-service lint",
+  "*.vue": "vue-cli-service lint"
 }
