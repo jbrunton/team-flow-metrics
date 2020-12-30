@@ -33,7 +33,7 @@ export function parseParams(query: ParsedQs): ThroughputParams {
     fromDate: DateTime.fromISO(query.fromDate as string),
     toDate: DateTime.fromISO(query.toDate as string),
     hierarchyLevel: query.hierarchyLevel as string,
-    stepInterval: StepInterval[query.stepInterval as string],
+    stepInterval: StepInterval[query.stepInterval as string] as StepInterval,
   };
 }
 
@@ -51,6 +51,14 @@ export async function queryData(params: ChartParams): Promise<Issue[]> {
   return completedIssues;
 }
 
+type ThroughputRow = [string, number, string];
+
+type ReducerResult = {
+  issues: Issue[];
+  currentDate: DateTime;
+  rows: ThroughputRow[];
+};
+
 export function buildDataTable(
   issues: Issue[],
   params: ThroughputParams
@@ -60,11 +68,20 @@ export function buildDataTable(
     dates.push(nextIntervalDate(dates[dates.length - 1], params.stepInterval));
   }
 
-  const { rows } = dates.slice(1).reduce(
-    ({ issues, currentDate, rows }, nextDate) => {
-      const group = takeWhile(issues, (issue) => issue.completed < nextDate);
+  const initialValue: ReducerResult = {
+    issues: issues,
+    currentDate: params.fromDate,
+    rows: [],
+  };
+  const { rows } = dates
+    .slice(1)
+    .reduce<ReducerResult>(({ issues, currentDate, rows }, nextDate) => {
+      const group = takeWhile(
+        issues,
+        (issue: Issue) => issue.completed < nextDate
+      );
       const count = group.length;
-      const row = [
+      const row: ThroughputRow = [
         formatDate(currentDate),
         count,
         currentDate.toFormat("yyyy-MM-dd"),
@@ -74,9 +91,7 @@ export function buildDataTable(
         currentDate: nextDate,
         rows: rows.concat([row]),
       };
-    },
-    { issues: issues, currentDate: params.fromDate, rows: [] }
-  );
+    }, initialValue);
 
   const builder = new DataTableBuilder([
     {

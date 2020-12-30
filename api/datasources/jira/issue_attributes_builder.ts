@@ -6,6 +6,13 @@ import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
 import { compareDateTimes, getCycleTime } from "../../helpers/date_helper";
 
+type JiraStatusChange = {
+  from: string;
+  fromString: string;
+  to: string;
+  toString: string;
+};
+
 export class IssueAttributesBuilder {
   private epicLinkFieldId: string;
   private hierarchyLevels: { [issueType: string]: HierarchyLevel } = {};
@@ -37,7 +44,7 @@ export class IssueAttributesBuilder {
     const startedDate = getStartedDate(transitions);
     const completedDate = getCompletedDate(transitions);
     const cycleTime = getCycleTime(startedDate, completedDate);
-    const issueType = json["fields"]["issuetype"]["name"];
+    const issueType = json["fields"]["issuetype"]["name"] as string;
     const hierarchyLevel =
       this.hierarchyLevels[issueType] || this.hierarchyLevels["*"];
     if (!hierarchyLevel) {
@@ -47,15 +54,17 @@ export class IssueAttributesBuilder {
     }
     const resolution = getResolution(json);
     return {
-      key: json["key"],
-      title: json["fields"]["summary"],
+      key: json["key"] as string,
+      title: json["fields"]["summary"] as string,
       issueType: issueType,
-      status: json["fields"]["status"]["name"],
-      statusCategory: json["fields"]["status"]["statusCategory"]["name"],
+      status: json["fields"]["status"]["name"] as string,
+      statusCategory: json["fields"]["status"]["statusCategory"][
+        "name"
+      ] as string,
       resolution: resolution,
       created: DateTime.fromISO(json["fields"]["created"]),
       hierarchyLevel: hierarchyLevel.name,
-      epicKey: json["fields"][this.epicLinkFieldId],
+      epicKey: json["fields"][this.epicLinkFieldId] as string,
       externalUrl: new URL(`browse/${json["key"]}`, process.env.JIRA_HOST).href,
       transitions: transitions,
       started: startedDate,
@@ -69,7 +78,9 @@ export class IssueAttributesBuilder {
     // TODO: What if changelog.total > changelog.maxResults? Are all entries always returned?
     return json.changelog.histories
       .map((event) => {
-        const statusChange = event.items.find((item) => item.field == "status");
+        const statusChange = event.items.find(
+          (item) => item.field == "status"
+        ) as JiraStatusChange;
         if (!statusChange) {
           return null;
         }
@@ -135,7 +146,7 @@ function getCompletedDate(transitions: Array<Transition>): DateTime {
 }
 
 function getResolution(json: JSON): string {
-  const resolution = json["fields"]["resolution"];
+  const resolution = json["fields"]["resolution"] as string;
   if (!resolution) {
     return null;
   }

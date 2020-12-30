@@ -4,7 +4,7 @@ import { Issue } from "../../../models/entities/issue";
 import { IssueFactory } from "../../factories/issue_factory";
 
 describe("CfdBuilder", () => {
-  let issue1, issue2: Issue;
+  let issue1: Issue, issue2: Issue;
 
   beforeEach(() => {
     issue1 = IssueFactory.build({

@@ -1,11 +1,10 @@
-const glob = require("glob");
-const path = require("path");
-const express = require("express");
-const bodyParser = require("body-parser");
-
+import { glob } from "glob";
+import * as path from "path";
+import * as express from "express";
+import * as bodyParser from "body-parser";
+import { createConnection } from "typeorm";
 import "reflect-metadata";
-
-const { createConnection } = require("typeorm");
+import { PostgresConnectionCredentialsOptions } from "typeorm/driver/postgres/PostgresConnectionCredentialsOptions";
 
 export async function createApp(): Promise<Express.Application> {
   const app = express();
@@ -13,6 +12,7 @@ export async function createApp(): Promise<Express.Application> {
 
   console.log("Configuring routers...");
   glob.sync("./routers/*_router.{js,ts}").forEach(function (file) {
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
     const { routerPath, router, environments } = require(path.resolve(file));
     const applyRouter =
       !environments || environments.includes(process.env.NODE_ENV);
@@ -28,8 +28,9 @@ export async function createApp(): Promise<Express.Application> {
 
   console.log("Creating connection...");
   const connection = await createConnection();
+  const options = connection.options as PostgresConnectionCredentialsOptions;
   console.log(
-    `Connected to ${connection.options.host}:${connection.options.port}/${connection.options.database}`
+    `Connected to ${options.host}:${options.port}/${options.database}`
   );
 
   return app;

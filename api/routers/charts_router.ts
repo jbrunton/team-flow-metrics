@@ -36,7 +36,9 @@ router.get("/throughput/closedBetween", async (req, res) => {
   }
 
   const fromDate = DateTime.fromISO(req.query.fromDate as string).toUTC();
-  const stepInterval = StepInterval[req.query.stepInterval as string];
+  const stepInterval = StepInterval[
+    req.query.stepInterval as string
+  ] as StepInterval;
   const toDate = nextIntervalDate(fromDate, stepInterval);
   const hierarchyLevel = req.query.hierarchyLevel;
 

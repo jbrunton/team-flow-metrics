@@ -5,7 +5,7 @@ import { IssueCollection } from "../../../../models/scope/issue_collection";
 describe("IssueCollection", () => {
   let issues: Array<Issue>;
   let collection: IssueCollection;
-  let issue1, issue2, issue3, epic1: Issue;
+  let issue1: Issue, issue2: Issue, issue3: Issue, epic1: Issue;
 
   beforeEach(() => {
     issue1 = IssueFactory.build({ key: "STORY-101", epicKey: "EPIC-101" });
