@@ -8,8 +8,9 @@
     "test": "npm run test:unit",
     "test:unit": "vue-cli-service test:unit",
     "pre-commit": "lint-staged",
-    "lint": "vue-cli-service lint",
-    "lint:check": "npm run lint -- --no-fix --max-warnings 0"
+    "lint:typecheck": "vue-type-check --workspace . --srcDir src",
+    "lint": "vue-cli-service lint && npm run lint:typecheck",
+    "lint:check": "npm run lint -- --no-fix --max-warnings 0 && npm run lint:typecheck"
   },
   "dependencies": {
     "@mdi/font": "^5.8.55",
@@ -48,6 +49,7 @@
     "prettier": "^1.19.1",
     "sass-loader": "^8.0.2",
     "typescript": "~3.9.3",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "vue-type-check": "^1.1.0"
   }
 }
