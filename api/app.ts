@@ -1,12 +1,12 @@
 import { glob } from "glob";
 import * as path from "path";
-import * as express from "express";
+import express from "express";
 import * as bodyParser from "body-parser";
 import { createConnection } from "typeorm";
 import "reflect-metadata";
 import { PostgresConnectionCredentialsOptions } from "typeorm/driver/postgres/PostgresConnectionCredentialsOptions";
 
-export async function createApp(): Promise<Express.Application> {
+export async function createApp(): Promise<express.Application> {
   const app = express();
   app.use(bodyParser.json());
 
