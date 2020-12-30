@@ -1,5 +1,6 @@
 import * as express from "express";
 import { syncIssues } from "./actions/sync_action";
+import { RouterDefinition } from "./router_definition";
 
 const router = express.Router();
 
@@ -26,4 +27,4 @@ router.get("/", async (req, res) => {
 module.exports = {
   routerPath: "/sync",
   router: router,
-};
+} as RouterDefinition;

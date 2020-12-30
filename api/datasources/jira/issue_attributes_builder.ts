@@ -5,13 +5,7 @@ import { Issue, Transition } from "../../models/types";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
 import { compareDateTimes, getCycleTime } from "../../helpers/date_helper";
-
-type JiraStatusChange = {
-  from: string;
-  fromString: string;
-  to: string;
-  toString: string;
-};
+import { JiraIssue, JiraStatusChange } from "./types";
 
 export class IssueAttributesBuilder {
   private epicLinkFieldId: string;
@@ -36,7 +30,7 @@ export class IssueAttributesBuilder {
     }
   }
 
-  build(json: JSON): Issue {
+  build(json: JiraIssue): Issue {
     const transitions = this.getTransitions(json);
     const lastTransition = transitions
       .map((transition) => transition.date)
@@ -44,7 +38,7 @@ export class IssueAttributesBuilder {
     const startedDate = getStartedDate(transitions);
     const completedDate = getCompletedDate(transitions);
     const cycleTime = getCycleTime(startedDate, completedDate);
-    const issueType = json["fields"]["issuetype"]["name"] as string;
+    const issueType = json.fields.issuetype.name;
     const hierarchyLevel =
       this.hierarchyLevels[issueType] || this.hierarchyLevels["*"];
     if (!hierarchyLevel) {
@@ -54,18 +48,16 @@ export class IssueAttributesBuilder {
     }
     const resolution = getResolution(json);
     return {
-      key: json["key"] as string,
-      title: json["fields"]["summary"] as string,
+      key: json.key,
+      title: json.fields.summary,
       issueType: issueType,
-      status: json["fields"]["status"]["name"] as string,
-      statusCategory: json["fields"]["status"]["statusCategory"][
-        "name"
-      ] as string,
+      status: json.fields.status.name,
+      statusCategory: json.fields.status.statusCategory.name,
       resolution: resolution,
-      created: DateTime.fromISO(json["fields"]["created"]),
+      created: DateTime.fromISO(json.fields.created),
       hierarchyLevel: hierarchyLevel.name,
       epicKey: json["fields"][this.epicLinkFieldId] as string,
-      externalUrl: new URL(`browse/${json["key"]}`, process.env.JIRA_HOST).href,
+      externalUrl: new URL(`browse/${json.key}`, process.env.JIRA_HOST).href,
       transitions: transitions,
       started: startedDate,
       completed: completedDate,
@@ -74,13 +66,11 @@ export class IssueAttributesBuilder {
     };
   }
 
-  private getTransitions(json): Array<Transition> {
+  private getTransitions(json: JiraIssue): Array<Transition> {
     // TODO: What if changelog.total > changelog.maxResults? Are all entries always returned?
     return json.changelog.histories
       .map((event) => {
-        const statusChange = event.items.find(
-          (item) => item.field == "status"
-        ) as JiraStatusChange;
+        const statusChange = event.items.find((item) => item.field == "status");
         if (!statusChange) {
           return null;
         }
@@ -145,8 +135,8 @@ function getCompletedDate(transitions: Array<Transition>): DateTime {
   return lastTransition.date;
 }
 
-function getResolution(json: JSON): string {
-  const resolution = json["fields"]["resolution"] as string;
+function getResolution(json: JiraIssue): string {
+  const resolution = json["fields"]["resolution"];
   if (!resolution) {
     return null;
   }

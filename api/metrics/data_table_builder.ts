@@ -61,6 +61,7 @@ export class DataTableBuilder {
     const columnValues = this.getColumnValues(colIndex);
     const percentileValues = percentiles
       .map((percentile) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         return jStat.percentile(columnValues, (percentile as number) / 100.0);
       })
       .reverse();

@@ -2,6 +2,7 @@ import * as express from "express";
 import { Field } from "../models/entities/field";
 import { HierarchyLevel } from "../models/entities/hierarchy_level";
 import { Status } from "../models/entities/status";
+import { RouterDefinition } from "./router_definition";
 import { getRepository } from "typeorm";
 
 const router = express.Router();
@@ -33,4 +34,4 @@ router.get("/hierarchy-levels", async (req, res) => {
 module.exports = {
   routerPath: "/meta",
   router: router,
-};
+} as RouterDefinition;

@@ -5,26 +5,7 @@ import { getConnection } from "typeorm";
 import { IssueAttributesBuilder } from "./issue_attributes_builder";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
-
-type JiraSearchResult = {
-  issues: unknown[];
-  startAt: number;
-  total: number;
-  maxResults: number;
-};
-
-type JiraField = {
-  id: string;
-  name: string;
-};
-
-type JiraStatus = {
-  id: string;
-  name: string;
-  statusCategory: {
-    name: string;
-  };
-};
+import { JiraField, JiraSearchResult, JiraStatus } from "./types";
 
 export class JiraClient {
   _client: Client;
@@ -55,7 +36,7 @@ export class JiraClient {
     const connection = getConnection();
     const repo = connection.getRepository(Issue);
 
-    const results = [];
+    const results: JiraSearchResult[] = [];
     console.log("fetching page 1");
     let result = (await this._client.issueSearch.searchForIssuesUsingJqlPost({
       jql,
@@ -76,7 +57,7 @@ export class JiraClient {
       results.push(result);
     }
 
-    const issues = [];
+    const issues: Issue[] = [];
     const builder = new IssueAttributesBuilder(
       fields,
       statuses,
