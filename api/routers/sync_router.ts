@@ -13,11 +13,11 @@ router.get("/", async (req, res) => {
   } catch (e) {
     console.log(e);
     const json = {
-      error: e.message,
+      error: e.message as string,
       data: null,
     };
     if (e.response) {
-      json.data = e.response.data;
+      json.data = e.response.data as unknown;
     }
     res.status(500).json(json);
   }

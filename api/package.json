@@ -2,7 +2,7 @@
   "name": "metrics-api",
   "version": "0.1.0",
   "scripts": {
-    "debug": "NODE_ENV=development nodemon --ext 'ts,js,json' --inspect --exec 'ts-node main.ts'",
+    "debug": "NODE_ENV=development nodemon --ext 'ts,js,json' --inspect --exec 'ts-node main.js'",
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "NODE_ENV=test jest -c jest.config.unit.js",
     "test:integration": "docker-compose --env-file=../.env run api npm run test:integration:local",
@@ -38,6 +38,7 @@
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-typescript": "^7.12.1",
     "@types/jest": "^26.0.15",
+    "@types/lodash": "^4.14.166",
     "@types/luxon": "^1.25.0",
     "@types/node": "^8.0.29",
     "@types/rosie": "0.0.38",

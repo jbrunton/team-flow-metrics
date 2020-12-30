@@ -2,7 +2,7 @@ import { DateTime } from "luxon";
 import { Factory } from "rosie";
 import { Issue } from "../../models/entities/issue";
 
-export const IssueFactory = Factory.define("Issue", Issue)
+export const IssueFactory = Factory.define<Issue>("Issue", Issue)
   .sequence("key", (k) => `ISSUE-${k}`)
   .attr("title", ["key"], (key) => `Example Issue ${key}`)
   .attr("issueType", "Story")
