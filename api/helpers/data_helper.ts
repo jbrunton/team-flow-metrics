@@ -6,8 +6,10 @@ import { jStat } from "jstat";
  * @param valueOf a function which returns the value for the given item
  */
 export function excludeOutliers<T>(data: T[], valueOf: (T) => number): T[] {
-  const values = data.map((x) => valueOf(x));
+  const values = data.map((x: T) => valueOf(x));
 
+  // no typings available for jStat
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const [q25, , q75] = jStat.quartiles(values) as [number, number, number];
   const iqr = q75 - q25;
   const cutoff = iqr * 1.5;

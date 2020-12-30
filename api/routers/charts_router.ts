@@ -7,6 +7,7 @@ import { nextIntervalDate, StepInterval } from "../helpers/date_helper";
 import { buildScatterplot } from "../metrics/scatterplot";
 import { buildThroughputChart } from "../metrics/throughput";
 import { buildCfd } from "../metrics/cfd";
+import { RouterDefinition } from "./router_definition";
 
 const router = express.Router();
 
@@ -62,4 +63,4 @@ router.get("/throughput/closedBetween", async (req, res) => {
 module.exports = {
   routerPath: "/charts",
   router: router,
-};
+} as RouterDefinition;

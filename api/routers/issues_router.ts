@@ -1,5 +1,6 @@
 import * as express from "express";
 import { getRepository } from "typeorm";
+import { RouterDefinition } from "./router_definition";
 import { Issue } from "../models/entities/issue";
 
 const router = express.Router();
@@ -33,4 +34,4 @@ router.get("/:key/children", async (req, res) => {
 module.exports = {
   routerPath: "/issues",
   router: router,
-};
+} as RouterDefinition;
