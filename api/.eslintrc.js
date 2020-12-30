@@ -24,13 +24,13 @@ module.exports = {
     {
       files: "*",
       rules: {
-        "@typescript-eslint/no-unsafe-member-access": "off",
-        "@typescript-eslint/no-unsafe-return": "off",
-        "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-var-requires": "off",
-        "@typescript-eslint/restrict-template-expressions": "off",
-        "no-undef": "off",
-        "@typescript-eslint/restrict-plus-operands": "off",
+        "@typescript-eslint/no-unsafe-member-access": "warn",
+        "@typescript-eslint/no-unsafe-return": "warn",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/no-var-requires": "warn",
+        "@typescript-eslint/restrict-template-expressions": "warn",
+        "no-undef": "warn",
+        "@typescript-eslint/restrict-plus-operands": "warn",
       }
     }
   ]
