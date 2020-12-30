@@ -20,7 +20,7 @@ type CfdTransition = {
 export class CfdBuilder {
   private issues: Array<Issue> = [];
 
-  addIssues(issues: Issue[]) {
+  addIssues(issues: Issue[]): void {
     this.issues = this.issues.concat(issues);
   }
 

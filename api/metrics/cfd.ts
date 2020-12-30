@@ -3,15 +3,7 @@ import { formatDate } from "../helpers/charts_helper";
 import { Issue } from "../models/entities/issue";
 import { DataTableBuilder } from "./data_table_builder";
 import { ParsedQs } from "qs";
-import {
-  Between,
-  getRepository,
-  IsNull,
-  LessThan,
-  MoreThan,
-  Not,
-} from "typeorm";
-import { excludeOutliers } from "../helpers/data_helper";
+import { getRepository, IsNull, LessThan, MoreThan, Not } from "typeorm";
 import { ChartParams, ValidationError } from "./chart_params";
 import { chartBuilder } from "./chart_builder";
 import { CfdBuilder } from "./cfd_builder";
@@ -144,7 +136,7 @@ export function buildResponse(
   dataTable: DataTableBuilder,
   data: Issue[],
   params: CfdParams
-) {
+): unknown {
   return {
     meta: {
       issuesCount: data.length,

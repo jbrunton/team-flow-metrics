@@ -1,7 +1,5 @@
 import * as express from "express";
-import { Between, IsNull, LessThan, MoreThan, Not } from "typeorm";
-import { CfdBuilder } from "../metrics/cfd_builder";
-import { DataTableBuilder } from "../metrics/data_table_builder";
+import { Between, IsNull, Not } from "typeorm";
 import { DateTime } from "luxon";
 import { getRepository } from "typeorm";
 import { Issue } from "../models/entities/issue";
@@ -9,7 +7,6 @@ import { nextIntervalDate, StepInterval } from "../helpers/date_helper";
 import { buildScatterplot } from "../metrics/scatterplot";
 import { buildThroughputChart } from "../metrics/throughput";
 import { buildCfd } from "../metrics/cfd";
-import { formatDate } from "../helpers/charts_helper";
 
 const router = express.Router();
 
