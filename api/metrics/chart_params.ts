@@ -1,5 +1,4 @@
 import { DateTime } from "luxon";
-import { ParsedQs } from "qs";
 
 export type ChartParams = {
   fromDate: DateTime;

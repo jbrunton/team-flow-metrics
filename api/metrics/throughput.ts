@@ -98,7 +98,10 @@ export function buildDataTable(
   return builder;
 }
 
-export function buildResponse(dataTable: DataTableBuilder, data: Issue[]) {
+export function buildResponse(
+  dataTable: DataTableBuilder,
+  data: Issue[]
+): unknown {
   return {
     meta: {
       issuesCount: data.length,

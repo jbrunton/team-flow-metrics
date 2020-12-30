@@ -28,30 +28,30 @@ export class DataTableBuilder {
     this.cols = cols;
   }
 
-  setColumns(cols: Array<DataTableColumn>) {
+  setColumns(cols: Array<DataTableColumn>): void {
     this.cols = cols;
   }
 
-  addRow(row: Array<number>) {
+  addRow(row: Array<number>): void {
     this.rows.push(row);
   }
 
-  addRows(rows: Array<Array<unknown>>) {
+  addRows(rows: Array<Array<unknown>>): void {
     for (const row of rows) {
       this.rows.push(row);
     }
   }
 
-  getColumnValues(colIndex: number) {
+  getColumnValues(colIndex: number): unknown {
     return this.rows.map((row) => row[colIndex]);
   }
 
   addPercentiles(
     colIndex: number,
     percentiles: Array<unknown>,
-    fromValue: any,
-    toValue: any
-  ) {
+    fromValue: number | string,
+    toValue: number | string
+  ): void {
     if (this.rows.length <= 1) {
       return;
     }

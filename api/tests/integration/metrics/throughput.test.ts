@@ -4,7 +4,6 @@ import { DateTime } from "luxon";
 import { getConnection, createConnection, getRepository } from "typeorm";
 import { Issue } from "../../../models/entities/issue";
 import { IssueFactory } from "../../factories/issue_factory";
-import { times } from "lodash";
 
 describe("queryData", () => {
   let params;

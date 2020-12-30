@@ -8,7 +8,7 @@ import { jStat } from "jstat";
 export function excludeOutliers<T>(data: T[], valueOf: (T) => number): T[] {
   const values = data.map((x) => valueOf(x));
 
-  const [q25, _, q75] = jStat.quartiles(values);
+  const [q25, , q75] = jStat.quartiles(values);
   const iqr = q75 - q25;
   const cutoff = iqr * 1.5;
 

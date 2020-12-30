@@ -4,12 +4,16 @@ import { ValidationError } from "./chart_params";
 import { DataTableBuilder } from "./data_table_builder";
 
 export function chartBuilder<Params, Data>(
-  parseParams: (ParsedQs) => Params,
-  queryData: (Params) => Promise<Data[]>,
-  buildDataTable: (Data, Params) => DataTableBuilder,
-  buildResponse: (DataTableBuilder, Data, Params) => unknown
+  parseParams: (query: ParsedQs) => Params,
+  queryData: (params: Params) => Promise<Data[]>,
+  buildDataTable: (data: Data[], params: Params) => DataTableBuilder,
+  buildResponse: (
+    builder: DataTableBuilder,
+    data: Data[],
+    params: Params
+  ) => unknown
 ) {
-  return async (req: Request, res: Response) => {
+  return async (req: Request, res: Response): Promise<unknown> => {
     try {
       const params = parseParams(req.query);
       const data = await queryData(params);
