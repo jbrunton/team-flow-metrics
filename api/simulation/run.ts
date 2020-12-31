@@ -1,5 +1,6 @@
 import { times } from "lodash";
 import { DateTime } from "luxon";
+import { jStat } from "jstat";
 import { dateRange, StepInterval } from "../helpers/date_helper";
 import { Issue } from "../models/types";
 import { RandomGenerator, randomGenerator, selectValue } from "./select";
@@ -69,4 +70,12 @@ export function run(
     .map(() => runOnce(backlogSize, measurements, generator))
     .sort((a, b) => a - b);
   return results;
+}
+
+export function summarize(runs: number[]): [number, number][] {
+  return times(10).map((k) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const percentile = jStat.percentile(runs, k / 10) as number;
+    return [k * 10, percentile];
+  });
 }
