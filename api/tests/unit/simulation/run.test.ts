@@ -1,4 +1,13 @@
-import { Measurements, runOnce } from "../../../simulation/run";
+import { DateTime } from "luxon";
+import { StepInterval } from "../../../helpers/date_helper";
+import {
+  computeThroughput,
+  measure,
+  Measurements,
+  run,
+  runOnce,
+} from "../../../simulation/run";
+import { IssueFactory } from "../../factories/issue_factory";
 
 describe("runOnce", () => {
   it("runs the MCS once", () => {
@@ -22,5 +31,67 @@ describe("runOnce", () => {
     // 6.5  |  0  |  2  - throughput sample #3
     // 7.5  |  2  |  0  - throughput sample #4
     expect(runOnce(5, measurements, generator)).toEqual(7.5);
+  });
+});
+
+describe("computeThroughput", () => {
+  it("computes the throughput for a given ordered list of issues", () => {
+    const issues = [
+      IssueFactory.build({ completed: DateTime.local(2020, 1, 3, 9, 30) }),
+      IssueFactory.build({ completed: DateTime.local(2020, 1, 5, 0, 10) }),
+      IssueFactory.build({ completed: DateTime.local(2020, 1, 5, 10, 30) }),
+    ];
+    expect(computeThroughput(issues, StepInterval.Daily)).toEqual([
+      [DateTime.local(2020, 1, 3), 1],
+      [DateTime.local(2020, 1, 4), 0],
+      [DateTime.local(2020, 1, 5), 2],
+    ]);
+  });
+});
+
+describe("measure", () => {
+  it("measures cycle times and throughput for the given issues", () => {
+    const issues = [
+      IssueFactory.build({
+        cycleTime: 1,
+        completed: DateTime.local(2020, 1, 3, 9, 30),
+      }),
+      IssueFactory.build({
+        cycleTime: 3,
+        completed: DateTime.local(2020, 1, 5, 0, 10),
+      }),
+      IssueFactory.build({
+        cycleTime: 2,
+        completed: DateTime.local(2020, 1, 5, 10, 30),
+      }),
+    ];
+    expect(measure(issues)).toEqual({
+      cycleTimes: [1, 3, 2],
+      throughputs: [1, 0, 2],
+    });
+  });
+});
+
+describe("run", () => {
+  it("returns results for `runCount` runs of the simulation", () => {
+    const measurements: Measurements = {
+      cycleTimes: [2.5, 3.5, 5.5],
+      throughputs: [1, 0, 2],
+    };
+
+    const generator = jest.fn();
+    generator
+      .mockReturnValueOnce(1) // cycle time sample #1
+      .mockReturnValueOnce(0) // throughput sample #1
+      .mockReturnValueOnce(2) // throughput sample #2
+      .mockReturnValueOnce(1) // throughput sample #3
+      .mockReturnValueOnce(2) // throughput sample #4
+      .mockReturnValueOnce(2) // cycle time sample #2
+      .mockReturnValueOnce(0) // throughput sample #5
+      .mockReturnValueOnce(0) // throughput sample #6
+      .mockReturnValueOnce(0) // throughput sample #7
+      .mockReturnValueOnce(1) // throughput sample #8
+      .mockReturnValueOnce(2); // throughput sample #9
+    expect(run(5, measurements, 2, generator)).toEqual([7.5, 10.5]);
   });
 });
