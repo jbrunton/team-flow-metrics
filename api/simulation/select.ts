@@ -1,6 +1,3 @@
-import { DateTime } from "luxon";
-import { Issue } from "../models/types";
-
 /**
  * Any function which given an integer k returns a random
  * integer in the range [0-k).

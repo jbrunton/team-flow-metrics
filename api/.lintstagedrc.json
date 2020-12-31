@@ -1,3 +1,3 @@
 {
-  "*.ts": "eslint --fix --max-warnings 249"
+  "*.ts": "eslint --fix --max-warnings 21"
 }

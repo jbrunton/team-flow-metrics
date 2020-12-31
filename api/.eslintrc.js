@@ -6,6 +6,9 @@ module.exports = {
     tsconfigRootDir: __dirname,
     project: ['./tsconfig.json'],
   },
+  env: {
+    node: true
+  },
   plugins: [
     "@typescript-eslint",
   ],
@@ -31,6 +34,12 @@ module.exports = {
         "@typescript-eslint/restrict-template-expressions": "warn",
         "no-undef": "warn",
         "@typescript-eslint/restrict-plus-operands": "warn",
+      }
+    },
+    {
+      files: "./tests/**/*",
+      env: {
+        jest: true
       }
     }
   ]
