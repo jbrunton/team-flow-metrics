@@ -74,7 +74,7 @@ export function run(
 
 export function summarize(runs: number[]): [number, number][] {
   return times(10).map((k) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     const percentile = jStat.percentile(runs, k / 10) as number;
     return [k * 10, percentile];
   });
