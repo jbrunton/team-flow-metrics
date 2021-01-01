@@ -71,7 +71,7 @@ router.get("/when", async (req, res) => {
     return res.json({
       chartOpts: {
         seriesType: "bars",
-        bar: { groupWidth: "100%" },
+        bar: { groupWidth: "95%" },
         chartArea: {
           width: "90%",
           height: "80%",

@@ -84,31 +84,42 @@ export type SummaryRow = {
 
 export function summarize(runs: number[], startDate: DateTime): SummaryRow[] {
   const timeByDays = groupBy(runs, (run) => Math.ceil(run));
+  const minIndex = Math.floor(runs.length * 0.01);
+  const maxIndex = Math.floor(runs.length * 0.99);
   const percentiles = {
     "50": Math.floor(runs.length * 0.5),
     "70": Math.floor(runs.length * 0.7),
     "85": Math.floor(runs.length * 0.85),
   };
-  let cume = 0;
+  let index = 0;
   return Object.entries(timeByDays)
     .map(([duration, runsWithDuration]) => {
       const count = runsWithDuration.length;
       const date = startDate.plus({ days: parseInt(duration) });
+      const startIndex = index;
+      const endIndex = index + count;
 
-      const percentile = Object.entries(percentiles).find(([, index]) => {
-        return cume <= index && index <= cume + count;
-      });
+      const percentile = Object.entries(percentiles).find(
+        ([, percentileIndex]) => {
+          return startIndex <= percentileIndex && percentileIndex <= endIndex;
+        }
+      );
       const annotation = percentile ? `${percentile[0]}th` : null;
       const annotationText = percentile ? date.toISODate() : null;
 
-      cume += count;
+      index += count;
 
       return {
         date,
         count,
         annotation,
         annotationText,
+        startIndex,
+        endIndex,
       };
+    })
+    .filter((row) => {
+      return row.endIndex >= minIndex && row.startIndex <= maxIndex;
     })
     .sort((row1, row2) => compareDateTimes(row1.date, row2.date));
 }
