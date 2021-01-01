@@ -54,7 +54,7 @@ router.get("/when", async (req, res) => {
     return res.json({
       chartOpts: {
         seriesType: "bars",
-        bar: { groupWidth: "100%", lineWidth: 0 },
+        bar: { groupWidth: "100%" },
       },
       chartData: dataTable.build(),
     });

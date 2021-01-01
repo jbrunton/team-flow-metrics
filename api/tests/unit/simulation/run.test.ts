@@ -97,7 +97,15 @@ describe("run", () => {
   });
 });
 
-describe.only("summarize", () => {
-  const summary = summarize([1, 3, 5, 5, 9, 10]);
-  expect(summary).toEqual({});
+describe("summarize", () => {
+  it("returns data for a histogram of durations", () => {
+    const summary = summarize([1, 3, 10, 5, 9, 5]);
+    expect(summary).toEqual([
+      { count: 1, days: 1 },
+      { count: 1, days: 3 },
+      { count: 2, days: 5 },
+      { count: 1, days: 9 },
+      { count: 1, days: 10 },
+    ]);
+  });
 });

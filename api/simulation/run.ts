@@ -2,7 +2,7 @@ import { groupBy, times } from "lodash";
 import { DateTime } from "luxon";
 import { dateRange, StepInterval } from "../helpers/date_helper";
 import { Issue } from "../models/types";
-import { RandomGenerator, createGenerator, selectValue } from "./select";
+import { RandomGenerator, newGenerator, selectValue } from "./select";
 
 export type Measurements = {
   cycleTimes: number[];
@@ -63,7 +63,7 @@ export function run(
   backlogSize: number,
   measurements: Measurements,
   runCount: number,
-  generator: RandomGenerator = createGenerator()
+  generator: RandomGenerator = newGenerator()
 ): number[] {
   const results = times(runCount)
     .map(() => runOnce(backlogSize, measurements, generator))
@@ -79,27 +79,9 @@ export type SummaryRow = {
 export function summarize(runs: number[]): SummaryRow[] {
   const timeByDays = groupBy(runs, (run) => Math.ceil(run));
   return Object.entries(timeByDays)
-    .map(([key, runs]: [string, number[]]) => ({
+    .map(([key, runs]) => ({
       days: parseInt(key),
       count: runs.length,
     }))
-    .sort((row1, row2) => row2.days - row1.days);
-  // .map(([days, runs]) => ({
-  //   days,
-  //   count: runs.length
-  // }));
-
-  // const percentiles = times(10).map((k) => {
-  //   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  //   const percentile = jStat.percentile(runs, k / 10) as number;
-  //   return [k * 10, percentile];
-  // });
-  // const rows = percentiles.map(([percentile, cume], index) => {
-  //   return {
-  //     percentile,
-  //     cume,
-  //     count: index > 0 ? cume - percentiles[index - 1][1] : cume
-  //   };
-  // })
-  // return rows;
+    .sort((row1, row2) => row1.days - row2.days);
 }
