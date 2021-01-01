@@ -6,6 +6,7 @@ import {
   Measurements,
   run,
   runOnce,
+  summarize,
 } from "../../../simulation/run";
 import { IssueFactory } from "../../factories/issue_factory";
 
@@ -94,4 +95,9 @@ describe("run", () => {
       .mockReturnValueOnce(2); // throughput sample #9
     expect(run(5, measurements, 2, generator)).toEqual([7.5, 10.5]);
   });
+});
+
+describe.only("summarize", () => {
+  const summary = summarize([1, 3, 5, 5, 9, 10]);
+  expect(summary).toEqual({});
 });

@@ -55,6 +55,12 @@ const routes: Array<RouteConfig> = [
     name: "Throughput",
     component: () =>
       import(/* webpackChunkName: "throughput" */ "../views/Throughput.vue")
+  },
+  {
+    path: "/forecast",
+    name: "Forecast",
+    component: () =>
+      import(/* webpackChunkName: "forecast" */ "../views/Forecast.vue")
   }
 ];
 
