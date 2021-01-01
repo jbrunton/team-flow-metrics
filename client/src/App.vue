@@ -153,7 +153,8 @@ $tooltip-color: $primary-light;
 }
 
 // fixes flickering behavior in tooltips
-svg > g > g:last-child {
-  pointer-events: none;
-}
+// Note: may not be needed any more, and breaks annotations
+// svg > g > g:last-child {
+//   pointer-events: none;
+// }
 </style>

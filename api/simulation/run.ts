@@ -78,14 +78,37 @@ export function run(
 export type SummaryRow = {
   date: DateTime;
   count: number;
+  annotation?: string;
+  annotationText?: string;
 };
 
 export function summarize(runs: number[], startDate: DateTime): SummaryRow[] {
   const timeByDays = groupBy(runs, (run) => Math.ceil(run));
+  const percentiles = {
+    "50": Math.floor(runs.length * 0.5),
+    "70": Math.floor(runs.length * 0.7),
+    "85": Math.floor(runs.length * 0.85),
+  };
+  let cume = 0;
   return Object.entries(timeByDays)
-    .map(([key, runs]) => ({
-      date: startDate.plus({ days: parseInt(key) }),
-      count: runs.length,
-    }))
+    .map(([duration, runsWithDuration]) => {
+      const count = runsWithDuration.length;
+      const date = startDate.plus({ days: parseInt(duration) });
+
+      const percentile = Object.entries(percentiles).find(([, index]) => {
+        return cume <= index && index <= cume + count;
+      });
+      const annotation = percentile ? `${percentile[0]}th` : null;
+      const annotationText = percentile ? date.toISODate() : null;
+
+      cume += count;
+
+      return {
+        date,
+        count,
+        annotation,
+        annotationText,
+      };
+    })
     .sort((row1, row2) => compareDateTimes(row1.date, row2.date));
 }

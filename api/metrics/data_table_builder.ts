@@ -1,10 +1,9 @@
 import { jStat } from "jstat";
 
-type DataTableColumn = {
-  label: string;
-  type: string;
-  role?: string;
-};
+type DataTableColumn = { type: string } & (
+  | { label: string }
+  | { role: string }
+);
 
 type DataTableValue = {
   v: unknown;
