@@ -119,7 +119,11 @@ export function summarize(runs: number[], startDate: DateTime): SummaryRow[] {
       };
     })
     .filter((row) => {
-      return row.endIndex >= minIndex && row.startIndex <= maxIndex;
+      const startIndex = row.startIndex;
+      const endIndex = row.endIndex;
+      delete row.startIndex;
+      delete row.endIndex;
+      return endIndex >= minIndex && startIndex <= maxIndex;
     })
     .sort((row1, row2) => compareDateTimes(row1.date, row2.date));
 }
