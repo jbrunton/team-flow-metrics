@@ -56,12 +56,18 @@ router.get("/when", async (req, res) => {
     const results = summarize(runs, params.startDate);
     const dataTable = new DataTableBuilder([
       { label: "date", type: "date" },
+      { type: "string", role: "annotation" },
+      { type: "string", role: "annotationText" },
       { label: "count", type: "number" },
     ]);
-    dataTable.addRows(results.map((row) => [formatDate(row.date), row.count]));
-    //res.set('Content-Type', 'text/plain')
-    //return res.send("hi\nthere")
-    //return res.send(runs.join("\n"))
+    dataTable.addRows(
+      results.map((row) => [
+        formatDate(row.date),
+        row.annotation,
+        row.annotationText,
+        row.count,
+      ])
+    );
     return res.json({
       chartOpts: {
         seriesType: "bars",
@@ -71,6 +77,10 @@ router.get("/when", async (req, res) => {
           height: "80%",
           top: "5%",
         },
+        legend: {
+          position: "none",
+        },
+        annotations: { style: "line" },
         height: 300,
       },
       chartData: dataTable.build(),
