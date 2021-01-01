@@ -1,6 +1,10 @@
 import { groupBy, times } from "lodash";
 import { DateTime } from "luxon";
-import { dateRange, StepInterval } from "../helpers/date_helper";
+import {
+  compareDateTimes,
+  dateRange,
+  StepInterval,
+} from "../helpers/date_helper";
 import { Issue } from "../models/types";
 import { RandomGenerator, newGenerator, selectValue } from "./select";
 
@@ -63,7 +67,7 @@ export function run(
   backlogSize: number,
   measurements: Measurements,
   runCount: number,
-  generator: RandomGenerator = newGenerator()
+  generator: RandomGenerator
 ): number[] {
   const results = times(runCount)
     .map(() => runOnce(backlogSize, measurements, generator))
@@ -72,16 +76,16 @@ export function run(
 }
 
 export type SummaryRow = {
-  days: number;
+  date: DateTime;
   count: number;
 };
 
-export function summarize(runs: number[]): SummaryRow[] {
+export function summarize(runs: number[], startDate: DateTime): SummaryRow[] {
   const timeByDays = groupBy(runs, (run) => Math.ceil(run));
   return Object.entries(timeByDays)
     .map(([key, runs]) => ({
-      days: parseInt(key),
+      date: startDate.plus({ days: parseInt(key) }),
       count: runs.length,
     }))
-    .sort((row1, row2) => row1.days - row2.days);
+    .sort((row1, row2) => compareDateTimes(row1.date, row2.date));
 }

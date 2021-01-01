@@ -9,6 +9,16 @@
       <div class="column is-one-quarter">
         <HierarchyLevelPicker v-model="selectedLevel" />
       </div>
+      <div class="column is-one-quarter">
+        <b-field label="Start Date">
+          <b-datepicker
+            placeholder="Click to select..."
+            v-model="startDate"
+            :date-formatter="formatDate"
+          >
+          </b-datepicker>
+        </b-field>
+      </div>
     </div>
 
     <div id="chart_div"></div>
@@ -27,7 +37,7 @@
 
 import Vue from "vue";
 import axios from "axios";
-import { formatDateRange } from "@/helpers/date_helper";
+import { formatDateRange, formatDate } from "@/helpers/date_helper";
 import { buildUrl, formatDateParam } from "@/helpers/url_helper";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
@@ -46,6 +56,9 @@ export default Vue.extend({
     const chartParams = getDefaultChartParams(this.$route.query);
     return {
       ...chartParams,
+      startDate: DateTime.local()
+        .startOf("day")
+        .toJSDate(),
       chartOps: {},
       chartData: [],
       chart: null
@@ -103,6 +116,8 @@ export default Vue.extend({
       return formatDateRange(dates);
     },
 
+    formatDate,
+
     parseDate(input?: string): DateTime {
       if (!input) {
         return null;
@@ -135,6 +150,7 @@ export default Vue.extend({
         fromDate: formatDateParam(this.dates[0]),
         toDate: formatDateParam(this.dates[1]),
         hierarchyLevel: String(this.selectedLevel),
+        startDate: formatDateParam(DateTime.fromJSDate(this.startDate)),
         backlogSize: 50
       };
     },
