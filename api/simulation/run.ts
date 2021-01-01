@@ -6,7 +6,7 @@ import {
   StepInterval,
 } from "../helpers/date_helper";
 import { Issue } from "../models/types";
-import { RandomGenerator, newGenerator, selectValue } from "./select";
+import { RandomGenerator, selectValue } from "./select";
 
 export type Measurements = {
   cycleTimes: number[];
