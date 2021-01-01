@@ -152,9 +152,8 @@ $tooltip-color: $primary-light;
   vertical-align: middle;
 }
 
-// fixes flickering behavior in tooltips
-// Note: may not be needed any more, and breaks annotations
-// svg > g > g:last-child {
-//   pointer-events: none;
-// }
+// fixes flickering behavior when cursor moves over tooltips
+svg > g > g.google-visualization-tooltip {
+  pointer-events: none;
+}
 </style>
