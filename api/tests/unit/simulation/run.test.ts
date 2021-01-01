@@ -102,11 +102,36 @@ describe("summarize", () => {
     const startDate = DateTime.local(2020, 1, 1);
     const summary = summarize([1, 3, 10, 5, 9, 5], startDate);
     expect(summary).toEqual([
-      { count: 1, date: DateTime.local(2020, 1, 2) },
-      { count: 1, date: DateTime.local(2020, 1, 4) },
-      { count: 2, date: DateTime.local(2020, 1, 6) },
-      { count: 1, date: DateTime.local(2020, 1, 10) },
-      { count: 1, date: DateTime.local(2020, 1, 11) },
+      {
+        date: DateTime.local(2020, 1, 2),
+        count: 1,
+        annotation: null,
+        annotationText: null,
+      },
+      {
+        date: DateTime.local(2020, 1, 4),
+        count: 1,
+        annotation: null,
+        annotationText: null,
+      },
+      {
+        date: DateTime.local(2020, 1, 6),
+        count: 2,
+        annotation: "50th",
+        annotationText: "2020-01-06",
+      },
+      {
+        date: DateTime.local(2020, 1, 10),
+        count: 1,
+        annotation: "70th",
+        annotationText: "2020-01-10",
+      },
+      {
+        date: DateTime.local(2020, 1, 11),
+        count: 1,
+        annotation: "85th",
+        annotationText: "2020-01-11",
+      },
     ]);
   });
 });
