@@ -1,9 +1,8 @@
-import { times } from "lodash";
+import { groupBy, times } from "lodash";
 import { DateTime } from "luxon";
-import { jStat } from "jstat";
 import { dateRange, StepInterval } from "../helpers/date_helper";
 import { Issue } from "../models/types";
-import { RandomGenerator, randomGenerator, selectValue } from "./select";
+import { RandomGenerator, newGenerator, selectValue } from "./select";
 
 export type Measurements = {
   cycleTimes: number[];
@@ -13,7 +12,7 @@ export type Measurements = {
 export function runOnce(
   backlogSize: number,
   measurements: Measurements,
-  generator: RandomGenerator = randomGenerator
+  generator: RandomGenerator
 ): number {
   let time = selectValue(measurements.cycleTimes, generator);
   while (backlogSize > 0) {
@@ -56,7 +55,7 @@ export function measure(issues: Issue[]): Measurements {
   );
   return {
     cycleTimes: issues.map((issue) => issue.cycleTime),
-    throughputs,
+    throughputs: throughputs,
   };
 }
 
@@ -64,7 +63,7 @@ export function run(
   backlogSize: number,
   measurements: Measurements,
   runCount: number,
-  generator: RandomGenerator = randomGenerator
+  generator: RandomGenerator = newGenerator()
 ): number[] {
   const results = times(runCount)
     .map(() => runOnce(backlogSize, measurements, generator))
@@ -72,10 +71,17 @@ export function run(
   return results;
 }
 
-export function summarize(runs: number[]): [number, number][] {
-  return times(10).map((k) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    const percentile = jStat.percentile(runs, k / 10) as number;
-    return [k * 10, percentile];
-  });
+export type SummaryRow = {
+  days: number;
+  count: number;
+};
+
+export function summarize(runs: number[]): SummaryRow[] {
+  const timeByDays = groupBy(runs, (run) => Math.ceil(run));
+  return Object.entries(timeByDays)
+    .map(([key, runs]) => ({
+      days: parseInt(key),
+      count: runs.length,
+    }))
+    .sort((row1, row2) => row1.days - row2.days);
 }

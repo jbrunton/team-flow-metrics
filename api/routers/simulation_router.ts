@@ -5,6 +5,7 @@ import { DateTime } from "luxon";
 import { ValidationError } from "../metrics/chart_params";
 import { queryData } from "../metrics/throughput";
 import { measure, run, summarize } from "../simulation/run";
+import { DataTableBuilder } from "../metrics/data_table_builder";
 
 const router = express.Router();
 
@@ -40,10 +41,22 @@ router.get("/when", async (req, res) => {
     const params = parseParams(req.query);
     const issues = await queryData(params);
     const measurements = measure(issues);
-    const runs = run(params.backlogSize, measurements, 1000);
+    const runs = run(params.backlogSize, measurements, 10000);
     const results = summarize(runs);
+    const dataTable = new DataTableBuilder([
+      { label: "days", type: "number" },
+      { label: "count", type: "number" },
+    ]);
+    dataTable.addRows(results.map((row) => [row.days, row.count]));
+    //res.set('Content-Type', 'text/plain')
+    //return res.send("hi\nthere")
+    //return res.send(runs.join("\n"))
     return res.json({
-      results,
+      chartOpts: {
+        seriesType: "bars",
+        bar: { groupWidth: "100%" },
+      },
+      chartData: dataTable.build(),
     });
   } catch (e) {
     if (e instanceof ValidationError) {
