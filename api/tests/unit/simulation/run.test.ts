@@ -1,6 +1,5 @@
 import { DateTime } from "luxon";
 import { StepInterval } from "../../../helpers/date_helper";
-import { when } from "jest-when";
 import {
   categorizeWeekday,
   computeThroughput,
