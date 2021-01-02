@@ -3,17 +3,17 @@
     <h1 class="title">Issues</h1>
 
     <section class="content columns">
-      <b-field label="Search" class="column is-half">
+      <b-field label="Search" class="column is-6">
         <b-input v-model="searchQuery"></b-input>
       </b-field>
-      <b-field label="Issue Type" class="column">
+      <b-field label="Issue Type" class="column is-3">
         <b-dropdown
           v-model="selectedIssueTypes"
           multiple
           aria-role="list"
           class="is-fullwidth"
         >
-          <button class="button is-primary" type="button" slot="trigger">
+          <button class="button" type="button" slot="trigger">
             <span>{{ selectedIssueTypes.join(", ") }}</span>
             <b-icon icon="menu-down"></b-icon>
           </button>
@@ -28,14 +28,14 @@
           </b-dropdown-item>
         </b-dropdown>
       </b-field>
-      <b-field label="Status" class="column">
+      <b-field label="Status" class="column is-3">
         <b-dropdown
           v-model="selectedStatuses"
           multiple
           aria-role="list"
           class="is-fullwidth"
         >
-          <button class="button is-primary" type="button" slot="trigger">
+          <button class="button" type="button" slot="trigger">
             <span>{{ selectedStatuses.join(", ") }}</span>
             <b-icon icon="menu-down"></b-icon>
           </button>

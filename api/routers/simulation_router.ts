@@ -92,13 +92,13 @@ router.get("/when", async (req, res) => {
         chartArea: {
           width: "90%",
           height: "80%",
-          top: "5%",
+          top: "10%",
         },
         legend: {
           position: "none",
         },
         annotations: { style: "line" },
-        height: 300,
+        height: 400,
       },
       chartData: dataTable.build(),
     });
