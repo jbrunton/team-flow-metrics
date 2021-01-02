@@ -22,6 +22,11 @@
         </b-field>
       </div>
       <div class="column is-one-quarter">
+        <b-field label="Backlog Size">
+          <b-input v-model="backlogSize" :lazy="true" expanded></b-input>
+        </b-field>
+      </div>
+      <div class="column is-one-quarter">
         <b-field label="Seed">
           <b-input v-model="seed" :lazy="true" expanded></b-input>
           <p class="control">
@@ -67,13 +72,12 @@ export default Vue.extend({
   },
 
   data() {
-    const chartParams = getDefaultChartParams(this.$route.query);
+    const chartParams = this.parseParams();
     return {
       ...chartParams,
       startDate: DateTime.local()
         .startOf("day")
         .toJSDate(),
-      seed: this.newSeed(),
       chartOps: {},
       chartData: [],
       chart: null
@@ -96,6 +100,16 @@ export default Vue.extend({
       new ResizeObserver(this.drawChart).observe(
         document.getElementById("chart_div")
       );
+    },
+
+    parseParams() {
+      const query = this.$route.query;
+      const defaultParams = getDefaultChartParams(query);
+      return {
+        ...defaultParams,
+        seed: query.seed,
+        backlogSize: query.backlogSize
+      };
     },
 
     async fetchData() {
@@ -174,7 +188,7 @@ export default Vue.extend({
         toDate: formatDateParam(this.dates[1]),
         hierarchyLevel: String(this.selectedLevel),
         startDate: formatDateParam(DateTime.fromJSDate(this.startDate)),
-        backlogSize: 50,
+        backlogSize: this.backlogSize,
         seed: this.seed
       };
     },
