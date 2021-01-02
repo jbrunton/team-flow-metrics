@@ -41,6 +41,11 @@
     </div>
 
     <ExcludeOutliers v-model="excludeOutliers" />
+    <div class="field">
+      <b-checkbox v-model="excludeLongTails">
+        Hide long tails
+      </b-checkbox>
+    </div>
 
     <div id="chart_div"></div>
   </div>
@@ -85,6 +90,7 @@ export default Vue.extend({
       chartOps: {},
       chartData: [],
       excludeOutliers: false,
+      excludeLongTails: true,
       chart: null
     };
   },
@@ -195,7 +201,8 @@ export default Vue.extend({
         startDate: formatDateParam(DateTime.fromJSDate(this.startDate)),
         backlogSize: this.backlogSize,
         seed: this.seed,
-        excludeOutliers: String(this.excludeOutliers)
+        excludeOutliers: String(this.excludeOutliers),
+        excludeLongTails: String(this.excludeLongTails)
       };
     },
 

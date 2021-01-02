@@ -161,7 +161,7 @@ describe("run", () => {
 describe("summarize", () => {
   it("returns data for a histogram of durations", () => {
     const startDate = DateTime.local(2020, 1, 1);
-    const summary = summarize([1, 3, 10, 5, 9, 5, 3, 5], startDate);
+    const summary = summarize([1, 3, 10, 5, 9, 5, 3, 5], startDate, false);
     expect(summary).toEqual([
       {
         date: DateTime.local(2020, 1, 2),
