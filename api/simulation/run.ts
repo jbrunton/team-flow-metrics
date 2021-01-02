@@ -142,6 +142,7 @@ export type SummaryRow = {
   annotationText?: string;
   startPercentile: number;
   endPercentile: number;
+  tooltip: string;
 };
 
 export function summarize(
@@ -149,10 +150,9 @@ export function summarize(
   startDate: DateTime,
   excludeLongTails: boolean
 ): SummaryRow[] {
-  console.log("summarize", { excludeLongTails });
   const timeByDays = groupBy(runs, (run) => Math.ceil(run));
-  const rows = Object.keys(timeByDays).length;
-  const longtail = rows < 50 ? 0 : rows < 100 ? 0.01 : 0.02;
+  const rowCount = Object.keys(timeByDays).length;
+  const longtail = getLongTailCutoff(rowCount);
   const minPercentile = longtail;
   const maxPercentile = 1 - longtail;
   const percentiles = {
@@ -177,6 +177,11 @@ export function summarize(
 
       index += count;
 
+      const percentComplete = Math.floor((index / runs.length) * 100);
+      const tooltip = `${percentComplete}% of trials finished by ${date.toFormat(
+        "d MMM yyyy"
+      )}`;
+
       return {
         date,
         count,
@@ -184,6 +189,7 @@ export function summarize(
         annotationText,
         startPercentile,
         endPercentile,
+        tooltip,
       };
     })
     .filter((row) => {
