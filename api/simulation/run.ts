@@ -109,6 +109,19 @@ export function getColorForPercentile(percentile: number): string {
   return "#f44336";
 }
 
+export function getLongTailCutoff(rowCount: number): number {
+  if (rowCount < 50) {
+    return 0;
+  }
+  if (rowCount < 100) {
+    return 0.01;
+  }
+  if (rowCount < 200) {
+    return 0.02;
+  }
+  return 0.025;
+}
+
 export function run(
   backlogSize: number,
   measurements: Measurements,
@@ -131,7 +144,12 @@ export type SummaryRow = {
   endPercentile: number;
 };
 
-export function summarize(runs: number[], startDate: DateTime): SummaryRow[] {
+export function summarize(
+  runs: number[],
+  startDate: DateTime,
+  excludeLongTails: boolean
+): SummaryRow[] {
+  console.log("summarize", { excludeLongTails });
   const timeByDays = groupBy(runs, (run) => Math.ceil(run));
   const rows = Object.keys(timeByDays).length;
   const longtail = rows < 50 ? 0 : rows < 100 ? 0.01 : 0.02;
@@ -169,10 +187,10 @@ export function summarize(runs: number[], startDate: DateTime): SummaryRow[] {
       };
     })
     .filter((row) => {
-      return (
-        row.endPercentile >= minPercentile &&
-        row.startPercentile <= maxPercentile
-      );
+      return excludeLongTails
+        ? row.endPercentile >= minPercentile &&
+            row.startPercentile <= maxPercentile
+        : true;
     })
     .sort((row1, row2) => compareDateTimes(row1.date, row2.date));
 }
