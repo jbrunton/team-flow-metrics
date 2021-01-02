@@ -20,7 +20,7 @@ Deming provided his [Fourteen Points](https://deming.org/explore/fourteen-points
 2. When charts are generated to provide insight, the math is sometimes incorrect because it assumes an underlying normal distribution to work item cycle times, when actually knowledge work tends to follow a Weibull distribution.
 3. Predictions are often based on flawed methods (e.g. averages) which fail to give true forecasts with probabilities, and therefore leave management oblivious to risks of delay and cost overruns.
 
-`team-flow-metrics` is an open source tool which attempts to provide useful, actionable data for process improvement, and meaningful forecasts with probabilities. Other tools provide these capabilities (notably those provided by Daniel Vacanti at [https://actionableagile.com/](actionableagile.com)), but this project differs because:
+`team-flow-metrics` is an open source tool which attempts to provide useful, actionable data for process improvement, and meaningful forecasts with probabilities. Other tools provide these capabilities (notably those provided by Daniel Vacanti at [actionableagile.com](https://actionableagile.com/)), but this project differs because:
 
 1. It is open source and free to use.
 2. While this is not yet implemented, it will be designed to be extremely configurable so that users can adapt the modelling and forecasting capabilities to their needs (e.g. to fit with different organizational designs and units of delivery).
