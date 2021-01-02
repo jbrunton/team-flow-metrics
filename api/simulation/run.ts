@@ -24,9 +24,12 @@ export function runOnce(
   generator: RandomGenerator
 ): number {
   let time = selectValue(measurements.cycleTimes, generator);
-  let weekday = startWeekday;
+  let weekday = Math.floor(time + startWeekday);
+  while (weekday > 7) {
+    --weekday;
+  }
   while (backlogSize > 0) {
-    const category = categorizeWeekday(startWeekday + time);
+    const category = categorizeWeekday(weekday);
     const throughput = selectValue(
       measurements.throughputs[category],
       generator
