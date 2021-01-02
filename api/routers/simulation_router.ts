@@ -17,6 +17,7 @@ type SimulationParams = {
   startDate: DateTime;
   hierarchyLevel: string;
   backlogSize: number;
+  seed?: number;
 };
 
 export function parseParams(query: ParsedQs): SimulationParams {
@@ -39,6 +40,7 @@ export function parseParams(query: ParsedQs): SimulationParams {
     startDate: DateTime.fromISO(query.startDate as string),
     hierarchyLevel: query.hierarchyLevel as string,
     backlogSize: parseInt(query.backlogSize as string),
+    seed: query.seed ? parseInt(query.seed as string) : null,
   };
 }
 
@@ -52,7 +54,7 @@ router.get("/when", async (req, res) => {
       measurements,
       10000,
       params.startDate,
-      newGenerator(123)
+      newGenerator(params.seed)
     );
     const results = summarize(runs, params.startDate);
     const dataTable = new DataTableBuilder([

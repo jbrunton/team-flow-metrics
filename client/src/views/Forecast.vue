@@ -1,6 +1,6 @@
 <template>
   <div class="issues">
-    <h1>Throughput</h1>
+    <h1>Forecast</h1>
 
     <div class="columns">
       <div class="column is-half">
@@ -9,6 +9,8 @@
       <div class="column is-one-quarter">
         <HierarchyLevelPicker v-model="selectedLevel" />
       </div>
+    </div>
+    <div class="columns">
       <div class="column is-one-quarter">
         <b-field label="Start Date">
           <b-datepicker
@@ -17,6 +19,18 @@
             :date-formatter="formatDate"
           >
           </b-datepicker>
+        </b-field>
+      </div>
+      <div class="column is-one-quarter">
+        <b-field label="Seed">
+          <b-input v-model="seed" :lazy="true" expanded></b-input>
+          <p class="control">
+            <b-button
+              v-on:click="refreshSeed"
+              class="button"
+              icon-right="refresh"
+            ></b-button>
+          </p>
         </b-field>
       </div>
     </div>
@@ -59,6 +73,7 @@ export default Vue.extend({
       startDate: DateTime.local()
         .startOf("day")
         .toJSDate(),
+      seed: this.newSeed(),
       chartOps: {},
       chartData: [],
       chart: null
@@ -88,6 +103,14 @@ export default Vue.extend({
       this.chartData = response.data.chartData;
       this.chartOpts = response.data.chartOpts;
       this.drawChart();
+    },
+
+    refreshSeed() {
+      this.seed = this.newSeed();
+    },
+
+    newSeed(): number {
+      return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
     },
 
     drawChart() {
@@ -151,7 +174,8 @@ export default Vue.extend({
         toDate: formatDateParam(this.dates[1]),
         hierarchyLevel: String(this.selectedLevel),
         startDate: formatDateParam(DateTime.fromJSDate(this.startDate)),
-        backlogSize: 50
+        backlogSize: 50,
+        seed: this.seed
       };
     },
 
