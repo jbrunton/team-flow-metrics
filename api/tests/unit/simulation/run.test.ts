@@ -170,6 +170,7 @@ describe("summarize", () => {
         annotationText: null,
         startPercentile: 0,
         endPercentile: 0.125,
+        tooltip: "12% of trials finished by 2 Jan 2020",
       },
       {
         date: DateTime.local(2020, 1, 4),
@@ -178,6 +179,7 @@ describe("summarize", () => {
         annotationText: null,
         startPercentile: 0.125,
         endPercentile: 0.375,
+        tooltip: "37% of trials finished by 4 Jan 2020",
       },
       {
         date: DateTime.local(2020, 1, 6),
@@ -186,6 +188,7 @@ describe("summarize", () => {
         annotationText: "2020-01-06",
         startPercentile: 0.375,
         endPercentile: 0.75,
+        tooltip: "75% of trials finished by 6 Jan 2020",
       },
       {
         date: DateTime.local(2020, 1, 10),
@@ -194,6 +197,7 @@ describe("summarize", () => {
         annotationText: "2020-01-10",
         startPercentile: 0.75,
         endPercentile: 0.875,
+        tooltip: "87% of trials finished by 10 Jan 2020",
       },
       {
         date: DateTime.local(2020, 1, 11),
@@ -202,6 +206,7 @@ describe("summarize", () => {
         annotationText: "2020-01-11",
         startPercentile: 0.875,
         endPercentile: 1,
+        tooltip: "100% of trials finished by 11 Jan 2020",
       },
     ]);
   });

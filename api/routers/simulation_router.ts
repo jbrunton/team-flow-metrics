@@ -72,6 +72,7 @@ router.get("/when", async (req, res) => {
       { type: "string", role: "annotationText" },
       { label: "count", type: "number" },
       { label: "style", type: "string", role: "style" },
+      { label: "tooltip", type: "string", role: "tooltip" },
     ]);
     dataTable.addRows(
       results.map((row) => {
@@ -82,6 +83,7 @@ router.get("/when", async (req, res) => {
           row.annotationText,
           row.count,
           `color: ${color}`,
+          row.tooltip,
         ];
       })
     );
