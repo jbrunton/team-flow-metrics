@@ -85,6 +85,22 @@ export function runOnce(
   return time;
 }
 
+export function getColorForPercentile(percentile: number): string {
+  if (percentile > 0.95) {
+    return "#009600";
+  }
+  if (percentile > 0.85) {
+    return "#00C900";
+  }
+  if (percentile > 0.7) {
+    return "#C9C900";
+  }
+  if (percentile > 0.5) {
+    return "#FF9B00";
+  }
+  return "#f44336";
+}
+
 export function run(
   backlogSize: number,
   measurements: Measurements,
@@ -103,32 +119,33 @@ export type SummaryRow = {
   count: number;
   annotation?: string;
   annotationText?: string;
+  startPercentile: number;
+  endPercentile: number;
 };
 
 export function summarize(runs: number[], startDate: DateTime): SummaryRow[] {
   const timeByDays = groupBy(runs, (run) => Math.ceil(run));
   const rows = Object.keys(timeByDays).length;
   const longtail = rows < 50 ? 0 : rows < 100 ? 0.01 : 0.02;
-  const minIndex = Math.floor(runs.length * longtail);
-  const maxIndex = Math.floor(runs.length * (1 - longtail));
+  const minPercentile = longtail;
+  const maxPercentile = 1 - longtail;
   const percentiles = {
-    "50": Math.floor(runs.length * 0.5),
-    "70": Math.floor(runs.length * 0.7),
-    "85": Math.floor(runs.length * 0.85),
+    "50": 0.5,
+    "70": 0.7,
+    "85": 0.85,
+    "95": 0.95,
   };
   let index = 0;
   return Object.entries(timeByDays)
     .map(([duration, runsWithDuration]) => {
       const count = runsWithDuration.length;
       const date = startDate.plus({ days: parseInt(duration) });
-      const startIndex = index;
-      const endIndex = index + count;
+      const startPercentile = index / runs.length;
+      const endPercentile = (index + count) / runs.length;
 
-      const percentile = Object.entries(percentiles).find(
-        ([, percentileIndex]) => {
-          return startIndex <= percentileIndex && percentileIndex <= endIndex;
-        }
-      );
+      const percentile = Object.entries(percentiles).find(([, percentile]) => {
+        return startPercentile <= percentile && percentile < endPercentile;
+      });
       const annotation = percentile ? `${percentile[0]}th` : null;
       const annotationText = percentile ? date.toISODate() : null;
 
@@ -139,16 +156,15 @@ export function summarize(runs: number[], startDate: DateTime): SummaryRow[] {
         count,
         annotation,
         annotationText,
-        startIndex,
-        endIndex,
+        startPercentile,
+        endPercentile,
       };
     })
     .filter((row) => {
-      const startIndex = row.startIndex;
-      const endIndex = row.endIndex;
-      delete row.startIndex;
-      delete row.endIndex;
-      return endIndex >= minIndex && startIndex <= maxIndex;
+      return (
+        row.endPercentile >= minPercentile &&
+        row.startPercentile <= maxPercentile
+      );
     })
     .sort((row1, row2) => compareDateTimes(row1.date, row2.date));
 }

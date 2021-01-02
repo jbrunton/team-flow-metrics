@@ -4,7 +4,12 @@ import { ParsedQs } from "qs";
 import { DateTime } from "luxon";
 import { ValidationError } from "../metrics/chart_params";
 import { queryData } from "../metrics/throughput";
-import { measure, run, summarize } from "../simulation/run";
+import {
+  getColorForPercentile,
+  measure,
+  run,
+  summarize,
+} from "../simulation/run";
 import { DataTableBuilder } from "../metrics/data_table_builder";
 import { formatDate } from "../helpers/charts_helper";
 import { newGenerator } from "../simulation/select";
@@ -62,14 +67,19 @@ router.get("/when", async (req, res) => {
       { type: "string", role: "annotation" },
       { type: "string", role: "annotationText" },
       { label: "count", type: "number" },
+      { label: "style", type: "string", role: "style" },
     ]);
     dataTable.addRows(
-      results.map((row) => [
-        formatDate(row.date),
-        row.annotation,
-        row.annotationText,
-        row.count,
-      ])
+      results.map((row) => {
+        const color = getColorForPercentile(row.endPercentile);
+        return [
+          formatDate(row.date),
+          row.annotation,
+          row.annotationText,
+          row.count,
+          `color: ${color}`,
+        ];
+      })
     );
     return res.json({
       chartOpts: {
