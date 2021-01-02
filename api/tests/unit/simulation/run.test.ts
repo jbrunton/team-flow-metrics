@@ -129,37 +129,47 @@ describe("run", () => {
 describe("summarize", () => {
   it("returns data for a histogram of durations", () => {
     const startDate = DateTime.local(2020, 1, 1);
-    const summary = summarize([1, 3, 10, 5, 9, 5], startDate);
+    const summary = summarize([1, 3, 10, 5, 9, 5, 3, 5], startDate);
     expect(summary).toEqual([
       {
         date: DateTime.local(2020, 1, 2),
         count: 1,
         annotation: null,
         annotationText: null,
+        startPercentile: 0,
+        endPercentile: 0.125,
       },
       {
         date: DateTime.local(2020, 1, 4),
-        count: 1,
+        count: 2,
         annotation: null,
         annotationText: null,
+        startPercentile: 0.125,
+        endPercentile: 0.375,
       },
       {
         date: DateTime.local(2020, 1, 6),
-        count: 2,
+        count: 3,
         annotation: "50th",
         annotationText: "2020-01-06",
+        startPercentile: 0.375,
+        endPercentile: 0.75,
       },
       {
         date: DateTime.local(2020, 1, 10),
         count: 1,
-        annotation: "70th",
+        annotation: "85th",
         annotationText: "2020-01-10",
+        startPercentile: 0.75,
+        endPercentile: 0.875,
       },
       {
         date: DateTime.local(2020, 1, 11),
         count: 1,
-        annotation: "85th",
+        annotation: "95th",
         annotationText: "2020-01-11",
+        startPercentile: 0.875,
+        endPercentile: 1,
       },
     ]);
   });
