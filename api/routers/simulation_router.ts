@@ -51,6 +51,7 @@ router.get("/when", async (req, res) => {
       params.backlogSize,
       measurements,
       10000,
+      params.startDate,
       newGenerator(123)
     );
     const results = summarize(runs, params.startDate);
