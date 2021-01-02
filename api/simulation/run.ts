@@ -17,33 +17,6 @@ export function categorizeWeekday(weekday: number): string {
   return [6, 7].includes(weekday) ? "weekend" : "weekday";
 }
 
-export function runOnce(
-  backlogSize: number,
-  measurements: Measurements,
-  startWeekday: number,
-  generator: RandomGenerator
-): number {
-  let time = selectValue(measurements.cycleTimes, generator);
-  let weekday = Math.floor(time + startWeekday);
-  while (weekday > 7) {
-    --weekday;
-  }
-  while (backlogSize > 0) {
-    const category = categorizeWeekday(weekday);
-    const throughput = selectValue(
-      measurements.throughputs[category],
-      generator
-    );
-    backlogSize -= throughput;
-    time += 1;
-    weekday += 1;
-    if (weekday > 7) {
-      weekday = 1;
-    }
-  }
-  return time;
-}
-
 export function computeThroughput(
   issues: Issue[],
   stepInterval: StepInterval
@@ -83,6 +56,33 @@ export function measure(issues: Issue[]): Measurements {
     cycleTimes: issues.map((issue) => issue.cycleTime),
     throughputs,
   };
+}
+
+export function runOnce(
+  backlogSize: number,
+  measurements: Measurements,
+  startWeekday: number,
+  generator: RandomGenerator
+): number {
+  let time = selectValue(measurements.cycleTimes, generator);
+  let weekday = Math.floor(time + startWeekday);
+  while (weekday > 7) {
+    weekday -= 7;
+  }
+  while (backlogSize > 0) {
+    const category = categorizeWeekday(weekday);
+    const throughput = selectValue(
+      measurements.throughputs[category],
+      generator
+    );
+    backlogSize -= throughput;
+    time += 1;
+    weekday += 1;
+    while (weekday > 7) {
+      weekday -= 7;
+    }
+  }
+  return time;
 }
 
 export function run(
