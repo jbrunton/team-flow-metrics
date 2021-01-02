@@ -54,12 +54,44 @@ describe("measure", () => {
         cycleTime: 2,
         completed: DateTime.local(2020, 1, 6, 10, 30),
       }),
+      IssueFactory.build({
+        cycleTime: 200,
+        completed: DateTime.local(2020, 1, 7, 10, 30),
+      }),
     ];
-    expect(measure(issues)).toEqual({
+    expect(measure(issues, false)).toEqual({
+      cycleTimes: [1, 3, 2, 200],
+      throughputs: {
+        weekend: [0, 0],
+        weekday: [2, 0, 1, 1],
+      },
+    });
+  });
+
+  it("optionally excludes cycle time outliers", () => {
+    const issues = [
+      IssueFactory.build({
+        cycleTime: 1,
+        completed: DateTime.local(2020, 1, 2, 9, 30),
+      }),
+      IssueFactory.build({
+        cycleTime: 3,
+        completed: DateTime.local(2020, 1, 2, 12, 10),
+      }),
+      IssueFactory.build({
+        cycleTime: 2,
+        completed: DateTime.local(2020, 1, 6, 10, 30),
+      }),
+      IssueFactory.build({
+        cycleTime: 200,
+        completed: DateTime.local(2020, 1, 7, 10, 30),
+      }),
+    ];
+    expect(measure(issues, true)).toEqual({
       cycleTimes: [1, 3, 2],
       throughputs: {
         weekend: [0, 0],
-        weekday: [2, 0, 1],
+        weekday: [2, 0, 1, 1],
       },
     });
   });
