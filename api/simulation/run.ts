@@ -58,7 +58,7 @@ export function measure(
   }
   let cycleTimes = issues.map((issue) => issue.cycleTime);
   if (excludeCycleTimeOutliers) {
-    cycleTimes = excludeOutliers(cycleTimes, (x) => x);
+    cycleTimes = excludeOutliers(cycleTimes, (x: number) => x);
   }
   return {
     cycleTimes,
