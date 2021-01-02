@@ -57,15 +57,6 @@ router.get("/when", async (req, res) => {
   try {
     const params = parseParams(req.query);
     const issues = await queryData(params);
-    const measurements = measure(issues, params.excludeOutliers);
-    const runs = run(
-      params.backlogSize,
-      measurements,
-      10000,
-      params.startDate,
-      newGenerator(params.seed)
-    );
-    const results = summarize(runs, params.startDate, params.includeLongTails);
     const dataTable = new DataTableBuilder([
       { label: "date", type: "date" },
       { type: "string", role: "annotation" },
@@ -74,19 +65,35 @@ router.get("/when", async (req, res) => {
       { label: "style", type: "string", role: "style" },
       { label: "tooltip", type: "string", role: "tooltip" },
     ]);
-    dataTable.addRows(
-      results.map((row) => {
-        const color = getColorForPercentile(row.endPercentile);
-        return [
-          formatDate(row.date),
-          row.annotation,
-          row.annotationText,
-          row.count,
-          `color: ${color}`,
-          row.tooltip,
-        ];
-      })
-    );
+
+    if (issues.length) {
+      const measurements = measure(issues, params.excludeOutliers);
+      const runs = run(
+        params.backlogSize,
+        measurements,
+        10000,
+        params.startDate,
+        newGenerator(params.seed)
+      );
+      const results = summarize(
+        runs,
+        params.startDate,
+        params.includeLongTails
+      );
+      dataTable.addRows(
+        results.map((row) => {
+          const color = getColorForPercentile(row.endPercentile);
+          return [
+            formatDate(row.date),
+            row.annotation,
+            row.annotationText,
+            row.count,
+            `color: ${color}`,
+            row.tooltip,
+          ];
+        })
+      );
+    }
     return res.json({
       chartOpts: {
         seriesType: "bars",

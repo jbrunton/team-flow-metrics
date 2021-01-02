@@ -150,7 +150,6 @@ export function summarize(
   startDate: DateTime,
   includeLongTails: boolean
 ): SummaryRow[] {
-  console.log("summarize", { includeLongTails });
   const timeByDays = groupBy(runs, (run) => Math.ceil(run));
   const rowCount = Object.keys(timeByDays).length;
   const longtail = getLongTailCutoff(rowCount);
