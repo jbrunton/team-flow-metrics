@@ -1,6 +1,6 @@
 <template>
   <b-field label="Hierarchy Level">
-    <b-select aria-role="list" v-model="input">
+    <b-select aria-role="list" v-model="input" expanded>
       <option
         v-for="level in hierarchyLevels"
         :value="level.name"
