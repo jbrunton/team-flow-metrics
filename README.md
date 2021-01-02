@@ -14,7 +14,7 @@ In software (and knowledge work more generally), management is often unaware of 
 
 > If you have a stable system, there is no use to specify a goal. You will get whatever the system will deliver. A goal beyond the capability of the system will not be reached. If you have not a stable system, there is no point setting a goal. There is no way to know what the system will produce: it has no capability.
 
-Deming provided an alternative theory of management (his [Fourteen Points](https://deming.org/explore/fourteen-points/)) as an alternative. However, project management tools common in software and other knowledge work fail to deliver on the promise of this theory:
+Deming provided his [Fourteen Points](https://deming.org/explore/fourteen-points/) as an alternative theory of management. However, project management tools common in software and other knowledge work fail to deliver on the promise of this theory:
 
 1. Project management software often fails to give management sufficient insight into the capabilities of processes (e.g. it focuses on flawed measurements such as story point velocity, rather than flow metrics like throughput and cycle times). 
 2. When charts are generated to provide insight, the math is sometimes incorrect because it assumes an underlying normal distribution to work item cycle times, when actually knowledge work tends to follow a Weibull distribution.
