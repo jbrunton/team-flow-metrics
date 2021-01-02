@@ -1,5 +1,6 @@
 import { groupBy, times } from "lodash";
 import { DateTime } from "luxon";
+import { excludeOutliers } from "../helpers/data_helper";
 import {
   compareDateTimes,
   dateRange,
@@ -43,7 +44,10 @@ export function computeThroughput(
   });
 }
 
-export function measure(issues: Issue[]): Measurements {
+export function measure(
+  issues: Issue[],
+  excludeCycleTimeOutliers: boolean
+): Measurements {
   const throughputs: Record<string, number[]> = {};
   for (const { date, count } of computeThroughput(issues, StepInterval.Daily)) {
     const category = categorizeWeekday(date.weekday);
@@ -52,8 +56,12 @@ export function measure(issues: Issue[]): Measurements {
     }
     throughputs[category].push(count);
   }
+  let cycleTimes = issues.map((issue) => issue.cycleTime);
+  if (excludeCycleTimeOutliers) {
+    cycleTimes = excludeOutliers(cycleTimes, (x) => x);
+  }
   return {
-    cycleTimes: issues.map((issue) => issue.cycleTime),
+    cycleTimes,
     throughputs,
   };
 }

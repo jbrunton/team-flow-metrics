@@ -40,6 +40,8 @@
       </div>
     </div>
 
+    <ExcludeOutliers v-model="excludeOutliers" />
+
     <div id="chart_div"></div>
   </div>
 </template>
@@ -60,6 +62,7 @@ import { formatDateRange, formatDate } from "@/helpers/date_helper";
 import { buildUrl, formatDateParam } from "@/helpers/url_helper";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
+import ExcludeOutliers from "@/components/ExcludeOutliers.vue";
 import { getDefaultChartParams } from "@/helpers/chart_helper";
 import { DateTime } from "luxon";
 
@@ -68,7 +71,8 @@ export default Vue.extend({
 
   components: {
     DatePicker,
-    HierarchyLevelPicker
+    HierarchyLevelPicker,
+    ExcludeOutliers
   },
 
   data() {
@@ -80,6 +84,7 @@ export default Vue.extend({
         .toJSDate(),
       chartOps: {},
       chartData: [],
+      excludeOutliers: false,
       chart: null
     };
   },
@@ -189,7 +194,8 @@ export default Vue.extend({
         hierarchyLevel: String(this.selectedLevel),
         startDate: formatDateParam(DateTime.fromJSDate(this.startDate)),
         backlogSize: this.backlogSize,
-        seed: this.seed
+        seed: this.seed,
+        excludeOutliers: String(this.excludeOutliers)
       };
     },
 

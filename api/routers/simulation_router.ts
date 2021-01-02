@@ -23,6 +23,7 @@ type SimulationParams = {
   hierarchyLevel: string;
   backlogSize: number;
   seed?: number;
+  excludeOutliers: boolean;
 };
 
 export function parseParams(query: ParsedQs): SimulationParams {
@@ -44,6 +45,7 @@ export function parseParams(query: ParsedQs): SimulationParams {
     toDate: DateTime.fromISO(query.toDate as string),
     startDate: DateTime.fromISO(query.startDate as string),
     hierarchyLevel: query.hierarchyLevel as string,
+    excludeOutliers: query.excludeOutliers === "true",
     backlogSize: parseInt(query.backlogSize as string),
     seed: query.seed ? parseInt(query.seed as string) : null,
   };
@@ -53,7 +55,7 @@ router.get("/when", async (req, res) => {
   try {
     const params = parseParams(req.query);
     const issues = await queryData(params);
-    const measurements = measure(issues);
+    const measurements = measure(issues, params.excludeOutliers);
     const runs = run(
       params.backlogSize,
       measurements,
