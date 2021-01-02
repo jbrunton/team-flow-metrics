@@ -3,15 +3,15 @@
     <h1>Throughput</h1>
 
     <div class="columns">
-      <div class="column is-half">
+      <div class="column is-4">
         <DatePicker v-model="dates" />
       </div>
-      <div class="column is-one-quarter">
+      <div class="column is-2">
         <HierarchyLevelPicker v-model="selectedLevel" />
       </div>
-      <div class="column is-one-quarter">
+      <div class="column is-2">
         <b-field label="Step Interval">
-          <b-select aria-role="list" v-model="selectedInterval">
+          <b-select aria-role="list" v-model="selectedInterval" expanded>
             <option
               v-for="interval in stepIntervals"
               :value="interval.key"
