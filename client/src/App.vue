@@ -26,6 +26,9 @@
           <b-navbar-item tag="router-link" :to="{ path: '/throughput' }">
             Throughput
           </b-navbar-item>
+          <b-navbar-item tag="router-link" :to="{ path: '/forecast' }">
+            Forecast
+          </b-navbar-item>
         </template>
       </b-navbar>
     </div>

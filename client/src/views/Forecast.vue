@@ -107,8 +107,8 @@ export default Vue.extend({
       const defaultParams = getDefaultChartParams(query);
       return {
         ...defaultParams,
-        seed: query.seed,
-        backlogSize: query.backlogSize
+        seed: query.seed || this.newSeed(),
+        backlogSize: query.backlogSize || 100
       };
     },
 
