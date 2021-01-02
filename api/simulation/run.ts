@@ -148,8 +148,9 @@ export type SummaryRow = {
 export function summarize(
   runs: number[],
   startDate: DateTime,
-  excludeLongTails: boolean
+  includeLongTails: boolean
 ): SummaryRow[] {
+  console.log("summarize", { includeLongTails });
   const timeByDays = groupBy(runs, (run) => Math.ceil(run));
   const rowCount = Object.keys(timeByDays).length;
   const longtail = getLongTailCutoff(rowCount);
@@ -193,10 +194,13 @@ export function summarize(
       };
     })
     .filter((row) => {
-      return excludeLongTails
-        ? row.endPercentile >= minPercentile &&
-            row.startPercentile <= maxPercentile
-        : true;
+      if (includeLongTails) {
+        return true;
+      }
+      return (
+        row.endPercentile >= minPercentile &&
+        row.startPercentile <= maxPercentile
+      );
     })
     .sort((row1, row2) => compareDateTimes(row1.date, row2.date));
 }

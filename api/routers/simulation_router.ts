@@ -24,7 +24,7 @@ type SimulationParams = {
   backlogSize: number;
   seed?: number;
   excludeOutliers: boolean;
-  excludeLongTails: boolean;
+  includeLongTails: boolean;
 };
 
 export function parseParams(query: ParsedQs): SimulationParams {
@@ -47,7 +47,7 @@ export function parseParams(query: ParsedQs): SimulationParams {
     startDate: DateTime.fromISO(query.startDate as string),
     hierarchyLevel: query.hierarchyLevel as string,
     excludeOutliers: query.excludeOutliers === "true",
-    excludeLongTails: query.excludeLongTails === "true",
+    includeLongTails: query.includeLongTails === "true",
     backlogSize: parseInt(query.backlogSize as string),
     seed: query.seed ? parseInt(query.seed as string) : null,
   };
@@ -65,7 +65,7 @@ router.get("/when", async (req, res) => {
       params.startDate,
       newGenerator(params.seed)
     );
-    const results = summarize(runs, params.startDate, params.excludeLongTails);
+    const results = summarize(runs, params.startDate, params.includeLongTails);
     const dataTable = new DataTableBuilder([
       { label: "date", type: "date" },
       { type: "string", role: "annotation" },
