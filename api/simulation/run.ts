@@ -70,9 +70,12 @@ export function runOnce(
   backlogSize: number,
   measurements: Measurements,
   startWeekday: number,
+  excludeLeadTimes: boolean,
   generator: RandomGenerator
 ): number {
-  let time = selectValue(measurements.cycleTimes, generator);
+  let time = excludeLeadTimes
+    ? 0
+    : selectValue(measurements.cycleTimes, generator);
   let weekday = Math.floor(time + startWeekday);
   while (weekday > 7) {
     weekday -= 7;
@@ -127,10 +130,19 @@ export function run(
   measurements: Measurements,
   runCount: number,
   startDate: DateTime,
+  excludeLeadTimes: boolean,
   generator: RandomGenerator
 ): number[] {
   const results = times(runCount)
-    .map(() => runOnce(backlogSize, measurements, startDate.weekday, generator))
+    .map(() =>
+      runOnce(
+        backlogSize,
+        measurements,
+        startDate.weekday,
+        excludeLeadTimes,
+        generator
+      )
+    )
     .sort((a, b) => a - b);
   return results;
 }

@@ -46,6 +46,11 @@
         Show long tails
       </b-checkbox>
     </div>
+    <div class="field">
+      <b-checkbox v-model="excludeLeadTimes">
+        Exclude initial cycle times
+      </b-checkbox>
+    </div>
 
     <div id="chart_div"></div>
   </div>
@@ -91,6 +96,7 @@ export default Vue.extend({
       chartData: [],
       excludeOutliers: false,
       includeLongTails: false,
+      excludeLeadTimes: false,
       chart: null
     };
   },
@@ -202,7 +208,8 @@ export default Vue.extend({
         backlogSize: this.backlogSize,
         seed: this.seed,
         excludeOutliers: String(this.excludeOutliers),
-        includeLongTails: String(this.includeLongTails)
+        includeLongTails: String(this.includeLongTails),
+        excludeLeadTimes: String(this.excludeLeadTimes)
       };
     },
 
