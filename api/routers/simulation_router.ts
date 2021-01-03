@@ -25,6 +25,7 @@ type SimulationParams = {
   seed?: number;
   excludeOutliers: boolean;
   includeLongTails: boolean;
+  excludeLeadTimes: boolean;
 };
 
 export function parseParams(query: ParsedQs): SimulationParams {
@@ -48,6 +49,7 @@ export function parseParams(query: ParsedQs): SimulationParams {
     hierarchyLevel: query.hierarchyLevel as string,
     excludeOutliers: query.excludeOutliers === "true",
     includeLongTails: query.includeLongTails === "true",
+    excludeLeadTimes: query.excludeLeadTimes === "true",
     backlogSize: parseInt(query.backlogSize as string),
     seed: query.seed ? parseInt(query.seed as string) : null,
   };
@@ -73,6 +75,7 @@ router.get("/when", async (req, res) => {
         measurements,
         10000,
         params.startDate,
+        params.excludeLeadTimes,
         newGenerator(params.seed)
       );
       const results = summarize(

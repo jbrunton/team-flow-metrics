@@ -124,7 +124,34 @@ describe("runOnce", () => {
     // 5.5  |  0  | 7 (Sun) |  4  - throughput sample #3
     // 6.5  |  2  | 1 (Mon) |  2  - throughput sample #4
     // 7.5  |  2  | 2 (Mon) |  0  - throughput sample #5
-    expect(runOnce(5, measurements, startWeekday, generator)).toEqual(7.5);
+    expect(runOnce(5, measurements, startWeekday, false, generator)).toEqual(
+      7.5
+    );
+  });
+
+  it("ignores lead times if excludeLeadTimes is true", () => {
+    const measurements: Measurements = {
+      cycleTimes: [2.5, 3.5, 5.5],
+      throughputs: {
+        weekend: [0],
+        weekday: [1, 2],
+      },
+    };
+    const startWeekday = 1;
+
+    const generator = jest.fn();
+    generator
+      .mockReturnValueOnce(1) // throughput sample #1
+      .mockReturnValueOnce(0) // throughput sample #2
+      .mockReturnValueOnce(0) // throughput sample #3
+      .mockReturnValueOnce(0); // throughput sample #4
+
+    // time | th. |   day   | backlog count
+    //   1  |  2  | 1 (Mon) |  3  - throughput sample #1
+    //   2  |  1  | 2 (Tue) |  2  - throughput sample #2
+    //   3  |  1  | 3 (Wed) |  1  - throughput sample #3
+    //   4  |  1  | 4 (Thu) |  0  - throughput sample #4
+    expect(runOnce(5, measurements, startWeekday, true, generator)).toEqual(4);
   });
 });
 
@@ -154,7 +181,10 @@ describe("run", () => {
       .mockReturnValueOnce(1) // throughput sample #4
       .mockReturnValueOnce(0) // throughput sample #5
       .mockReturnValueOnce(0); // throughput sample #6
-    expect(run(5, measurements, 2, startDate, generator)).toEqual([7.5, 8.5]);
+    expect(run(5, measurements, 2, startDate, false, generator)).toEqual([
+      7.5,
+      8.5,
+    ]);
   });
 });
 
