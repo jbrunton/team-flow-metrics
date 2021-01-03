@@ -4,6 +4,8 @@ A tool for producing flow metrics and forecasts for teams doing knowledge work.
 
 Specifically, it can produce cycle time scatterplots, throughput charts and cumulative flow diagrams in order to provide insight into process behavior and capabilities; and it can forecast using Monte Carlo methods to predict delivery times and costs for future work.
 
+<a href="https://raw.githubusercontent.com/jbrunton/team-flow-metrics/develop/docs/forecast.png"><img src="https://raw.githubusercontent.com/jbrunton/team-flow-metrics/develop/docs/forecast.png" /></a>
+
 Inspired by [Actionable Agile Metrics for Predictability](https://www.goodreads.com/book/show/25867120-actionable-agile-metrics-for-predictability) by Daniel Vacanti.
 
 Very much under development.
