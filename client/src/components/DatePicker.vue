@@ -12,9 +12,9 @@
         <b-dropdown-item custom>
           <div class="columns">
             <b-menu class="column">
-              <b-menu-list label="Absolute" style="whitespace: no-wrap;">
+              <b-menu-list label="Relative" style="whitespace: no-wrap;">
                 <b-dropdown-item
-                  v-for="range in calendarMonthRanges"
+                  v-for="range in relativeDayRanges"
                   :key="range.description"
                   aria-role="menuitem"
                   @click="selectRange(range)"
@@ -24,9 +24,24 @@
               </b-menu-list>
             </b-menu>
             <b-menu class="column">
-              <b-menu-list label="Relative" style="white-space: no-wrap;">
+              <b-menu-list
+                label="Calendar Months"
+                style="white-space: no-wrap;"
+              >
                 <b-dropdown-item
-                  v-for="range in relativeDateRanges"
+                  v-for="range in relativeMonthRanges"
+                  :key="range.description"
+                  aria-role="menuitem"
+                  @click="selectRange(range)"
+                >
+                  {{ range.description }}
+                </b-dropdown-item>
+              </b-menu-list>
+            </b-menu>
+            <b-menu class="column">
+              <b-menu-list label="Calendar Weeks" style="white-space: no-wrap;">
+                <b-dropdown-item
+                  v-for="range in relativeWeekRanges"
                   :key="range.description"
                   aria-role="menuitem"
                   @click="selectRange(range)"
@@ -74,8 +89,10 @@ import Vue from "vue";
 import { DateTime } from "luxon";
 import {
   formatDate,
-  getRelativeDateRanges,
-  getCalendarMonthRanges,
+  getRelativeDayRanges,
+  getRelativeWeekRanges,
+  getRelativeMonthRanges,
+  getRelativeYearRanges,
   DateRange
 } from "../helpers/date_helper";
 
@@ -84,8 +101,10 @@ export default Vue.extend({
   data() {
     const [fromDate, toDate] = this.value;
     return {
-      relativeDateRanges: getRelativeDateRanges(),
-      calendarMonthRanges: getCalendarMonthRanges(),
+      relativeDayRanges: getRelativeDayRanges(),
+      relativeWeekRanges: getRelativeWeekRanges(),
+      relativeMonthRanges: getRelativeMonthRanges(),
+      relativeYearRanges: getRelativeYearRanges(),
       fromDate: fromDate.toJSDate(),
       toDate: toDate.toJSDate()
     };
