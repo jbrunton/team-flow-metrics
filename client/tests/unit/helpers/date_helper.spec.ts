@@ -2,9 +2,10 @@ import {
   formatDateRange,
   formatDate,
   formatTime,
-  getCalendarMonthRanges,
   getDefaultDateRange,
-  getRelativeDateRanges
+  getRelativeDayRanges,
+  getRelativeMonthRanges,
+  getRelativeWeekRanges
 } from "@/helpers/date_helper";
 import { DateTime } from "luxon";
 
@@ -31,10 +32,10 @@ describe("getDefaultDateRange", () => {
   });
 });
 
-describe("getRelativeDateRanges", () => {
+describe("getRelativeDayRanges", () => {
   it("returns a list of relative date ranges", () => {
     const now = DateTime.local(2020, 6, 10);
-    const ranges = getRelativeDateRanges(now);
+    const ranges = getRelativeDayRanges(now);
     expect(ranges).toEqual([
       {
         fromDate: DateTime.local(2020, 6, 3),
@@ -70,10 +71,10 @@ describe("getRelativeDateRanges", () => {
   });
 });
 
-describe("getCalendarMonthRanges", () => {
+describe("getRelativeMonthRanges", () => {
   it("returns a list of calendar month ranges", () => {
     const now = DateTime.local(2020, 6, 10, 10, 30);
-    const ranges = getCalendarMonthRanges(now);
+    const ranges = getRelativeMonthRanges(now);
     expect(ranges).toEqual([
       {
         fromDate: DateTime.local(2020, 6, 1),
@@ -83,27 +84,68 @@ describe("getCalendarMonthRanges", () => {
       {
         fromDate: DateTime.local(2020, 5, 1),
         toDate: DateTime.local(2020, 6, 1),
-        description: "May"
-      },
-      {
-        fromDate: DateTime.local(2020, 4, 1),
-        toDate: DateTime.local(2020, 5, 1),
-        description: "April"
+        description: "Last month"
       },
       {
         fromDate: DateTime.local(2020, 3, 1),
-        toDate: DateTime.local(2020, 4, 1),
-        description: "March"
+        toDate: DateTime.local(2020, 6, 1),
+        description: "Last 3 months"
       },
       {
-        fromDate: DateTime.local(2020, 2, 1),
-        toDate: DateTime.local(2020, 3, 1),
-        description: "February"
+        fromDate: DateTime.local(2019, 12, 1),
+        toDate: DateTime.local(2020, 6, 1),
+        description: "Last 6 months"
       },
       {
-        fromDate: DateTime.local(2020, 1, 1),
-        toDate: DateTime.local(2020, 2, 1),
-        description: "January"
+        fromDate: DateTime.local(2019, 6, 1),
+        toDate: DateTime.local(2020, 6, 1),
+        description: "Last 12 months"
+      },
+      {
+        fromDate: DateTime.local(2018, 6, 1),
+        toDate: DateTime.local(2020, 6, 1),
+        description: "Last 24 months"
+      }
+    ]);
+  });
+});
+
+describe("getRelativeWeekRanges", () => {
+  it("returns a list of calendar week ranges", () => {
+    // 10 June 2020 was a Wednesday, so 'this' week
+    // is Mon 8 June - Mon 15 June
+    const now = DateTime.local(2020, 6, 10, 10, 30);
+    const ranges = getRelativeWeekRanges(now);
+    expect(ranges).toEqual([
+      {
+        fromDate: DateTime.local(2020, 6, 8),
+        toDate: DateTime.local(2020, 6, 15),
+        description: "This week"
+      },
+      {
+        fromDate: DateTime.local(2020, 6, 1),
+        toDate: DateTime.local(2020, 6, 8),
+        description: "Last week"
+      },
+      {
+        fromDate: DateTime.local(2020, 5, 11),
+        toDate: DateTime.local(2020, 6, 8),
+        description: "Last 4 weeks"
+      },
+      {
+        fromDate: DateTime.local(2020, 4, 13),
+        toDate: DateTime.local(2020, 6, 8),
+        description: "Last 8 weeks"
+      },
+      {
+        fromDate: DateTime.local(2019, 12, 9),
+        toDate: DateTime.local(2020, 6, 8),
+        description: "Last 26 weeks"
+      },
+      {
+        fromDate: DateTime.local(2019, 6, 10),
+        toDate: DateTime.local(2020, 6, 8),
+        description: "Last 52 weeks"
       }
     ]);
   });

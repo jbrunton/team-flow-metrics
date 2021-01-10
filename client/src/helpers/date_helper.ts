@@ -23,9 +23,7 @@ export function getDefaultDateRange(
   return [fromDate, toDate];
 }
 
-export function getRelativeDateRanges(
-  now = DateTime.local()
-): Array<DateRange> {
+export function getRelativeDayRanges(now = DateTime.local()): Array<DateRange> {
   const today = now.startOf("day");
   const toDate = today.plus({ days: 1 });
   return [
@@ -62,29 +60,99 @@ export function getRelativeDateRanges(
   ];
 }
 
-export function getCalendarMonthRanges(
+export function getRelativeWeekRanges(
   now = DateTime.local()
 ): Array<DateRange> {
-  const thisMonth = now.startOf("month");
-  let fromDate = thisMonth;
-  const ranges = [
+  const startOfWeek = now.startOf("week");
+  return [
     {
-      fromDate: thisMonth,
-      toDate: thisMonth.plus({ months: 1 }),
-      description: "This month"
+      fromDate: startOfWeek,
+      toDate: startOfWeek.plus({ weeks: 1 }),
+      description: "This week"
+    },
+    {
+      fromDate: startOfWeek.minus({ weeks: 1 }),
+      toDate: startOfWeek,
+      description: "Last week"
+    },
+    {
+      fromDate: startOfWeek.minus({ weeks: 4 }),
+      toDate: startOfWeek,
+      description: "Last 4 weeks"
+    },
+    {
+      fromDate: startOfWeek.minus({ weeks: 8 }),
+      toDate: startOfWeek,
+      description: "Last 8 weeks"
+    },
+    {
+      fromDate: startOfWeek.minus({ weeks: 26 }),
+      toDate: startOfWeek,
+      description: "Last 26 weeks"
+    },
+    {
+      fromDate: startOfWeek.minus({ weeks: 52 }),
+      toDate: startOfWeek,
+      description: "Last 52 weeks"
     }
   ];
+}
 
-  for (let i = 0; i < 5; ++i) {
-    fromDate = fromDate.minus({ months: 1 });
-    ranges.push({
-      fromDate: fromDate,
-      toDate: fromDate.plus({ months: 1 }),
-      description: fromDate.toFormat("MMMM")
-    });
-  }
+export function getRelativeMonthRanges(
+  now = DateTime.local()
+): Array<DateRange> {
+  const startOfMonth = now.startOf("month");
+  return [
+    {
+      fromDate: startOfMonth,
+      toDate: startOfMonth.plus({ months: 1 }),
+      description: "This month"
+    },
+    {
+      fromDate: startOfMonth.minus({ months: 1 }),
+      toDate: startOfMonth,
+      description: "Last month"
+    },
+    {
+      fromDate: startOfMonth.minus({ months: 3 }),
+      toDate: startOfMonth,
+      description: "Last 3 months"
+    },
+    {
+      fromDate: startOfMonth.minus({ months: 6 }),
+      toDate: startOfMonth,
+      description: "Last 6 months"
+    },
+    {
+      fromDate: startOfMonth.minus({ months: 12 }),
+      toDate: startOfMonth,
+      description: "Last 12 months"
+    },
+    {
+      fromDate: startOfMonth.minus({ months: 24 }),
+      toDate: startOfMonth,
+      description: "Last 24 months"
+    }
+  ];
+}
 
-  return ranges;
+export function getRelativeYearRanges(
+  now = DateTime.local()
+): Array<DateRange> {
+  const today = now.startOf("day");
+  const toDate = today.plus({ days: 1 });
+  return [
+    {
+      fromDate: now.minus({ years: 1 }),
+      toDate: toDate,
+      description: "Last 1 year"
+    },
+    {
+      fromDate: now.minus({ years: 2 }),
+      toDate: toDate,
+      description: "Last 2 years"
+    }
+  ];
 }
 
 export function formatDate(date?: Date | DateTime): string {
