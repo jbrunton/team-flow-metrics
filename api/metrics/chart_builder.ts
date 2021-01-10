@@ -5,11 +5,11 @@ import { DataTableBuilder } from "./data_table_builder";
 
 export function chartBuilder<Params, Data>(
   parseParams: (query: ParsedQs) => Params,
-  queryData: (params: Params) => Promise<Data[]>,
-  buildDataTable: (data: Data[], params: Params) => DataTableBuilder,
+  queryData: (params: Params) => Promise<Data>,
+  buildDataTable: (data: Data, params: Params) => DataTableBuilder,
   buildResponse: (
     builder: DataTableBuilder,
-    data: Data[],
+    data: Data,
     params: Params
   ) => unknown
 ) {

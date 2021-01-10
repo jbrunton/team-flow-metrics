@@ -1,9 +1,17 @@
 import { DateTime } from "luxon";
+import { concat } from "lodash";
 import { formatDate } from "../helpers/charts_helper";
 import { Issue } from "../models/entities/issue";
 import { DataTableBuilder } from "./data_table_builder";
 import { ParsedQs } from "qs";
-import { getRepository, IsNull, LessThan, MoreThan, Not } from "typeorm";
+import {
+  Between,
+  getRepository,
+  IsNull,
+  LessThan,
+  MoreThanOrEqual,
+  Not,
+} from "typeorm";
 import { ChartParams, ValidationError } from "./chart_params";
 import { chartBuilder } from "./chart_builder";
 import { CfdBuilder } from "./cfd_builder";
@@ -13,7 +21,10 @@ export type EpicCfdParams = {
 };
 
 export type IssueCfdParams = ChartParams & {
-  excludeStoppedIssues: boolean;
+  includeStoppedIssues: boolean;
+  includeToDoIssues: boolean;
+  includeBacklog: boolean;
+  includeDoneIssues: boolean;
 };
 
 export type CfdParams = EpicCfdParams | IssueCfdParams;
@@ -33,7 +44,10 @@ export function parseParams(query: ParsedQs): CfdParams {
       fromDate: DateTime.fromISO(query.fromDate as string).toUTC(),
       toDate: DateTime.fromISO(query.toDate as string).toUTC(),
       hierarchyLevel: query.hierarchyLevel as string,
-      excludeStoppedIssues: query.excludeStoppedIssues === "true",
+      includeStoppedIssues: query.includeStoppedIssues === "true",
+      includeToDoIssues: query.includeToDoIssues === "true",
+      includeBacklog: query.includeBacklog === "true",
+      includeDoneIssues: query.includeDoneIssues === "true",
     };
   } else {
     throw new ValidationError([
@@ -42,7 +56,13 @@ export function parseParams(query: ParsedQs): CfdParams {
   }
 }
 
-export async function queryData(params: CfdParams): Promise<Issue[]> {
+export type CfdData = {
+  issues: Issue[];
+  backlogSize: number;
+  doneCount: number;
+};
+
+export async function queryData(params: CfdParams): Promise<CfdData> {
   if (isEpicParams(params)) {
     const epic = await getRepository(Issue).findOne({ key: params.epicKey });
     if (!epic) {
@@ -54,34 +74,71 @@ export async function queryData(params: CfdParams): Promise<Issue[]> {
     const issues = await getRepository(Issue).find({
       epicId: epic.id,
     });
-    return issues;
+    return {
+      issues,
+      backlogSize: 0,
+      doneCount: 0,
+    };
   } else {
+    const { fromDate, toDate } = params;
+    const isStopped = (issue: Issue) =>
+      issue.started && !issue.completed && issue.statusCategory === "To Do";
+    const issueType = params.hierarchyLevel === "Epic" ? "Epic" : Not("Epic"); // TODO: this is a hack
     const completedIssues = await getRepository(Issue).find({
-      completed: MoreThan(params.fromDate),
-      issueType: params.hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
-      started: LessThan(params.toDate),
+      issueType,
+      started: LessThan(toDate),
+      completed: MoreThanOrEqual(fromDate),
     });
     const inProgressIssues = await getRepository(Issue).find({
+      issueType,
+      started: Not(IsNull()),
       completed: IsNull(),
-      issueType: params.hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
-      started: LessThan(params.toDate),
+      created: LessThan(toDate),
     });
-    const issues = completedIssues
-      .concat(inProgressIssues)
-      .filter(
-        (issue) =>
-          !params.excludeStoppedIssues || issue.statusCategory !== "To Do"
-      );
-    return issues;
+    const toDoIssues = params.includeToDoIssues
+      ? await getRepository(Issue).find({
+          issueType,
+          started: IsNull(),
+          completed: IsNull(),
+          created: Between(fromDate, toDate),
+        })
+      : [];
+    const backlogSize =
+      params.includeToDoIssues && params.includeBacklog
+        ? await getRepository(Issue).count({
+            issueType,
+            started: IsNull(),
+            completed: IsNull(),
+            created: LessThan(fromDate),
+          })
+        : 0;
+    const doneCount = params.includeDoneIssues
+      ? await getRepository(Issue).count({
+          issueType,
+          completed: LessThan(fromDate),
+        })
+      : 0;
+    const candidates = concat(completedIssues, inProgressIssues, toDoIssues);
+    const issues = candidates.filter(
+      (issue) => params.includeStoppedIssues || !isStopped(issue)
+    );
+    return {
+      issues,
+      backlogSize,
+      doneCount,
+    };
   }
 }
 
 export function buildDataTable(
-  issues: Issue[],
+  { issues, backlogSize, doneCount }: CfdData,
   params: CfdParams
 ): DataTableBuilder {
   const cfdBuilder = new CfdBuilder();
   cfdBuilder.addIssues(issues);
+  cfdBuilder.setBacklogSize(backlogSize);
+  cfdBuilder.setDoneCount(doneCount);
+  const includeToDoColumn = isEpicParams(params) || params.includeToDoIssues;
   const rows = cfdBuilder
     .build(params["fromDate"], params["toDate"])
     .map((cfdRow) => {
@@ -92,7 +149,7 @@ export function buildDataTable(
         cfdRow.done,
         cfdRow.inProgress,
       ];
-      if (params["epicKey"]) {
+      if (includeToDoColumn) {
         row.push(cfdRow.toDo);
       }
       return row;
@@ -121,7 +178,7 @@ export function buildDataTable(
       type: "number",
     },
   ];
-  if (params["epicKey"]) {
+  if (includeToDoColumn) {
     columns.push({
       label: "To Do",
       type: "number",
@@ -134,12 +191,12 @@ export function buildDataTable(
 
 export function buildResponse(
   dataTable: DataTableBuilder,
-  data: Issue[],
+  { issues, backlogSize }: CfdData,
   params: CfdParams
 ): unknown {
   return {
     meta: {
-      issuesCount: data.length,
+      issuesCount: issues.length + backlogSize,
     },
     chartOpts: getChartOps(params),
     chartData: dataTable.build(),
@@ -153,7 +210,7 @@ function getChartOps(params: CfdParams) {
       height: "80%",
       top: "5%",
     },
-    height: 300,
+    height: 500,
     hAxis: {
       titleTextStyle: {
         color: "#333",
@@ -215,7 +272,7 @@ function getChartOps(params: CfdParams) {
   };
 }
 
-export const buildCfd = chartBuilder<CfdParams, Issue>(
+export const buildCfd = chartBuilder<CfdParams, CfdData>(
   parseParams,
   queryData,
   buildDataTable,
