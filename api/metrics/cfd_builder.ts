@@ -1,11 +1,7 @@
 import { Issue } from "../models/entities/issue";
 import { DateTime } from "luxon";
 import { flatten, compact, flow, sortBy } from "lodash/fp";
-import {
-  compareDateTimes,
-  dateRange,
-  StepInterval,
-} from "../helpers/date_helper";
+import { dateRange, StepInterval } from "../helpers/date_helper";
 
 export type CfdRow = {
   date: DateTime;
@@ -13,13 +9,6 @@ export type CfdRow = {
   toDo: number;
   inProgress: number;
   done: number;
-};
-
-type CfdTransition = {
-  date: DateTime;
-  key: string;
-  fromStatusCategory?: string;
-  toStatusCategory: string;
 };
 
 export class CfdBuilder {
@@ -40,12 +29,6 @@ export class CfdBuilder {
   }
 
   build(chartFromDate?: DateTime, chartToDate?: DateTime): CfdRow[] {
-    // const transitions = this.transitions();
-    // if (!transitions.length) {
-    //   return [];
-    // }
-    // const firstDate = transitions[0].date;
-    // const lastDate = transitions[transitions.length - 1].date;
     const dates = flow(
       flatten,
       compact,
@@ -57,7 +40,6 @@ export class CfdBuilder {
         issue.completed,
       ])
     );
-    //console.log({ dates: dates.map(date => date.toJSDate()) })
     if (!dates.length) {
       return [];
     }
@@ -65,13 +47,6 @@ export class CfdBuilder {
     const lastDate = dates[dates.length - 1];
     const fromDate = chartFromDate || firstDate.startOf("day");
     const toDate = chartToDate || lastDate.startOf("day").plus({ days: 1 });
-    // const firstRow: CfdRow = {
-    //   date: fromDate,
-    //   total: 0,
-    //   toDo: 0,
-    //   inProgress: 0,
-    //   done: 0,
-    // };
     const rows = dateRange(fromDate, toDate, StepInterval.Daily).map(
       (date) => ({
         date,
@@ -83,9 +58,7 @@ export class CfdBuilder {
     );
     const rowIndex = (date: DateTime) => {
       const index = Math.ceil(date.diff(fromDate, "day").days);
-      const result = Math.max(0, Math.min(rows.length, index));
-      //console.log("rowIndex", { index, result, "rows.length": rows.length });
-      return result;
+      return Math.max(0, Math.min(rows.length, index));
     };
     this.issues.forEach((issue: Issue) => {
       const createdIndex = rowIndex(issue.created);
@@ -110,36 +83,4 @@ export class CfdBuilder {
     });
     return rows;
   }
-
-  // transitions(): CfdTransition[] {
-  //   return this.issues
-  //     .map((issue) => {
-  //       const transitions: CfdTransition[] = [
-  //         {
-  //           date: issue.created,
-  //           key: issue.key,
-  //           toStatusCategory: "To Do",
-  //         },
-  //       ];
-  //       if (issue.started) {
-  //         transitions.push({
-  //           date: issue.started,
-  //           key: issue.key,
-  //           fromStatusCategory: "To Do",
-  //           toStatusCategory: "In Progress",
-  //         });
-  //       }
-  //       if (issue.completed) {
-  //         transitions.push({
-  //           date: issue.completed,
-  //           key: issue.key,
-  //           fromStatusCategory: issue.started ? "In Progress" : "To Do",
-  //           toStatusCategory: "Done",
-  //         });
-  //       }
-  //       return transitions;
-  //     })
-  //     .flat()
-  //     .sort((t1, t2) => compareDateTimes(t1.date, t2.date));
-  // }
 }
