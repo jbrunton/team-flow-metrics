@@ -12,22 +12,10 @@ import { DateTime } from "luxon";
 describe("getDefaultDateRange", () => {
   it("returns dates spanning the last 30 days by default", () => {
     const now = DateTime.local(2020, 2, 10);
-    const dates = getDefaultDateRange({}, now);
+    const dates = getDefaultDateRange(now);
     expect(dates).toEqual([
       DateTime.local(2020, 1, 11),
       DateTime.local(2020, 2, 11)
-    ]);
-  });
-
-  it("returns dates given by query params if defined", () => {
-    const now = DateTime.local(2020, 1, 10);
-    const dates = getDefaultDateRange(
-      { fromDate: "2020-02-01", toDate: "2020-02-07" },
-      now
-    );
-    expect(dates).toEqual([
-      DateTime.local(2020, 2, 1),
-      DateTime.local(2020, 2, 7)
     ]);
   });
 });

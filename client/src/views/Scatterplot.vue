@@ -36,7 +36,7 @@
 import Vue from "vue";
 import axios from "axios";
 import { buildUrl, formatDateParam } from "@/helpers/url_helper";
-import { getDefaultChartParams } from "@/helpers/chart_helper";
+import { getDefaultChartParams, saveChartParams } from "@/helpers/chart_helper";
 import IssueDetails from "@/components/IssueDetails.vue";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
@@ -127,6 +127,10 @@ export default Vue.extend({
       immediate: true,
       handler(params) {
         history.pushState({}, null, buildUrl(this.$route.path, params));
+        saveChartParams({
+          selectedLevel: this.selectedLevel,
+          dates: [this.dates[0], this.dates[1]]
+        });
       }
     },
 
