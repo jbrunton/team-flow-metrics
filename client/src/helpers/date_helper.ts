@@ -1,5 +1,4 @@
 import { DateTime } from "luxon";
-import { Route } from "vue-router";
 
 export type DateRange = {
   fromDate: DateTime;
@@ -8,15 +7,8 @@ export type DateRange = {
 };
 
 export function getDefaultDateRange(
-  query: Route["query"],
   now = DateTime.local()
 ): [DateTime, DateTime] {
-  if (query.fromDate && query.toDate) {
-    const fromDate = DateTime.fromISO(query.fromDate as string);
-    const toDate = DateTime.fromISO(query.toDate as string);
-    return [fromDate, toDate];
-  }
-
   const today = now.startOf("day");
   const toDate = today.plus({ days: 1 });
   const fromDate = now.minus({ days: 30 });

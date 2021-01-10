@@ -49,7 +49,7 @@ import { formatDateRange } from "../helpers/date_helper";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
 import { buildUrl, formatDateParam } from "@/helpers/url_helper";
-import { getDefaultChartParams } from "@/helpers/chart_helper";
+import { getDefaultChartParams, saveChartParams } from "@/helpers/chart_helper";
 
 export default Vue.extend({
   name: "CFD",
@@ -130,6 +130,10 @@ export default Vue.extend({
       immediate: true,
       handler(params) {
         history.pushState({}, null, buildUrl(this.$route.path, params));
+        saveChartParams({
+          selectedLevel: this.selectedLevel,
+          dates: [this.dates[0], this.dates[1]]
+        });
       }
     },
 

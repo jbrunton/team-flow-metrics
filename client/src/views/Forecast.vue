@@ -73,7 +73,7 @@ import { buildUrl, formatDateParam } from "@/helpers/url_helper";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
 import ExcludeOutliers from "@/components/ExcludeOutliers.vue";
-import { getDefaultChartParams } from "@/helpers/chart_helper";
+import { getDefaultChartParams, saveChartParams } from "@/helpers/chart_helper";
 import { DateTime } from "luxon";
 
 export default Vue.extend({
@@ -185,6 +185,10 @@ export default Vue.extend({
       immediate: true,
       handler(params) {
         history.pushState({}, null, buildUrl(this.$route.path, params));
+        saveChartParams({
+          selectedLevel: this.selectedLevel,
+          dates: [this.dates[0], this.dates[1]]
+        });
       }
     },
 
