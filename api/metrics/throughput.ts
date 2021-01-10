@@ -165,7 +165,7 @@ function getChartOps() {
   };
 }
 
-export const buildThroughputChart = chartBuilder<ThroughputParams, Issue>(
+export const buildThroughputChart = chartBuilder<ThroughputParams, Issue[]>(
   parseParams,
   queryData,
   buildDataTable,
