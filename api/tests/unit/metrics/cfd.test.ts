@@ -5,14 +5,18 @@ import {
   buildResponse,
   buildDataTable,
   parseParams,
+  CfdParams,
 } from "../../../metrics/cfd";
 import { ValidationError } from "../../../metrics/chart_params";
 
-const issueCfdParams = {
+const issueCfdParams: CfdParams = {
   fromDate: DateTime.local(2020, 1, 1),
   toDate: DateTime.local(2020, 1, 8),
   hierarchyLevel: "Story",
-  excludeStoppedIssues: false,
+  includeStoppedIssues: false,
+  includeToDoIssues: false,
+  includeDoneIssues: false,
+  includeBacklog: false,
 };
 
 const epicCfdParams = {
@@ -25,17 +29,23 @@ describe("#parseParams", () => {
       fromDate: "2020-01-01",
       toDate: "2020-02-01",
       hierarchyLevel: "Story",
-      excludeStoppedIssues: "true",
+      includeStoppedIssues: "true",
+      includeToDoIssues: "true",
+      includeDoneIssues: "true",
+      includeBacklog: "true",
     });
     expect(params).toEqual({
       fromDate: DateTime.utc(2020, 1, 1),
       toDate: DateTime.utc(2020, 2, 1),
       hierarchyLevel: "Story",
-      excludeStoppedIssues: true,
+      includeStoppedIssues: true,
+      includeToDoIssues: true,
+      includeDoneIssues: true,
+      includeBacklog: true,
     });
   });
 
-  it("defaults excludeStoppedIssues to false", () => {
+  it("sets default options", () => {
     const params = parseParams({
       fromDate: "2020-01-01",
       toDate: "2020-02-01",
@@ -45,7 +55,10 @@ describe("#parseParams", () => {
       fromDate: DateTime.utc(2020, 1, 1),
       toDate: DateTime.utc(2020, 2, 1),
       hierarchyLevel: "Story",
-      excludeStoppedIssues: false,
+      includeStoppedIssues: false,
+      includeToDoIssues: false,
+      includeDoneIssues: false,
+      includeBacklog: false,
     });
   });
 
@@ -74,7 +87,14 @@ describe("#parseParams", () => {
 describe("#buildDataTable", () => {
   describe("for IssueCfdParams", () => {
     it("defines columns", () => {
-      const dataTable = buildDataTable([], issueCfdParams);
+      const dataTable = buildDataTable(
+        {
+          issues: [],
+          backlogSize: 0,
+          doneCount: 0,
+        },
+        issueCfdParams
+      );
       expect(dataTable.cols).toEqual([
         {
           label: "Date",
@@ -110,21 +130,67 @@ describe("#buildDataTable", () => {
           cycleTime: 2,
         });
       });
-      const dataTable = buildDataTable(issues, issueCfdParams);
+      const dataTable = buildDataTable(
+        {
+          issues,
+          backlogSize: 0,
+          doneCount: 0,
+        },
+        issueCfdParams
+      );
       expect(dataTable.rows).toEqual([
+        ["Date(2020, 0, 1, 0, 0)", 0, 0, 0, 0],
         ["Date(2020, 0, 2, 0, 0)", 0, 1, 0, 0],
         ["Date(2020, 0, 3, 0, 0)", 0, 2, 0, 1],
         ["Date(2020, 0, 4, 0, 0)", 0, 2, 0, 2],
         ["Date(2020, 0, 5, 0, 0)", 0, 2, 1, 1],
         ["Date(2020, 0, 6, 0, 0)", 0, 2, 2, 0],
         ["Date(2020, 0, 7, 0, 0)", 0, 2, 2, 0],
+        ["Date(2020, 0, 8, 0, 0)", 0, 2, 2, 0],
+      ]);
+    });
+
+    it("adds backlog and done issues when specified in options", () => {
+      const issues = times(2).map((index) => {
+        return IssueFactory.build({
+          key: `ISSUE-${index + 1}`,
+          created: DateTime.local(2020, 1, 2 + index),
+          started: DateTime.local(2020, 1, 3 + index),
+          completed: DateTime.local(2020, 1, 5 + index),
+          cycleTime: 2,
+        });
+      });
+      const dataTable = buildDataTable(
+        {
+          issues,
+          backlogSize: 10,
+          doneCount: 10,
+        },
+        issueCfdParams
+      );
+      expect(dataTable.rows).toEqual([
+        ["Date(2020, 0, 1, 0, 0)", 0, 10, 10, 0],
+        ["Date(2020, 0, 2, 0, 0)", 0, 11, 10, 0],
+        ["Date(2020, 0, 3, 0, 0)", 0, 12, 10, 1],
+        ["Date(2020, 0, 4, 0, 0)", 0, 12, 10, 2],
+        ["Date(2020, 0, 5, 0, 0)", 0, 12, 11, 1],
+        ["Date(2020, 0, 6, 0, 0)", 0, 12, 12, 0],
+        ["Date(2020, 0, 7, 0, 0)", 0, 12, 12, 0],
+        ["Date(2020, 0, 8, 0, 0)", 0, 12, 12, 0],
       ]);
     });
   });
 
   describe("for EpicCfdParams", () => {
     it("defines columns", () => {
-      const dataTable = buildDataTable([], epicCfdParams);
+      const dataTable = buildDataTable(
+        {
+          issues: [],
+          backlogSize: 0,
+          doneCount: 0,
+        },
+        epicCfdParams
+      );
       expect(dataTable.cols).toEqual([
         {
           label: "Date",
@@ -164,9 +230,15 @@ describe("#buildDataTable", () => {
           cycleTime: 2,
         });
       });
-      const dataTable = buildDataTable(issues, epicCfdParams);
+      const dataTable = buildDataTable(
+        {
+          issues,
+          backlogSize: 0,
+          doneCount: 0,
+        },
+        epicCfdParams
+      );
       expect(dataTable.rows).toEqual([
-        ["Date(2020, 0, 1, 0, 0)", 0, 0, 0, 0, 0],
         ["Date(2020, 0, 2, 0, 0)", 0, 1, 0, 0, 1],
         ["Date(2020, 0, 3, 0, 0)", 0, 2, 0, 1, 1],
         ["Date(2020, 0, 4, 0, 0)", 0, 2, 0, 2, 0],
@@ -189,8 +261,13 @@ it("builds the json response", () => {
     });
   });
 
-  const dataTable = buildDataTable(issues, issueCfdParams);
-  const response = buildResponse(dataTable, issues, issueCfdParams);
+  const data = {
+    issues,
+    backlogSize: 0,
+    doneCount: 0,
+  };
+  const dataTable = buildDataTable(data, issueCfdParams);
+  const response = buildResponse(dataTable, data, issueCfdParams);
 
   expect(response).toEqual({
     meta: {
@@ -202,7 +279,7 @@ it("builds the json response", () => {
         height: "80%",
         top: "5%",
       },
-      height: 300,
+      height: 500,
       hAxis: {
         titleTextStyle: {
           color: "#333",
@@ -284,6 +361,15 @@ it("builds the json response", () => {
       rows: [
         {
           c: [
+            { v: "Date(2020, 0, 1, 0, 0)" },
+            { v: 0 },
+            { v: 0 },
+            { v: 0 },
+            { v: 0 },
+          ],
+        },
+        {
+          c: [
             { v: "Date(2020, 0, 2, 0, 0)" },
             { v: 0 },
             { v: 1 },
@@ -330,6 +416,15 @@ it("builds the json response", () => {
         {
           c: [
             { v: "Date(2020, 0, 7, 0, 0)" },
+            { v: 0 },
+            { v: 2 },
+            { v: 2 },
+            { v: 0 },
+          ],
+        },
+        {
+          c: [
+            { v: "Date(2020, 0, 8, 0, 0)" },
             { v: 0 },
             { v: 2 },
             { v: 2 },

@@ -12,8 +12,17 @@
     </div>
 
     <div class="field">
-      <b-checkbox v-model="excludeStoppedIssues">
-        Exclude stopped issues
+      <b-checkbox v-model="includeToDoIssues">
+        Show To Do count
+      </b-checkbox>
+      <b-checkbox v-model="includeBacklog" :disabled="!includeToDoIssues">
+        Include backlog
+      </b-checkbox>
+      <b-checkbox v-model="includeDoneIssues">
+        Include all completed issues
+      </b-checkbox>
+      <b-checkbox v-model="includeStoppedIssues">
+        Include stopped issues
       </b-checkbox>
     </div>
 
@@ -25,6 +34,9 @@
 .menu-label,
 .menu-list {
   white-space: nowrap;
+}
+.b-checkbox.checkbox {
+  margin-right: 24px !important;
 }
 </style>
 
@@ -54,8 +66,10 @@ export default Vue.extend({
       chartOps: {},
       chartData: [],
       chart: null,
-      excludeStoppedIssues: true,
-      selectedIssueKey: null
+      includeStoppedIssues: this.$route.query.includeStoppedIssues === "true",
+      includeToDoIssues: this.$route.query.includeToDoIssues === "true",
+      includeBacklog: this.$route.query.includeBacklog === "true",
+      includeDoneIssues: this.$route.query.includeDoneIssues === "true"
     };
   },
 
@@ -135,7 +149,10 @@ export default Vue.extend({
         fromDate: formatDateParam(this.dates[0]),
         toDate: formatDateParam(this.dates[1]),
         hierarchyLevel: String(this.selectedLevel),
-        excludeStoppedIssues: String(this.excludeStoppedIssues)
+        includeStoppedIssues: String(this.includeStoppedIssues),
+        includeToDoIssues: String(this.includeToDoIssues),
+        includeBacklog: String(this.includeBacklog),
+        includeDoneIssues: String(this.includeDoneIssues)
       };
     },
 
