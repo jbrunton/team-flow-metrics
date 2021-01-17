@@ -15,30 +15,26 @@ export function getDefaultDateRange(
   return [fromDate, toDate];
 }
 
+export function getRelativeDayRange(
+  days: number,
+  today: DateTime = DateTime.local().startOf("day")
+): DateRange {
+  const toDate = today.plus({ days: 1 });
+  return {
+    fromDate: today.minus({ days: days }),
+    toDate: toDate,
+    description: `Last ${days} days`
+  };
+}
+
 export function getRelativeDayRanges(now = DateTime.local()): Array<DateRange> {
   const today = now.startOf("day");
   const toDate = today.plus({ days: 1 });
   return [
-    {
-      fromDate: now.minus({ days: 7 }),
-      toDate: toDate,
-      description: "Last 7 days"
-    },
-    {
-      fromDate: now.minus({ days: 30 }),
-      toDate: toDate,
-      description: "Last 30 days"
-    },
-    {
-      fromDate: now.minus({ days: 90 }),
-      toDate: toDate,
-      description: "Last 90 days"
-    },
-    {
-      fromDate: now.minus({ days: 180 }),
-      toDate: toDate,
-      description: "Last 180 days"
-    },
+    getRelativeDayRange(7, today),
+    getRelativeDayRange(30, today),
+    getRelativeDayRange(90, today),
+    getRelativeDayRange(180, today),
     {
       fromDate: now.minus({ years: 1 }),
       toDate: toDate,
@@ -90,6 +86,18 @@ export function getRelativeWeekRanges(
   ];
 }
 
+export function getRelativeMonthRange(
+  months: number,
+  startOfMonth: DateTime = DateTime.local().startOf("month")
+): DateRange {
+  const description = months === 1 ? "Last month" : `Last ${months} months`;
+  return {
+    fromDate: startOfMonth.minus({ months }),
+    toDate: startOfMonth,
+    description
+  };
+}
+
 export function getRelativeMonthRanges(
   now = DateTime.local()
 ): Array<DateRange> {
@@ -100,31 +108,11 @@ export function getRelativeMonthRanges(
       toDate: startOfMonth.plus({ months: 1 }),
       description: "This month"
     },
-    {
-      fromDate: startOfMonth.minus({ months: 1 }),
-      toDate: startOfMonth,
-      description: "Last month"
-    },
-    {
-      fromDate: startOfMonth.minus({ months: 3 }),
-      toDate: startOfMonth,
-      description: "Last 3 months"
-    },
-    {
-      fromDate: startOfMonth.minus({ months: 6 }),
-      toDate: startOfMonth,
-      description: "Last 6 months"
-    },
-    {
-      fromDate: startOfMonth.minus({ months: 12 }),
-      toDate: startOfMonth,
-      description: "Last 12 months"
-    },
-    {
-      fromDate: startOfMonth.minus({ months: 24 }),
-      toDate: startOfMonth,
-      description: "Last 24 months"
-    }
+    getRelativeMonthRange(1, startOfMonth),
+    getRelativeMonthRange(3, startOfMonth),
+    getRelativeMonthRange(6, startOfMonth),
+    getRelativeMonthRange(12, startOfMonth),
+    getRelativeMonthRange(24, startOfMonth)
   ];
 }
 

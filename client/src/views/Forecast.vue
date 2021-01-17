@@ -184,7 +184,7 @@ export default Vue.extend({
     params: {
       immediate: true,
       handler(params) {
-        history.pushState({}, null, buildUrl(this.$route.path, params));
+        history.replaceState({}, null, buildUrl(this.$route.path, params));
         saveChartParams({
           selectedLevel: this.selectedLevel,
           dates: [this.dates[0], this.dates[1]]

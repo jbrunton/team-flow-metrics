@@ -14,7 +14,7 @@
           <b-navbar-item tag="router-link" :to="{ path: '/forecast' }">
             Forecast
           </b-navbar-item>
-          <b-navbar-dropdown label="Charts" hoverable="true">
+          <b-navbar-dropdown label="Charts" :hoverable="true">
             <b-navbar-item tag="router-link" :to="{ path: '/scatterplot' }">
               Scatterplot
             </b-navbar-item>
@@ -141,6 +141,9 @@ $colors: mergeColorMaps(
 );
 
 $tooltip-color: $primary-light;
+
+$card-radius: 0.5rem;
+$card-header-background-color: #eee;
 
 // Import Bulma and Buefy styles
 @import "~bulma";
