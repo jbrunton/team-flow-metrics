@@ -25,6 +25,8 @@ Then, to run the app:
 docker-compose up
 ```
 
+(This will take a few moments to build the container images the first time you start it.)
+
 You should find the app running at http://localhost:3001/.
 
 # Syncing data
