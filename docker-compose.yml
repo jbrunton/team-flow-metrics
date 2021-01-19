@@ -50,7 +50,7 @@ services:
     build:
       context: ./nginx
     ports:
-      - "${NGINX_PORT:-3001}:80"
+      - "${LOCAL_NGINX_PORT:-3001}:80"
   
   postgres:
     image: postgres:12
