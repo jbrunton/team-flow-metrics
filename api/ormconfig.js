@@ -11,13 +11,13 @@ const config = {
   database: `metrics_${process.env.NODE_ENV}`,
   synchronize: false,
   logging: process.env.NODE_ENV == "development",
-  entities: ["models/entities/*.ts"],
+  entities: ["models/entities/**/*.ts"],
   migrations: ["database/migrations/**/*.ts"],
-  subscribers: ["src/subscriber/**/*.ts"],
+  subscribers: ["models/subscribers/**/*.ts"],
   cli: {
-    entitiesDir: "src/entity",
-    migrationsDir: "src/migration",
-    subscribersDir: "src/subscriber",
+    entitiesDir: "models/entities",
+    migrationsDir: "database/migrations",
+    subscribersDir: "models/subscribers",
   },
 };
 
