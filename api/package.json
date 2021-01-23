@@ -28,7 +28,7 @@
     "jstat": "^1.9.4",
     "lodash": "^4.17.20",
     "luxon": "^1.25.0",
-    "pg": "^7.3.0",
+    "pg": "^8.5.1",
     "reflect-metadata": "^0.1.10",
     "seedrandom": "^3.0.5",
     "typeorm": "^0.2.30"
