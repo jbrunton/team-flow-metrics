@@ -4,6 +4,8 @@ import { HierarchyLevel } from "../models/entities/hierarchy_level";
 import { Status } from "../models/entities/status";
 import { RouterDefinition } from "./router_definition";
 import { getRepository } from "typeorm";
+import { Issue } from "../models/entities/issue";
+import { compact, map } from "lodash";
 
 const router = express.Router();
 
@@ -27,7 +29,20 @@ router.get("/hierarchy-levels", async (req, res) => {
   const levels = await getRepository(HierarchyLevel).find();
   res.json({
     count: levels.length,
-    levels: levels,
+    levels,
+  });
+});
+
+router.get("/resolutions", async (req, res) => {
+  const resolutions = await getRepository(Issue)
+    .createQueryBuilder()
+    .select("resolution")
+    .distinct(true)
+    .orderBy("resolution")
+    .getRawMany();
+  res.json({
+    count: resolutions.length,
+    resolutions: compact(map(resolutions, "resolution")),
   });
 });
 
