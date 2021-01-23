@@ -1,6 +1,5 @@
 import { DateTime } from "luxon";
 import "reflect-metadata";
-import { HierarchyLevel } from "../../../models/entities/hierarchy_level";
 import { IssueFactory } from "../../factories/issue_factory";
 const request = require("supertest");
 const { createApp } = require("../../../app");
