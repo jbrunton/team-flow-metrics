@@ -34,7 +34,13 @@ module.exports = {
         "@typescript-eslint/restrict-template-expressions": "warn",
         "no-undef": "warn",
         "@typescript-eslint/restrict-plus-operands": "warn",
-      }
+        "@typescript-eslint/no-misused-promises": [
+          "error",
+          {
+            "checksVoidReturn": false
+          }
+        ]
+      },
     },
     {
       files: "./tests/**/*",
