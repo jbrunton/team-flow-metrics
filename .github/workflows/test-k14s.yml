@@ -9,7 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: k14s/setup-k14s-action@v1
+      - uses: vmware-tanzu/setup-carvel-action@v1
       - run: |
           ytt version
           kbld version
