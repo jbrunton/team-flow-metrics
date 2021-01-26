@@ -10,3 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: k14s/setup-k14s-action@v1
+      - run: |
+          ytt version
+          kbld version
+          kapp version
+          kwt version
+          imgpkg version
+          vendir version
