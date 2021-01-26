@@ -1,0 +1,12 @@
+name: test-k14s
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: k14s/setup-k14s-action@v1
