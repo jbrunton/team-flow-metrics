@@ -32,6 +32,13 @@ export async function syncIssues(): Promise<Array<Issue>> {
   await fieldsRepo.save(fields);
 
   const statuses = await client.getStatuses();
+  statuses.push(
+    statusesRepo.create({
+      externalId: "10002",
+      name: "Done",
+      category: "Done",
+    })
+  );
   await statusesRepo.save(statuses);
 
   const issues = await client.search(

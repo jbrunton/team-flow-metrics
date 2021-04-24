@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { concat } from "lodash";
+import { concat, map } from "lodash";
 import { formatDate } from "../helpers/charts_helper";
 import { Issue } from "../models/entities/issue";
 import { DataTableBuilder } from "./data_table_builder";
@@ -57,6 +57,7 @@ export function parseParams(query: ParsedQs): CfdParams {
 }
 
 export type CfdData = {
+  epic?: Issue;
   issues: Issue[];
   backlogSize: number;
   doneCount: number;
@@ -75,6 +76,7 @@ export async function queryData(params: CfdParams): Promise<CfdData> {
       epicId: epic.id,
     });
     return {
+      epic,
       issues,
       backlogSize: 0,
       doneCount: 0,
@@ -130,8 +132,29 @@ export async function queryData(params: CfdParams): Promise<CfdData> {
   }
 }
 
+function getFromDate(
+  issues: Issue[],
+  epic: Issue,
+  params: CfdParams
+): DateTime {
+  return isEpicParams(params) && epic.statusCategory != "To Do"
+    ? map(issues, "started").sort()[0].minus({ days: 1 })
+    : params["fromDate"];
+}
+
+function getToDate(issues: Issue[], epic: Issue, params: CfdParams): DateTime {
+  if (isEpicParams(params)) {
+    if (epic?.statusCategory == "Done") {
+      return map(issues, "completed").sort().reverse()[0].plus({ days: 1 });
+    } else {
+      return DateTime.local();
+    }
+  }
+  return params["toDate"];
+}
+
 export function buildDataTable(
-  { issues, backlogSize, doneCount }: CfdData,
+  { issues, backlogSize, doneCount, epic }: CfdData,
   params: CfdParams
 ): DataTableBuilder {
   const cfdBuilder = new CfdBuilder();
@@ -139,21 +162,21 @@ export function buildDataTable(
   cfdBuilder.setBacklogSize(backlogSize);
   cfdBuilder.setDoneCount(doneCount);
   const includeToDoColumn = isEpicParams(params) || params.includeToDoIssues;
-  const rows = cfdBuilder
-    .build(params["fromDate"], params["toDate"])
-    .map((cfdRow) => {
-      const row = [
-        formatDate(cfdRow.date),
-        0,
-        cfdRow.total,
-        cfdRow.done,
-        cfdRow.inProgress,
-      ];
-      if (includeToDoColumn) {
-        row.push(cfdRow.toDo);
-      }
-      return row;
-    });
+  const fromDate = getFromDate(issues, epic, params);
+  const toDate = getToDate(issues, epic, params);
+  const rows = cfdBuilder.build(fromDate, toDate).map((cfdRow) => {
+    const row = [
+      formatDate(cfdRow.date),
+      0,
+      cfdRow.total,
+      cfdRow.done,
+      cfdRow.inProgress,
+    ];
+    if (includeToDoColumn) {
+      row.push(cfdRow.toDo);
+    }
+    return row;
+  });
   const builder = new DataTableBuilder();
   const columns = [
     {
