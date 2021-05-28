@@ -2,13 +2,19 @@
 
 ## Configuration
 
-Make a copy of the example .env file:
+Make a copy of the example configuration files:
 
 ```
-cp default.env .env
+cp example.env .env
+cp api/example.metrics.config.js api/metrics.config.js
 ```
 
-Then complete the relevant configuration details for your Jira domain and user in the `.env` file.
+Then complete the relevant configuration details in these two new files (credentials in the `.env` file, and other settings in `metrics.config.js`).
+
+In general, the two files have two different purposes:
+
+* `/.env` includes environment variables which are 1) relevant to deployment configurations (e.g. database names, local port numbers), and also variables which 2) are secrets which should not be committed to source control. This file should never be committed.
+* `/api/metrics.config.js` includes configuration code which is highly specific to interpreting data from your Jira instance. It may be convenient to commit this file to source control.
 
 ## Running the app
 

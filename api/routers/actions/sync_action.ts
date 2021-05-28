@@ -8,6 +8,7 @@ import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { IssueCollection } from "../../models/scope/issue_collection";
 import { Status } from "../../models/entities/status";
 import { compareDateTimes, getCycleTime } from "../../helpers/date_helper";
+import config from "../../config";
 
 export async function syncIssues(): Promise<Array<Issue>> {
   const client = new JiraClient();
@@ -38,7 +39,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
     fields,
     statuses,
     hierarchyLevels,
-    process.env.JIRA_QUERY
+    config.jira.query
   );
   await issuesRepo.save(issues);
 

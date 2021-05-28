@@ -19,15 +19,19 @@ jobs:
       - name: install dependencies
         run: npm install && npx lerna bootstrap
 
-      - name: static anlysis
+      - name: static analysis
         run: npx lerna run lint:check --scope ${{ matrix.package }}
+
+      - name: copy config files
+        run: |
+          cp example.env .env
+          cp api/example.metrics.config.js api/metrics.config.js
 
       - name: unit test
         run: npx lerna run test:unit --scope ${{ matrix.package }}
 
       - name: integration test
         run: |
-          cp default.env .env
           NODE_ENV=test npm run db:setup
           npx lerna run test:integration --scope ${{ matrix.package }}
         if: matrix.package == 'metrics-api'
