@@ -30,9 +30,11 @@ export async function syncIssues(): Promise<Array<Issue>> {
   await hierarchyLevelsRepo.save(hierarchyLevels);
 
   const fields = await client.getFields();
+  config.sync?.fields?.beforeSave(fields, fieldsRepo);
   await fieldsRepo.save(fields);
 
   const statuses = await client.getStatuses();
+  config.sync?.statuses?.beforeSave(statuses, statusesRepo);
   await statusesRepo.save(statuses);
 
   const issues = await client.search(
@@ -41,10 +43,11 @@ export async function syncIssues(): Promise<Array<Issue>> {
     hierarchyLevels,
     config.jira.query
   );
+  const issueCollection = new IssueCollection(issues);
+  config.sync?.issues?.beforeSave(issueCollection, issuesRepo);
   await issuesRepo.save(issues);
 
   console.log("Building parent/child relationships...");
-  const issueCollection = new IssueCollection(issues);
   for (const epicKey of issueCollection.getepicKeys()) {
     const parent = issueCollection.getIssue(epicKey);
     const children = issueCollection.getChildrenFor(epicKey);

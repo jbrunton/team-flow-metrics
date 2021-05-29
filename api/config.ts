@@ -1,4 +1,15 @@
 import * as fs from "fs";
+import { Repository } from "typeorm";
+import { Field } from "./models/entities/field";
+import { Issue } from "./models/entities/issue";
+import { Status } from "./models/entities/status";
+import { IssueCollection } from "./models/scope/issue_collection";
+
+export type Callbacks<T, Collection = T[]> = {
+  beforeSave?: (records: Collection, repo: Repository<T>) => void;
+};
+
+export type IssueCallbacks = Callbacks<Issue, IssueCollection>;
 
 export type MetricsConfig = {
   jira: {
@@ -8,6 +19,11 @@ export type MetricsConfig = {
       token: string;
     };
     query: string;
+  };
+  sync: {
+    statuses?: Callbacks<Status>;
+    fields?: Callbacks<Field>;
+    issues?: IssueCallbacks;
   };
 };
 

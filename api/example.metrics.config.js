@@ -1,3 +1,6 @@
+/** @typedef { import('./config').MetricsConfig } MetricsConfig */
+
+/** @type {MetricsConfig} */
 module.exports = {
   jira: {
     // Host domain for your Jira instance
