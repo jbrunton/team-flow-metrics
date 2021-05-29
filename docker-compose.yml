@@ -22,7 +22,6 @@ services:
       - EPIC_CYCLE_TIME_EXCL_RESOLUTIONS
       - EPIC_CYCLE_TIME_DONE_TIMEOUT_STATUS
       - EPIC_CYCLE_TIME_DONE_TIMEOUT
-      - STATUS_CATEGORY_OVERRIDES
 
     command: npm run debug
     depends_on:
