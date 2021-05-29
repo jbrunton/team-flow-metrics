@@ -1,4 +1,11 @@
+import { identity } from "lodash";
+import { DateTime } from "luxon";
+import { compareDateTimes } from "../../helpers/date_helper";
 import { Issue } from "../entities/issue";
+
+type DateTimeKeys = {
+  [T in keyof Issue]: Issue[T] extends DateTime ? T : never;
+}[keyof Issue];
 
 export class IssueCollection {
   readonly issues: Array<Issue>;
@@ -30,13 +37,20 @@ export class IssueCollection {
     return this.index[key];
   }
 
-  getepicKeys(): Array<string> {
+  getEpicKeys(): Array<string> {
     return Object.keys(this.children);
   }
 
   getParents(): Array<Issue> {
-    return this.getepicKeys()
+    return this.getEpicKeys()
       .map((epicKey) => this.index[epicKey])
       .filter((parent) => parent);
+  }
+
+  getSortedDates(field: DateTimeKeys): Array<DateTime> {
+    return this.issues
+      .map((child) => child[field])
+      .filter(identity)
+      .sort(compareDateTimes);
   }
 }
