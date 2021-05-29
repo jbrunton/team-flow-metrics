@@ -1,4 +1,5 @@
 import { Client } from "jira.js";
+import { asyncify, mapLimit } from "async";
 import { Issue } from "../../models/entities/issue";
 import { Field } from "../../models/entities/field";
 import { getConnection } from "typeorm";
@@ -7,12 +8,12 @@ import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
 import { JiraField, JiraSearchResult, JiraStatus } from "./types";
 import config from "../../config";
+import { range, reduce } from "lodash";
 
 export class JiraClient {
   _client: Client;
 
   constructor() {
-    const jiraConfig = config.jira;
     console.log(
       `Creating client for host ${config.jira.host}, user ${config.jira.credentials.username}`
     );
@@ -33,46 +34,56 @@ export class JiraClient {
     hierarchyLevels: Array<HierarchyLevel>,
     jql: string
   ): Promise<Array<Issue>> {
+    const client = this._client;
     console.log(`starting search: ${jql}`);
     console.time(`search: ${jql}`);
     const connection = getConnection();
     const repo = connection.getRepository(Issue);
 
-    const results: JiraSearchResult[] = [];
     console.log("fetching page 1");
-    let result = (await this._client.issueSearch.searchForIssuesUsingJqlPost({
+    const firstResult = (await client.issueSearch.searchForIssuesUsingJqlPost({
       jql,
       expand: ["changelog"],
     })) as JiraSearchResult;
-    results.push(result);
 
-    const pages = Math.ceil(result.total / result.maxResults);
+    const pageCount = Math.ceil(firstResult.total / firstResult.maxResults);
 
-    while (result.startAt + result.maxResults < result.total) {
-      const page = result.startAt / result.maxResults + 2;
-      console.log(`fetching page ${page} of ${pages}`);
-      result = (await this._client.issueSearch.searchForIssuesUsingJqlPost({
-        jql,
-        expand: ["changelog"],
-        startAt: result.startAt + result.maxResults,
-      })) as JiraSearchResult;
-      results.push(result);
-    }
+    const remainingResults = await mapLimit(
+      range(1, pageCount),
+      5,
+      asyncify((pageIndex: number) => {
+        console.log(`fetching page ${pageIndex + 1} of ${pageCount}`);
+        return client.issueSearch.searchForIssuesUsingJqlPost({
+          jql,
+          expand: ["changelog"],
+          startAt: pageIndex * firstResult.maxResults,
+        });
+      })
+    );
 
-    const issues: Issue[] = [];
+    const results = [firstResult, ...remainingResults];
+
     const builder = new IssueAttributesBuilder(
       fields,
       statuses,
       hierarchyLevels
     );
 
-    results.forEach((result) => {
-      result.issues.forEach((issue) => {
-        issues.push(repo.create(builder.build(issue)));
-      });
-    });
+    const issues = reduce(
+      results,
+      (issues: Issue[], result: JiraSearchResult) => {
+        return issues.concat(
+          result.issues.map((json) => {
+            const issue = builder.build(json);
+            return repo.create(issue);
+          })
+        );
+      },
+      []
+    );
 
     console.timeEnd(`search: ${jql}`);
+    console.log(`${issues.length} issues found`);
     return issues;
   }
 
