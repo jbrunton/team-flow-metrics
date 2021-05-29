@@ -48,7 +48,7 @@ export async function syncIssues(): Promise<Array<Issue>> {
   await issuesRepo.save(issues);
 
   console.log("Building parent/child relationships...");
-  for (const epicKey of issueCollection.getepicKeys()) {
+  for (const epicKey of issueCollection.getEpicKeys()) {
     const parent = issueCollection.getIssue(epicKey);
     const children = issueCollection.getChildrenFor(epicKey);
     if (parent) {

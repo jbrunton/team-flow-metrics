@@ -44,14 +44,14 @@ describe("IssueCollection", () => {
     });
   });
 
-  describe("#getepicKeys", () => {
+  describe("#getEpicKeys", () => {
     it("returns a list of keys of all parent issues", () => {
-      expect(collection.getepicKeys()).toEqual(["EPIC-101"]);
+      expect(collection.getEpicKeys()).toEqual(["EPIC-101"]);
     });
 
     it("returns an empty list if there are no parent issues", () => {
       const collection = new IssueCollection([issue3]);
-      expect(collection.getepicKeys()).toEqual([]);
+      expect(collection.getEpicKeys()).toEqual([]);
     });
   });
 

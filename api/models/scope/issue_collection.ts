@@ -30,12 +30,12 @@ export class IssueCollection {
     return this.index[key];
   }
 
-  getepicKeys(): Array<string> {
+  getEpicKeys(): Array<string> {
     return Object.keys(this.children);
   }
 
   getParents(): Array<Issue> {
-    return this.getepicKeys()
+    return this.getEpicKeys()
       .map((epicKey) => this.index[epicKey])
       .filter((parent) => parent);
   }
