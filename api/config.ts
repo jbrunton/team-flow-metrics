@@ -9,8 +9,6 @@ export type Callbacks<T, Collection = T[]> = {
   beforeSave?: (records: Collection, repo: Repository<T>) => void;
 };
 
-export type IssueCallbacks = Callbacks<Issue, IssueCollection>;
-
 export type MetricsConfig = {
   jira: {
     host: string;
@@ -23,7 +21,7 @@ export type MetricsConfig = {
   sync: {
     statuses?: Callbacks<Status>;
     fields?: Callbacks<Field>;
-    issues?: IssueCallbacks;
+    issues?: Callbacks<Issue, IssueCollection>;
   };
 };
 
