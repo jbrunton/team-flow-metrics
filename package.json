@@ -9,7 +9,7 @@
   "devDependencies": {
     "@types/jest": "^26.0.19",
     "husky": "^6.0.0",
-    "lerna": "^3.22.1"
+    "lerna": "^4.0.0"
   },
   "husky": {
     "hooks": {
