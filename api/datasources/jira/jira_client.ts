@@ -4,7 +4,6 @@ import { Issue } from "../../models/entities/issue";
 import { Field } from "../../models/entities/field";
 import { getConnection } from "typeorm";
 import { IssueAttributesBuilder } from "./issue_attributes_builder";
-import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
 import { JiraSearchResult } from "./types";
 import config from "../../config";
