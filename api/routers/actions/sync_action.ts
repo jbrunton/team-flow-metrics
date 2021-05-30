@@ -6,6 +6,7 @@ import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { IssueCollection } from "../../models/scope/issue_collection";
 import { Status } from "../../models/entities/status";
 import config from "../../config";
+import { IssueAttributesBuilder } from "../../datasources/jira/issue_attributes_builder";
 
 export async function syncIssues(): Promise<Array<Issue>> {
   const client = new JiraClient();
@@ -34,12 +35,9 @@ export async function syncIssues(): Promise<Array<Issue>> {
   config.sync?.statuses?.beforeSave(statuses, statusesRepo);
   await statusesRepo.save(statuses);
 
-  const issues = await client.search(
-    fields,
-    statuses,
-    hierarchyLevels,
-    config.jira.query
-  );
+  const builder = new IssueAttributesBuilder(fields, statuses, hierarchyLevels);
+
+  const issues = await client.search(config.jira.query, builder);
   const issueCollection = new IssueCollection(issues);
   config.sync?.issues?.beforeSave(issueCollection, issuesRepo);
   await issuesRepo.save(issues);

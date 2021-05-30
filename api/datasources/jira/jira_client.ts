@@ -29,22 +29,32 @@ export class JiraClient {
   }
 
   async search(
-    fields: Array<Field>,
-    statuses: Array<Status>,
-    hierarchyLevels: Array<HierarchyLevel>,
-    jql: string
+    jql: string,
+    builder: IssueAttributesBuilder
   ): Promise<Array<Issue>> {
     const client = this._client;
     console.log(`starting search: ${jql}`);
     console.time(`search: ${jql}`);
     const connection = getConnection();
     const repo = connection.getRepository(Issue);
-
-    console.log("fetching page 1");
-    const firstResult = await client.issueSearch.searchForIssuesUsingJqlPost({
+    const searchParams = {
       jql,
       expand: ["changelog"],
-    });
+      fields: [
+        "key",
+        "summary",
+        "issuetype",
+        "status",
+        "resolution",
+        "created",
+        builder.epicLinkFieldId,
+      ],
+    };
+
+    console.log("fetching page 1");
+    const firstResult = await client.issueSearch.searchForIssuesUsingJqlPost(
+      searchParams
+    );
 
     const pageCount = Math.ceil(firstResult.total / firstResult.maxResults);
 
@@ -54,20 +64,13 @@ export class JiraClient {
       asyncify((pageIndex: number) => {
         console.log(`fetching page ${pageIndex + 1} of ${pageCount}`);
         return client.issueSearch.searchForIssuesUsingJqlPost({
-          jql,
-          expand: ["changelog"],
+          ...searchParams,
           startAt: pageIndex * firstResult.maxResults,
         });
       })
     );
 
     const results = [firstResult, ...remainingResults];
-
-    const builder = new IssueAttributesBuilder(
-      fields,
-      statuses,
-      hierarchyLevels
-    );
 
     const issues = reduce(
       results,
