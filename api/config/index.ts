@@ -19,7 +19,7 @@ export type MetricsConfig = {
     };
     query: string;
   };
-  sync: {
+  sync?: {
     statuses?: Callbacks<Status>;
     fields?: Callbacks<Field>;
     issues?: Callbacks<Issue, IssueCollection>;
