@@ -1,4 +1,4 @@
-import { Client } from "jira.js";
+import { Version2Client } from "jira.js";
 import { asyncify, mapLimit } from "async";
 import { Issue } from "../../models/entities/issue";
 import { Field } from "../../models/entities/field";
@@ -6,22 +6,22 @@ import { getConnection } from "typeorm";
 import { IssueAttributesBuilder } from "./issue_attributes_builder";
 import { HierarchyLevel } from "../../models/entities/hierarchy_level";
 import { Status } from "../../models/entities/status";
-import { JiraField, JiraSearchResult, JiraStatus } from "./types";
+import { JiraSearchResult } from "./types";
 import config from "../../config";
 import { range, reduce } from "lodash";
 
 export class JiraClient {
-  _client: Client;
+  _client: Version2Client;
 
   constructor() {
     console.log(
       `Creating client for host ${config.jira.host}, user ${config.jira.credentials.username}`
     );
-    this._client = new Client({
+    this._client = new Version2Client({
       host: config.jira.host,
       authentication: {
         basic: {
-          username: config.jira.credentials.username,
+          email: config.jira.credentials.username,
           apiToken: config.jira.credentials.token,
         },
       },
@@ -41,10 +41,10 @@ export class JiraClient {
     const repo = connection.getRepository(Issue);
 
     console.log("fetching page 1");
-    const firstResult = (await client.issueSearch.searchForIssuesUsingJqlPost({
+    const firstResult = await client.issueSearch.searchForIssuesUsingJqlPost({
       jql,
       expand: ["changelog"],
-    })) as JiraSearchResult;
+    });
 
     const pageCount = Math.ceil(firstResult.total / firstResult.maxResults);
 
@@ -91,7 +91,7 @@ export class JiraClient {
     console.log("Fetching Jira fields");
     const connection = getConnection();
     const repo = connection.getRepository(Field);
-    const fields = (await this._client.issueFields.getFields()) as JiraField[];
+    const fields = await this._client.issueFields.getFields();
     return fields.map((field) =>
       repo.create({
         externalId: field.id,
@@ -104,7 +104,7 @@ export class JiraClient {
     console.log("Fetching Jira statuses");
     const connection = getConnection();
     const repo = connection.getRepository(Status);
-    const statuses = (await this._client.workflowStatuses.getAllStatuses()) as JiraStatus[];
+    const statuses = await this._client.workflowStatuses.getStatuses();
     return statuses.map((status) =>
       repo.create({
         name: status.name,
