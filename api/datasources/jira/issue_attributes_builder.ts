@@ -9,7 +9,7 @@ import { JiraIssue } from "./types";
 import config from "../../config";
 
 export class IssueAttributesBuilder {
-  private epicLinkFieldId: string;
+  readonly epicLinkFieldId: string;
   private hierarchyLevels: { [issueType: string]: HierarchyLevel } = {};
   private statusCategories: { [externalId: string]: string } = {};
 
