@@ -102,6 +102,24 @@
           </div>
         </div>
       </div>
+
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">Sync</p>
+        </header>
+        <div class="card-content">
+          <div class="content">
+            <b-button
+              :disabled="syncInProgress"
+              :loading="syncInProgress"
+              type="is-light"
+              @click="sync"
+              >Sync with Jira</b-button
+            >
+            <span v-text="syncMessage" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -122,10 +140,17 @@ import {
   getRelativeMonthRange
 } from "@/helpers/date_helper";
 import { formatDateParam } from "@/helpers/url_helper";
+import axios from "axios";
 import Vue from "vue";
 
 export default Vue.extend({
   name: "Home",
+  methods: {
+    async sync() {
+      this.syncInProgress = true;
+      await axios.get("/api/sync");
+    }
+  },
   data() {
     const last30Days = getRelativeDayRange(30);
     const last90Days = getRelativeDayRange(90);
@@ -184,7 +209,22 @@ export default Vue.extend({
       scatterplotParams,
       throughputParams,
       cfdParams,
-      forecastParams
+      forecastParams,
+      syncInProgress: false,
+      syncMessage: null,
+      connection: null
+    };
+  },
+  created() {
+    const ws = new WebSocket("ws://localhost:3001/api/ws");
+    ws.onmessage = message => {
+      const data = JSON.parse(message.data);
+      this.syncInProgress = data.syncInProgress;
+      if (data.syncInProgress) {
+        this.syncMessage = data.message;
+      } else {
+        this.syncMessage = null;
+      }
     };
   }
 });

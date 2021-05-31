@@ -15,7 +15,7 @@ router.get("/", (_, res) => {
     });
     worker.on("message", (message) => {
       console.log(message);
-      bus.emit(Event.BROADCAST, message);
+      bus.emit(Event.BROADCAST, JSON.stringify(message));
     });
     res.sendStatus(200);
   } catch (e) {
