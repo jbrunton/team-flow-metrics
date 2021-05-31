@@ -29,7 +29,8 @@ export class JiraClient {
 
   async search(
     jql: string,
-    builder: IssueAttributesBuilder
+    builder: IssueAttributesBuilder,
+    statusCallback: ({ progress: number }) => void
   ): Promise<Array<Issue>> {
     const client = this._client;
     console.log(`starting search: ${jql}`);
@@ -51,6 +52,8 @@ export class JiraClient {
     };
 
     console.log("fetching page 1");
+    let progress = 0;
+    statusCallback({ progress });
     const firstResult = await client.issueSearch.searchForIssuesUsingJqlPost(
       searchParams
     );
@@ -62,10 +65,16 @@ export class JiraClient {
       5,
       asyncify((pageIndex: number) => {
         console.log(`fetching page ${pageIndex + 1} of ${pageCount}`);
-        return client.issueSearch.searchForIssuesUsingJqlPost({
-          ...searchParams,
-          startAt: pageIndex * firstResult.maxResults,
-        });
+        return client.issueSearch
+          .searchForIssuesUsingJqlPost({
+            ...searchParams,
+            startAt: pageIndex * firstResult.maxResults,
+          })
+          .then((result) => {
+            progress += 1 / pageCount;
+            statusCallback({ progress });
+            return result;
+          });
       })
     );
 
@@ -83,6 +92,8 @@ export class JiraClient {
       },
       []
     );
+
+    statusCallback({ progress: 1 });
 
     console.timeEnd(`search: ${jql}`);
     console.log(`${issues.length} issues found`);
