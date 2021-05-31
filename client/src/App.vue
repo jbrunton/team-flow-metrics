@@ -191,3 +191,15 @@ svg > g > g.google-visualization-tooltip {
   }
 }
 </style>
+
+<script lang="ts">
+const ws = new WebSocket("ws://localhost:3001/api/ws");
+
+ws.onerror = event => {
+  console.error(event);
+};
+
+ws.onmessage = event => {
+  console.log("message received:", event);
+};
+</script>

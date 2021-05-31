@@ -2,7 +2,7 @@
   "name": "metrics-api",
   "version": "0.1.0",
   "scripts": {
-    "debug": "NODE_ENV=development nodemon --ext 'ts,js,json' --inspect --exec 'ts-node main.js'",
+    "debug": "NODE_ENV=development nodemon --ext 'ts,js,json' --inspect --exec 'ts-node main.ts'",
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "NODE_ENV=test jest -c jest.config.unit.js",
     "test:integration": "docker-compose --env-file=../.env run api npm run test:integration:local",
@@ -31,8 +31,9 @@
     "pg": "^8.5.1",
     "reflect-metadata": "^0.1.10",
     "seedrandom": "^3.0.5",
+    "ts-node": "10.0.0",
     "typeorm": "^0.2.30",
-    "ts-node": "10.0.0"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -47,6 +48,7 @@
     "@types/node": "^15.6.1",
     "@types/rosie": "0.0.39",
     "@types/seedrandom": "^2.4.28",
+    "@types/ws": "^7.4.4",
     "@typescript-eslint/eslint-plugin": "^4.11.1",
     "@typescript-eslint/parser": "^4.11.1",
     "async": "^3.2.0",

@@ -9,6 +9,7 @@ import config from "../../config";
 import { IssueAttributesBuilder } from "../../datasources/jira/issue_attributes_builder";
 import { WorkerJob } from "../../models/entities/worker_job";
 import { DateTime } from "luxon";
+import { parentPort } from "worker_threads";
 
 async function acquireJob(connection: Connection): Promise<WorkerJob> {
   return connection.transaction(async (entityManager) => {
@@ -52,7 +53,7 @@ async function syncIssues(): Promise<void> {
   await statusesRepo.query("DELETE FROM statuses");
   await hierarchyLevelsRepo.query("DELETE FROM hierarchy_levels");
 
-  console.log("Syncing Jira data...");
+  parentPort.postMessage("Syncing Jira data...");
   const hierarchyLevels = [
     { name: "Story", issueType: "*" },
     { name: "Epic", issueType: "Epic" },
@@ -69,12 +70,18 @@ async function syncIssues(): Promise<void> {
 
   const builder = new IssueAttributesBuilder(fields, statuses, hierarchyLevels);
 
-  const issues = await client.search(config.jira.query, builder);
+  const issues = await client.search(
+    config.jira.query,
+    builder,
+    ({ progress }) => {
+      parentPort.postMessage(`Syncing issues (${Math.round(progress * 100)}%)`);
+    }
+  );
   const issueCollection = new IssueCollection(issues);
   config.sync?.issues?.beforeSave(issueCollection, issuesRepo);
   await issuesRepo.save(issues);
 
-  console.log("Building parent/child relationships...");
+  parentPort.postMessage("Building parent/child relationships...");
   for (const epicKey of issueCollection.getEpicKeys()) {
     const parent = issueCollection.getIssue(epicKey);
     const children = issueCollection.getChildrenFor(epicKey);
@@ -95,6 +102,7 @@ async function syncIssues(): Promise<void> {
     }
   }
   await issuesRepo.save(issues);
+  parentPort.postMessage("Sync complete");
 }
 
 export async function runSyncAction(): Promise<void> {
