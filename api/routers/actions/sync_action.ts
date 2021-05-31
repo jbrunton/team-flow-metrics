@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { Connection, createConnection, getRepository, IsNull } from "typeorm";
 import { JiraClient } from "../../datasources/jira/jira_client";
 import { Field } from "../../models/entities/field";
 import { Issue } from "../../models/entities/issue";
@@ -7,8 +7,40 @@ import { IssueCollection } from "../../models/scope/issue_collection";
 import { Status } from "../../models/entities/status";
 import config from "../../config";
 import { IssueAttributesBuilder } from "../../datasources/jira/issue_attributes_builder";
+import { WorkerJob } from "../../models/entities/worker_job";
+import { DateTime } from "luxon";
 
-export async function syncIssues(): Promise<Array<Issue>> {
+async function acquireJob(connection: Connection): Promise<WorkerJob> {
+  return connection.transaction(async (entityManager) => {
+    const workerJobsRepo = entityManager.getRepository(WorkerJob);
+
+    async function checkAndCreateJob(job: WorkerJob) {
+      if (job) {
+        throw new Error("Sync job already in progress");
+      }
+      job = workerJobsRepo.create({
+        job_key: "sync_issues",
+        started: DateTime.local(),
+      });
+      await workerJobsRepo.save(job);
+      return job;
+    }
+
+    const job = await workerJobsRepo
+      .createQueryBuilder("worker_jobs")
+      .setLock("pessimistic_write")
+      .where({
+        job_key: "sync_issues",
+        completed: IsNull(),
+      })
+      .getOne()
+      .then(checkAndCreateJob);
+
+    return job;
+  });
+}
+
+async function syncIssues(): Promise<void> {
   const client = new JiraClient();
   const issuesRepo = getRepository(Issue);
   const fieldsRepo = getRepository(Field);
@@ -63,6 +95,16 @@ export async function syncIssues(): Promise<Array<Issue>> {
     }
   }
   await issuesRepo.save(issues);
+}
 
-  return issues;
+export async function runSyncAction(): Promise<void> {
+  const connection = await createConnection();
+  const workerJobsRepo = getRepository(WorkerJob);
+  const job = await acquireJob(connection);
+  try {
+    await syncIssues();
+  } finally {
+    job.completed = DateTime.local();
+    await workerJobsRepo.save(job);
+  }
 }

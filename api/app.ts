@@ -2,10 +2,12 @@ import { glob } from "glob";
 import * as path from "path";
 import express from "express";
 import * as bodyParser from "body-parser";
-import { createConnection } from "typeorm";
+import { createConnection, getRepository, IsNull } from "typeorm";
 import "reflect-metadata";
 import { PostgresConnectionCredentialsOptions } from "typeorm/driver/postgres/PostgresConnectionCredentialsOptions";
 import { RouterDefinition } from "./routers/router_definition";
+import { WorkerJob } from "./models/entities/worker_job";
+import { DateTime } from "luxon";
 
 export async function createApp(): Promise<express.Application> {
   const app = express();
@@ -35,6 +37,18 @@ export async function createApp(): Promise<express.Application> {
   console.log(
     `Connected to ${options.host}:${options.port}/${options.database}`
   );
+
+  // In case any sync jobs stall, consider them completed on a restart
+  const stalledJobs = await getRepository(WorkerJob).find({
+    completed: IsNull(),
+  });
+  stalledJobs.forEach((job) => {
+    console.log(
+      `Found stalled job: ${job.job_key} (started: ${job.started.toISO()})`
+    );
+    job.completed = DateTime.local();
+  });
+  await getRepository(WorkerJob).save(stalledJobs);
 
   return app;
 }
