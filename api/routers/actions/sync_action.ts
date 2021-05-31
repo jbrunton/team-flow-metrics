@@ -53,7 +53,10 @@ async function syncIssues(): Promise<void> {
   await statusesRepo.query("DELETE FROM statuses");
   await hierarchyLevelsRepo.query("DELETE FROM hierarchy_levels");
 
-  parentPort.postMessage("Syncing Jira data...");
+  parentPort.postMessage({
+    syncInProgress: true,
+    message: "Syncing Jira data...",
+  });
   const hierarchyLevels = [
     { name: "Story", issueType: "*" },
     { name: "Epic", issueType: "Epic" },
@@ -74,14 +77,20 @@ async function syncIssues(): Promise<void> {
     config.jira.query,
     builder,
     ({ progress }) => {
-      parentPort.postMessage(`Syncing issues (${Math.round(progress * 100)}%)`);
+      parentPort.postMessage({
+        syncInProgress: true,
+        message: `Syncing issues (${Math.round(progress * 100)}%)`,
+      });
     }
   );
   const issueCollection = new IssueCollection(issues);
   config.sync?.issues?.beforeSave(issueCollection, issuesRepo);
   await issuesRepo.save(issues);
 
-  parentPort.postMessage("Building parent/child relationships...");
+  parentPort.postMessage({
+    syncInProgress: true,
+    message: "Building parent/child relationships...",
+  });
   for (const epicKey of issueCollection.getEpicKeys()) {
     const parent = issueCollection.getIssue(epicKey);
     const children = issueCollection.getChildrenFor(epicKey);
@@ -102,7 +111,10 @@ async function syncIssues(): Promise<void> {
     }
   }
   await issuesRepo.save(issues);
-  parentPort.postMessage("Sync complete");
+  parentPort.postMessage({
+    syncInProgress: false,
+    message: "Sync complete",
+  });
 }
 
 export async function runSyncAction(): Promise<void> {
