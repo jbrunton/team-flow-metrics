@@ -31,7 +31,8 @@
     "pg": "^8.5.1",
     "reflect-metadata": "^0.1.10",
     "seedrandom": "^3.0.5",
-    "typeorm": "^0.2.30"
+    "typeorm": "^0.2.30",
+    "ts-node": "10.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -59,7 +60,6 @@
     "prettier": "^2.2.1",
     "rosie": "^2.0.1",
     "supertest": "^6.1.2",
-    "ts-node": "10.0.0",
     "typescript": "~3.9.3"
   }
 }

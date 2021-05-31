@@ -1,16 +1,18 @@
 import * as express from "express";
-import { syncIssues } from "./actions/sync_action";
+import { Worker } from "worker_threads";
 import { RouterDefinition } from "./router_definition";
+import * as path from "path";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", (_, res) => {
   try {
-    const issues = await syncIssues();
-    res.json({
-      count: issues.length,
-      issues: issues,
+    new Worker(path.join(__dirname, "workers/worker.js"), {
+      workerData: {
+        aliasModule: path.resolve(__dirname, "workers/sync_worker.ts"),
+      },
     });
+    res.sendStatus(200);
   } catch (e) {
     console.log(e);
     const json = {
