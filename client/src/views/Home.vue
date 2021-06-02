@@ -267,7 +267,6 @@ export default Vue.extend({
   },
   computed: {
     latestDescription() {
-      console.log("latestDescription updating...", this.latest);
       return this.latest
         ? `Last sync: ${new Date(this.latest.created).toLocaleString()}`
         : "Never";
