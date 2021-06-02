@@ -102,21 +102,32 @@
           </div>
         </div>
       </div>
+    </div>
 
+    <div class="column is-4">
       <div class="card">
         <header class="card-header">
           <p class="card-header-title">Sync</p>
         </header>
         <div class="card-content">
           <div class="content">
-            <b-button
-              :disabled="syncInProgress"
-              :loading="syncInProgress"
-              type="is-light"
-              @click="sync"
-              >Sync with Jira</b-button
-            >
-            <span v-text="syncMessage" />
+            <div class="block">
+              <b-button :disabled="syncInProgress" type="is-light" @click="sync"
+                >Sync with Jira</b-button
+              >
+            </div>
+            <div class="block" v-if="syncInProgress">
+              <span v-text="syncMessage" />
+            </div>
+            <div class="block" v-if="syncInProgress">
+              <b-progress
+                v-if="syncProgress"
+                type="is-info"
+                :value="syncProgress"
+                show-value
+              ></b-progress>
+              <b-progress v-else type="is-info"></b-progress>
+            </div>
           </div>
         </div>
       </div>
@@ -212,6 +223,7 @@ export default Vue.extend({
       forecastParams,
       syncInProgress: false,
       syncMessage: null,
+      syncProgress: null,
       connection: null
     };
   },
@@ -219,11 +231,15 @@ export default Vue.extend({
     const ws = new WebSocket("ws://localhost:3001/api/ws");
     ws.onmessage = message => {
       const data = JSON.parse(message.data);
-      this.syncInProgress = data.syncInProgress;
-      if (data.syncInProgress) {
+      if (data.event !== "sync-info") return;
+
+      this.syncInProgress = data.inProgress;
+      if (data.inProgress) {
         this.syncMessage = data.message;
+        this.syncProgress = data.progress;
       } else {
         this.syncMessage = null;
+        this.syncProgress = null;
       }
     };
   }

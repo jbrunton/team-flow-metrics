@@ -54,7 +54,8 @@ async function syncIssues(): Promise<void> {
   await hierarchyLevelsRepo.query("DELETE FROM hierarchy_levels");
 
   parentPort.postMessage({
-    syncInProgress: true,
+    event: "sync-info",
+    inProgress: true,
     message: "Syncing Jira data...",
   });
   const hierarchyLevels = [
@@ -78,8 +79,10 @@ async function syncIssues(): Promise<void> {
     builder,
     ({ progress }) => {
       parentPort.postMessage({
-        syncInProgress: true,
-        message: `Syncing issues (${Math.round(progress * 100)}%)`,
+        event: "sync-info",
+        inProgress: true,
+        progress: Math.round(progress * 100),
+        message: `Syncing issues...`,
       });
     }
   );
@@ -88,9 +91,12 @@ async function syncIssues(): Promise<void> {
   await issuesRepo.save(issues);
 
   parentPort.postMessage({
-    syncInProgress: true,
+    event: "sync-info",
+    inProgress: true,
+    progress: 100,
     message: "Building parent/child relationships...",
   });
+
   for (const epicKey of issueCollection.getEpicKeys()) {
     const parent = issueCollection.getIssue(epicKey);
     const children = issueCollection.getChildrenFor(epicKey);
@@ -112,7 +118,9 @@ async function syncIssues(): Promise<void> {
   }
   await issuesRepo.save(issues);
   parentPort.postMessage({
-    syncInProgress: false,
+    event: "sync-info",
+    inProgress: false,
+    progress: 100,
     message: "Sync complete",
   });
 }
