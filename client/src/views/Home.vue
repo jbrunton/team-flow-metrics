@@ -112,6 +112,9 @@
         <div class="card-content">
           <div class="content">
             <div class="block">
+              <span v-text="latestDescription" />
+            </div>
+            <div class="block">
               <b-button :disabled="syncInProgress" type="is-light" @click="sync"
                 >Sync with Jira</b-button
               >
@@ -159,7 +162,12 @@ export default Vue.extend({
   methods: {
     async sync() {
       this.syncInProgress = true;
-      await axios.get("/api/sync");
+      await axios.post("/api/sync");
+    },
+
+    async fetchLatest() {
+      const response = await axios.get("/api/sync/latest");
+      this.latest = response.data;
     },
 
     connect() {
@@ -175,6 +183,7 @@ export default Vue.extend({
         } else {
           this.syncMessage = null;
           this.syncProgress = null;
+          this.fetchLatest();
         }
       };
 
@@ -249,11 +258,20 @@ export default Vue.extend({
       syncInProgress: false,
       syncMessage: null,
       syncProgress: null,
-      connection: null
+      latest: null
     };
   },
   created() {
     this.connect();
+    this.fetchLatest();
+  },
+  computed: {
+    latestDescription() {
+      console.log("latestDescription updating...", this.latest);
+      return this.latest
+        ? `Last sync: ${new Date(this.latest.created).toLocaleString()}`
+        : "Never";
+    }
   }
 });
 </script>

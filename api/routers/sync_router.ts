@@ -1,13 +1,26 @@
 import * as express from "express";
 import { RouterDefinition } from "./router_definition";
 import { bus, Event } from "../bus";
-import { acquireJob } from "../models/entities/worker_job";
+import { acquireJob, WorkerJob } from "../models/entities/worker_job";
 import { createWorker } from "./workers";
 import { SyncWorkerData } from "./workers/sync_worker";
+import { getRepository, IsNull, Not } from "typeorm";
 
 const router = express.Router();
 
-router.get("/", async (_, res) => {
+router.get("/latest", async (_, res) => {
+  try {
+    const job = await getRepository(WorkerJob).findOne({
+      where: { job_key: "sync", completed: Not(IsNull()) },
+      order: { completed: "DESC" },
+    });
+    res.json(job);
+  } catch (e) {
+    res.sendStatus(500);
+  }
+});
+
+router.post("/", async (_, res) => {
   try {
     const job = await acquireJob("sync");
     bus.emit(
