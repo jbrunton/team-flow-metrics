@@ -160,6 +160,31 @@ export default Vue.extend({
     async sync() {
       this.syncInProgress = true;
       await axios.get("/api/sync");
+    },
+
+    connect() {
+      const ws = new WebSocket("ws://localhost:3001/api/ws");
+      ws.onmessage = message => {
+        const data = JSON.parse(message.data);
+        if (data.event !== "sync-info") return;
+
+        this.syncInProgress = data.inProgress;
+        if (data.inProgress) {
+          this.syncMessage = data.message;
+          this.syncProgress = data.progress;
+        } else {
+          this.syncMessage = null;
+          this.syncProgress = null;
+        }
+      };
+
+      ws.onclose = e => {
+        console.log(
+          "Socket connection closed. Reconnecting in 5 seconds...",
+          e.reason
+        );
+        setTimeout(() => this.connect(), 5000);
+      };
     }
   },
   data() {
@@ -228,20 +253,7 @@ export default Vue.extend({
     };
   },
   created() {
-    const ws = new WebSocket("ws://localhost:3001/api/ws");
-    ws.onmessage = message => {
-      const data = JSON.parse(message.data);
-      if (data.event !== "sync-info") return;
-
-      this.syncInProgress = data.inProgress;
-      if (data.inProgress) {
-        this.syncMessage = data.message;
-        this.syncProgress = data.progress;
-      } else {
-        this.syncMessage = null;
-        this.syncProgress = null;
-      }
-    };
+    this.connect();
   }
 });
 </script>
