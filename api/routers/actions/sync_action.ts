@@ -1,4 +1,4 @@
-import { Connection, createConnection, getRepository, IsNull } from "typeorm";
+import { createConnection, getRepository } from "typeorm";
 import { JiraClient } from "../../datasources/jira/jira_client";
 import { Field } from "../../models/entities/field";
 import { Issue } from "../../models/entities/issue";
@@ -10,36 +10,6 @@ import { IssueAttributesBuilder } from "../../datasources/jira/issue_attributes_
 import { WorkerJob } from "../../models/entities/worker_job";
 import { DateTime } from "luxon";
 import { parentPort } from "worker_threads";
-
-async function acquireJob(connection: Connection): Promise<WorkerJob> {
-  return connection.transaction(async (entityManager) => {
-    const workerJobsRepo = entityManager.getRepository(WorkerJob);
-
-    async function checkAndCreateJob(job: WorkerJob) {
-      if (job) {
-        throw new Error("Sync job already in progress");
-      }
-      job = workerJobsRepo.create({
-        job_key: "sync_issues",
-        started: DateTime.local(),
-      });
-      await workerJobsRepo.save(job);
-      return job;
-    }
-
-    const job = await workerJobsRepo
-      .createQueryBuilder("worker_jobs")
-      .setLock("pessimistic_write")
-      .where({
-        job_key: "sync_issues",
-        completed: IsNull(),
-      })
-      .getOne()
-      .then(checkAndCreateJob);
-
-    return job;
-  });
-}
 
 async function syncIssues(): Promise<void> {
   const client = new JiraClient();
@@ -56,7 +26,7 @@ async function syncIssues(): Promise<void> {
   parentPort.postMessage({
     event: "sync-info",
     inProgress: true,
-    message: "Syncing Jira data...",
+    message: "Syncing metadata...",
   });
   const hierarchyLevels = [
     { name: "Story", issueType: "*" },
@@ -125,11 +95,13 @@ async function syncIssues(): Promise<void> {
   });
 }
 
-export async function runSyncAction(): Promise<void> {
-  const connection = await createConnection();
+export async function runSyncAction(jobId: number): Promise<void> {
+  await createConnection();
   const workerJobsRepo = getRepository(WorkerJob);
-  const job = await acquireJob(connection);
+  const job = await workerJobsRepo.findOne({ id: jobId });
   try {
+    job.started = DateTime.local();
+    await workerJobsRepo.save(job);
     await syncIssues();
   } finally {
     job.completed = DateTime.local();

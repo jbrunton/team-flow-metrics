@@ -1,20 +1,27 @@
 import * as express from "express";
-import { Worker } from "worker_threads";
 import { RouterDefinition } from "./router_definition";
-import * as path from "path";
 import { bus, Event } from "../bus";
+import { acquireJob } from "../models/entities/worker_job";
+import { createWorker } from "./workers";
+import { SyncWorkerData } from "./workers/sync_worker";
 
 const router = express.Router();
 
-router.get("/", (_, res) => {
+router.get("/", async (_, res) => {
   try {
-    const worker = new Worker(path.join(__dirname, "workers/worker.js"), {
-      workerData: {
-        aliasModule: path.resolve(__dirname, "workers/sync_worker.ts"),
-      },
+    const job = await acquireJob("sync");
+    bus.emit(
+      Event.BROADCAST,
+      JSON.stringify({
+        event: "sync-info",
+        inProgress: true,
+        message: "Syncing with Jira...",
+      })
+    );
+    const worker = createWorker<SyncWorkerData>("sync_worker.ts", {
+      jobId: job.id,
     });
     worker.on("message", (message) => {
-      console.log(message);
       bus.emit(Event.BROADCAST, JSON.stringify(message));
     });
     res.sendStatus(200);
