@@ -103,6 +103,15 @@ export async function runSyncAction(jobId: number): Promise<void> {
     job.started = DateTime.local();
     await workerJobsRepo.save(job);
     await syncIssues();
+  } catch (e) {
+    console.error(e);
+    console.error(e.response.data);
+    parentPort.postMessage({
+      event: "sync-info",
+      inProgress: false,
+      progress: 100,
+      message: `Error: ${e.message}`,
+    });
   } finally {
     job.completed = DateTime.local();
     await workerJobsRepo.save(job);

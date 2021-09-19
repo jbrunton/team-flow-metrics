@@ -19,6 +19,9 @@ export type MetricsConfig = {
     };
     query: string;
   };
+  boards?: {
+    defaultResolutions?: ["Done"],
+  },
   sync?: {
     statuses?: Callbacks<Status>;
     fields?: Callbacks<Field>;

@@ -3,13 +3,14 @@ import { formatDate } from "../helpers/charts_helper";
 import { Issue } from "../models/entities/issue";
 import { DataTableBuilder } from "./data_table_builder";
 import { ParsedQs } from "qs";
-import { Between, getRepository, IsNull, Not } from "typeorm";
+import { Any, Between, getRepository, IsNull, Not } from "typeorm";
 import { excludeOutliers } from "../helpers/data_helper";
 import { ChartParams, ValidationError } from "./chart_params";
 import { chartBuilder } from "./chart_builder";
 
 export type ScatterplotParams = ChartParams & {
   excludeOutliers: boolean;
+  resolutions: string[];
 };
 
 export function parseParams(query: ParsedQs): ScatterplotParams {
@@ -29,15 +30,20 @@ export function parseParams(query: ParsedQs): ScatterplotParams {
     toDate: DateTime.fromISO(query.toDate as string),
     hierarchyLevel: query.hierarchyLevel as string,
     excludeOutliers: query.excludeOutliers === "true",
+    resolutions: query.resolutions !== "" ? (query.resolutions as string).split(",") : [],
   };
 }
 
 export async function queryData(params: ScatterplotParams): Promise<Issue[]> {
+  const whereOptions = params.resolutions.length ? {
+    resolution: Any(params.resolutions),
+  } : {};
   const issues = await getRepository(Issue).find({
     where: {
       completed: Between(params.fromDate, params.toDate),
       issueType: params.hierarchyLevel === "Epic" ? "Epic" : Not("Epic"), // TODO: this is a hack
       started: Not(IsNull()),
+      ...whereOptions
     },
     order: {
       completed: "ASC",

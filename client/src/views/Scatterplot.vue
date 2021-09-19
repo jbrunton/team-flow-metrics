@@ -9,6 +9,9 @@
       <div class="column is-2">
         <HierarchyLevelPicker v-model="selectedLevel" />
       </div>
+      <div class="column is-4">
+        <ResolutionPicker v-model="selectedResolutions" />
+      </div>
     </div>
 
     <ExcludeOutliers v-model="excludeOutliers" />
@@ -41,6 +44,7 @@ import IssueDetails from "@/components/IssueDetails.vue";
 import DatePicker from "@/components/DatePicker.vue";
 import HierarchyLevelPicker from "@/components/HierarchyLevelPicker.vue";
 import ExcludeOutliers from "@/components/ExcludeOutliers.vue";
+import ResolutionPicker from "@/components/ResolutionPicker.vue";
 
 export default Vue.extend({
   name: "Issues",
@@ -49,17 +53,19 @@ export default Vue.extend({
     IssueDetails,
     DatePicker,
     HierarchyLevelPicker,
-    ExcludeOutliers
+    ExcludeOutliers,
+    ResolutionPicker,
   },
 
   data() {
     const chartParams = getDefaultChartParams(this.$route.query);
     return {
       ...chartParams,
-      chartOps: {},
+      chartOpts: {},
       chartData: [],
       initialized: false,
       chart: null,
+      selectedResolutions: [],
       excludeOutliers: false,
       selectedIssueKey: null
     };
@@ -129,6 +135,7 @@ export default Vue.extend({
         history.replaceState({}, null, buildUrl(this.$route.path, params));
         saveChartParams({
           selectedLevel: this.selectedLevel,
+          selectedResolutions: this.selectedResolutions,
           dates: [this.dates[0], this.dates[1]]
         });
       }
@@ -150,6 +157,7 @@ export default Vue.extend({
         fromDate: formatDateParam(this.dates[0]),
         toDate: formatDateParam(this.dates[1]),
         hierarchyLevel: String(this.selectedLevel),
+        resolutions: this.selectedResolutions.join(","),
         excludeOutliers: String(this.excludeOutliers)
       };
     },

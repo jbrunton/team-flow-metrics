@@ -16,6 +16,7 @@ export function chartBuilder<Params, Data>(
   return async (req: Request, res: Response): Promise<unknown> => {
     try {
       const params = parseParams(req.query);
+      console.log({ params });
       const data = await queryData(params);
       const dataTable = buildDataTable(data, params);
       const response = buildResponse(dataTable, data, params);

@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 export type ChartParams = {
   dates: [DateTime, DateTime];
   selectedLevel: string;
+  selectedResolutions: string[];
 };
 
 export const getChartDateRange = (
@@ -48,7 +49,8 @@ export const getDefaultChartParams = (
 ): ChartParams => {
   return {
     dates: getChartDateRange(query, now),
-    selectedLevel: getChartHierarchyLevel(query)
+    selectedLevel: getChartHierarchyLevel(query),
+    selectedResolutions: [],
   };
 };
 
