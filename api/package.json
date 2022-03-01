@@ -47,7 +47,7 @@
     "@types/luxon": "^1.25.0",
     "@types/node": "^15.6.1",
     "@types/rosie": "0.0.39",
-    "@types/seedrandom": "^2.4.28",
+    "@types/seedrandom": "^3.0.2",
     "@types/ws": "^7.4.4",
     "@typescript-eslint/eslint-plugin": "^4.11.1",
     "@typescript-eslint/parser": "^4.11.1",
