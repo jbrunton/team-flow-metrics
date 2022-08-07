@@ -22,6 +22,7 @@ type SimulationParams = {
   startDate: DateTime;
   hierarchyLevel: string;
   backlogSize: number;
+  throughputScale: number;
   seed?: number;
   excludeOutliers: boolean;
   includeLongTails: boolean;
@@ -51,6 +52,7 @@ export function parseParams(query: ParsedQs): SimulationParams {
     includeLongTails: query.includeLongTails === "true",
     excludeLeadTimes: query.excludeLeadTimes === "true",
     backlogSize: parseInt(query.backlogSize as string),
+    throughputScale: parseFloat(query.throughputScale as string),
     seed: query.seed ? parseInt(query.seed as string) : null,
   };
 }
@@ -69,7 +71,7 @@ router.get("/when", async (req, res) => {
     ]);
 
     if (issues.length) {
-      const measurements = measure(issues, params.excludeOutliers);
+      const measurements = measure(issues, params.excludeOutliers, params.throughputScale);
       const runs = run(
         params.backlogSize,
         measurements,

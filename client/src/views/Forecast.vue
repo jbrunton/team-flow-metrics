@@ -26,6 +26,11 @@
           <b-input v-model="backlogSize" :lazy="true" expanded></b-input>
         </b-field>
       </div>
+      <div class="column is-2">
+        <b-field label="Throughput Scale">
+          <b-input v-model="throughputScale" :lazy="true" expanded></b-input>
+        </b-field>
+      </div>
       <div class="column is-one-quarter">
         <b-field label="Seed">
           <b-input v-model="seed" :lazy="true" expanded></b-input>
@@ -125,7 +130,8 @@ export default Vue.extend({
       return {
         ...defaultParams,
         seed: query.seed || this.newSeed(),
-        backlogSize: query.backlogSize || 100
+        backlogSize: query.backlogSize || 100,
+        throughputScale: query.throughputScale || 1,
       };
     },
 
@@ -210,6 +216,7 @@ export default Vue.extend({
         hierarchyLevel: String(this.selectedLevel),
         startDate: formatDateParam(DateTime.fromJSDate(this.startDate)),
         backlogSize: this.backlogSize,
+        throughputScale: this.throughputScale,
         seed: this.seed,
         excludeOutliers: String(this.excludeOutliers),
         includeLongTails: String(this.includeLongTails),

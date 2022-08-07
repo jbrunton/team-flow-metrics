@@ -46,7 +46,8 @@ export function computeThroughput(
 
 export function measure(
   issues: Issue[],
-  excludeCycleTimeOutliers: boolean
+  excludeCycleTimeOutliers: boolean,
+  throughputScale: number,
 ): Measurements {
   const throughputs: Record<string, number[]> = {};
   for (const { date, count } of computeThroughput(issues, StepInterval.Daily)) {
@@ -54,7 +55,7 @@ export function measure(
     if (!throughputs[category]) {
       throughputs[category] = [];
     }
-    throughputs[category].push(count);
+    throughputs[category].push(count * throughputScale);
   }
   let cycleTimes = issues.map((issue) => issue.cycleTime);
   if (excludeCycleTimeOutliers) {
