@@ -1,5 +1,3 @@
-import { SupportOptionRange } from "prettier";
-
 export type JiraIssue = {
   key: string;
   fields: {

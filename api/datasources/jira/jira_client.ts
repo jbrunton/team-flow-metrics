@@ -48,6 +48,7 @@ export class JiraClient {
         "resolution",
         "created",
         builder.epicLinkFieldId,
+        builder.parentFieldId,
       ],
     };
 

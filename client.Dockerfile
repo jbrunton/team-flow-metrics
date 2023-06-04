@@ -1,7 +1,5 @@
-FROM node:lts-alpine
+FROM node:14
 WORKDIR "/app"
-
-RUN apk update && apk add yarn python g++ make git && rm -rf /var/cache/apk/*
 
 COPY package.json package-lock.json lerna.json ./
 RUN npm ci
