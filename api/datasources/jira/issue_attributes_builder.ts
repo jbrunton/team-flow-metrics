@@ -10,6 +10,7 @@ import config from "../../config";
 
 export class IssueAttributesBuilder {
   readonly epicLinkFieldId: string;
+  readonly parentFieldId: string;
   private hierarchyLevels: { [issueType: string]: HierarchyLevel } = {};
   private statusCategories: { [externalId: string]: string } = {};
 
@@ -21,6 +22,9 @@ export class IssueAttributesBuilder {
     for (const field of fields) {
       if (field.name === "Epic Link") {
         this.epicLinkFieldId = field.externalId;
+      }
+      if (field.name === "Parent") {
+        this.parentFieldId = field.externalId;
       }
     }
     for (const status of statuses) {
@@ -48,6 +52,8 @@ export class IssueAttributesBuilder {
       );
     }
     const resolution = getResolution(json);
+    const epicKey = json["fields"][this.epicLinkFieldId] as string;
+    const parentKey = json["fields"][this.parentFieldId]?.key as string;
     return {
       key: json.key,
       title: json.fields.summary,
@@ -57,7 +63,7 @@ export class IssueAttributesBuilder {
       resolution: resolution,
       created: DateTime.fromISO(json.fields.created),
       hierarchyLevel: hierarchyLevel.name,
-      epicKey: json["fields"][this.epicLinkFieldId] as string,
+      epicKey: epicKey ?? parentKey,
       externalUrl: new URL(`browse/${json.key}`, config.jira.host).href,
       transitions: transitions,
       started: startedDate,
