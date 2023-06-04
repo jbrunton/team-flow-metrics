@@ -16,6 +16,35 @@ In general, the two files have two different purposes:
 * `/.env` includes environment variables which are 1) relevant to deployment configurations (e.g. database names, local port numbers), and also variables which 2) are secrets which should not be committed to source control. This file should never be committed.
 * `/api/metrics.config.js` includes configuration code which is highly specific to interpreting data from your Jira instance. It may be convenient to commit this file to source control.
 
+### Cycle time strategy
+
+By default, epic cycle times are derived from epic status changes. However, it is not uncommon for a team to forget to update epic statuses in Jira, so sometimes these cycle time data aren't useful. If this is the case, it may be helpful to use the provided "Story Cycle Time Strategy" which will compute epic cycle times based on when stories in the epic were started and completed.
+
+This can be configured in the `metrics.config.js` file as follows:
+
+```javascript
+/** @typedef { import('./config').MetricsConfig } MetricsConfig */
+
+const { applyStoryCycleTimeStrategy } = require('./config/cycle_time_strategies');
+
+/** @type {MetricsConfig} */
+module.exports = {
+  jira: {
+    // etc.
+  },
+  sync: {
+    issues: {
+      beforeSave(issues) {
+        applyStoryCycleTimeStrategy({
+          issueCollection: issues,
+        });
+      },
+    },
+  },
+};
+
+```
+
 ## Running the app
 
 First time setup:
